@@ -9,3 +9,6 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   // por ahora no interceptamos nada
 });
+
+
+    
