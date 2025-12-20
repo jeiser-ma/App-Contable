@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- Mobile first -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+
+    <title>App Contable</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body class="bg-light">
+    <!-- ===== HEADER ===== -->
+    <nav class="navbar navbar-dark bg-primary px-1 fixed-top border-bottom">
+      <div
+        class="container-fluid d-flex justify-content-between align-items-center"
+      >
+        <!-- Izquierda: icono app + título -->
+        <div class="d-flex align-items-center gap-4 ">
+          <img
+            src="img/app-icon.png"
+            alt="App Contable"
+            title="App Contable"
+            width="28"
+            height="28"
+          />
+          <span id="pageTitle" class="navbar-brand fw-semibold">
+            App Contable
+          </span>
+        </div>
+
+        <!-- Derecha: botón salir -->
+        <button
+          id="btnLogout"
+          class="btn btn-sm rounded-circle btn-light d-flex align-items-center justify-content-center"
+          style="width: 36px; height: 36px"
+          title="Salir"
+        >
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===== CONTENIDO DINÁMICO ===== -->
+    <main
+      id="app"
+      class="container-fluid"
+      style="padding-top: 70px; padding-bottom: 70px"
+    >
+      <!-- AQUÍ SE INYECTAN LAS PÁGINAS -->
+    </main>
+
+    <!-- ===== NAVBAR INFERIOR (MÓVIL) ===== -->
+    <nav class="navbar navbar-light bg-light fixed-bottom border-top">
+      <div class="container-fluid d-flex justify-content-around">
+        <button
+          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
+          id="navHome"
+        >
+          <div class="text-center">
+            <i class="bi bi-house fs-4"></i><br />
+            <small>Inicio</small>
+          </div>
+        </button>
+
+        <button
+          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
+          id="navProducts"
+        >
+          <div class="text-center">
+            <i class="bi bi-box fs-4"></i><br />
+            <small>Productos</small>
+          </div>
+        </button>
+
+        <button
+          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
+          id="navSettings"
+        >
+          <div class="text-center">
+            <i class="bi bi-gear fs-4"></i><br />
+            <small>Ajustes</small>
+          </div>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===== AQUI SE CARGAN LOS MODALS ===== -->
+    <div id="modals"></div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/undo.js"></script>
+  </body>
+</html>

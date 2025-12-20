@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- Mobile first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>App Contable | Login</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/bootstrap-icons.min.css" />
+
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body class="bg-light d-flex align-items-center" style="min-height: 100vh;">
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-8 col-md-5">
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+
+            <h4 class="text-center mb-4">
+              <i class="bi bi-calculator-fill"></i> App Contable
+            </h4>
+
+            <form id="loginForm">
+              <div class="mb-3">
+                <label class="form-label">Usuario</label>
+                <input
+                  type="text"
+                  id="inputUser"
+                  class="form-control"
+                  required />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input
+                  type="password"
+                  id="inputPass"
+                  class="form-control"
+                  required />
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Entrar
+              </button>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JS (solo referencias) -->
+  <script src="js/auth.js"></script>
+
+</body>
+</html>

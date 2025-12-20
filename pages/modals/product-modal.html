@@ -1,0 +1,59 @@
+<div class="modal fade" id="productModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productModalTitle">Producto</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="productForm">
+          <input type="hidden" id="productId" />
+
+          <div class="mb-2">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="inputName" required />
+            <div class="invalid-feedback">
+              <!-- el mensaje se setea por JS -->
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Precio</label>
+            <input
+              type="number"
+              class="form-control"
+              id="inputPrice"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Unidad de medida</label>
+            <input type="text" class="form-control" id="inputUM" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Cantidad</label>
+            <input
+              type="number"
+              class="form-control"
+              id="inputQuantity"
+              min="0"
+            />
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn rounded-pill btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn rounded-pill btn-primary" id="btnSaveProduct">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>

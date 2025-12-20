@@ -1,0 +1,90 @@
+<div class="container-flui">
+  <div class="d-flex align-items-center gap-2 ">
+    <!-- Buscador -->
+    <div class="flex-grow-1">
+      <div
+        class="input-group input-group-sm rounded-pill overflow-hidden border h-100"
+      >
+        <!-- Icono búsqueda -->
+        <span class="input-group-text bg-primary text-white border-0 px-3">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          id="searchProduct"
+          class="form-control border-0 rounded-0"
+          placeholder="Buscar producto..."
+        />
+
+        <!-- Botón limpiar -->
+        <button
+          class="btn btn-link btn-sm text-muted border-0 px-2 d-none"
+          id="btnClearSearch"
+          type="button"
+        >
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="w-auto">
+      <div
+        class="input-group input-group-sm rounded-pill overflow-hidden border h-100"
+      >
+        <select
+          class="form-select border-0 rounded-0"
+          id="orderBy"
+          placeholder="Select..."
+        >
+          <option value="" disabled selected>Ordenar…</option>
+          <option value="name">Nombre</option>
+          <option value="price">Precio</option>
+          <option value="quantity">Cantidad</option>
+        </select>
+
+        <button class="btn btn-primary border-0 rounded-0" id="orderDir">
+          <i class="bi bi-sort-alpha-down"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Btn Add -->
+    <button
+      class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
+      style="width: 40px; height: 40px"
+      id="btnAddProduct"
+    >
+      <i class="bi bi-plus fs-5"></i>
+    </button>
+  </div>
+
+  <div id="productsCounter" class="text-muted small px-1">15 de 15 Productos</div>
+
+  <div class="container-fluid px-2 py-2">
+    <div id="productsList" class="d-grid gap-2">
+      <!-- items -->
+    </div>
+  </div>
+
+  <template id="productCardTemplate">
+    <div class="card shadow-sm">
+      <div class="card-body py-1 px-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="me-2">
+            <div class="fw-semibold product-name"></div>
+            <div class="text-muted small product-meta"></div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-warning rounded-circle btn-sm btn-edit">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-danger rounded-circle btn-sm btn-delete">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+</div>
