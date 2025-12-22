@@ -1,0 +1,10 @@
+// MOVEMENT_SCHEMA = Esquema de movimientos de productos
+{
+  "id": "uuid",
+  "productId": "uuid-del-producto",
+  "type": "IN | OUT",
+  "quantity": 10,
+  "date": "2025-12-19",
+  "note": "Compra proveedor X",
+  "createdAt": "timestamp"
+}

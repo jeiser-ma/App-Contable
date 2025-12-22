@@ -27,7 +27,7 @@
         class="container-fluid d-flex justify-content-between align-items-center"
       >
         <!-- Izquierda: icono app + título -->
-        <div class="d-flex align-items-center gap-4 ">
+        <div class="d-flex align-items-center gap-4">
           <img
             src="img/app-icon.png"
             alt="App Contable"
@@ -35,9 +35,14 @@
             width="28"
             height="28"
           />
-          <span id="pageTitle" class="navbar-brand fw-semibold">
-            App Contable
-          </span>
+
+          <!-- Icono + título del módulo -->
+          <div class="d-flex align-items-center gap-2">
+            <i id="moduleIcon" class="bi bi-house fs-5"></i>
+            <span id="pageTitle" class="navbar-brand fw-semibold mb-0">
+              Inicio
+            </span>
+          </div>
         </div>
 
         <!-- Derecha: botón salir -->
@@ -64,6 +69,7 @@
     <!-- ===== NAVBAR INFERIOR (MÓVIL) ===== -->
     <nav class="navbar navbar-light bg-light fixed-bottom border-top">
       <div class="container-fluid d-flex justify-content-around">
+        <!-- HOME -->
         <button
           class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
           id="navHome"
@@ -73,7 +79,7 @@
             <small>Inicio</small>
           </div>
         </button>
-
+        <!-- PRODUCTOS -->
         <button
           class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
           id="navProducts"
@@ -84,6 +90,17 @@
           </div>
         </button>
 
+        <!-- MOVIMIENTOS -->
+        <button
+          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
+          id="navMovements"
+        >
+          <div class="text-center">
+            <i class="bi bi-arrow-left-right fs-4"></i><br />
+            <small>Movimientos</small>
+          </div>
+        </button>
+        <!-- SETTINGS -->
         <button
           class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
           id="navSettings"
@@ -100,12 +117,16 @@
     <div id="modals"></div>
 
     <!-- ===== SCRIPTS ===== -->
+    <!-- Core/Shared JS -->
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/router.js"></script>
-    <script src="js/products.js"></script>
-    <script src="js/modals.js"></script>
-    <script src="js/undo.js"></script>
+    <script src="shared/js/storage.js"></script>
+    <script src="shared/js/auth.js"></script>
+    <script src="shared/js/router.js"></script>
+    <script src="shared/js/modals.js"></script>
+    <script src="shared/js/undo.js"></script>
+    
+    <!-- Módulos JS -->
+    <script src="modules/products/products.js"></script>
+    <script src="modules/movements/movements.js"></script>
   </body>
 </html>

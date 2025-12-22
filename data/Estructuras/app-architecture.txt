@@ -1,0 +1,27 @@
+app-contable/
+├── modules/                    ← NUEVO: Módulos específicos
+│   ├── products/
+│   │   ├── products.js
+│   │   ├── products.html
+│   │   └── modals/
+│   │       └── product-modal.html
+│   └── movements/
+│       ├── movements.js
+│       ├── movements.html
+│       └── modals/
+│           └── movement-modal.html
+│
+├── shared/                      ← NUEVO: Recursos compartidos
+│   ├── js/                      ← JS core de la app
+│   │   ├── router.js
+│   │   ├── modals.js
+│   │   ├── storage.js
+│   │   ├── auth.js
+│   │   └── undo.js
+│   └── pages/                   ← Páginas y componentes compartidos
+│       ├── components/
+│       │   └── snackbar.html
+│       ├── modals/
+│       │   └── confirm-delete.html
+│       ├── home.html
+│       └── settings.html

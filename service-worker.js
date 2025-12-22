@@ -10,5 +10,3 @@ self.addEventListener("fetch", (event) => {
   // por ahora no interceptamos nada
 });
 
-
-    

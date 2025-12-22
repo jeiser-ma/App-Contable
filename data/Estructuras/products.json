@@ -1,0 +1,8 @@
+// PRODUCT_SCHEMA = Esquema de productos
+{
+  "id": "uuid",
+  "name": "nombre del producto",
+  "price": 10.0,
+  "um": "unidad de medida",
+  "quantity": 10
+}

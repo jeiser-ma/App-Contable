@@ -1,0 +1,100 @@
+<div
+  class="modal fade"
+  id="movementModal"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title d-flex align-items-center gap-2">
+          <i id="movementIcon" class="bi bi-plus-circle text-success"></i>
+          <span id="movementTitle">Entrada de producto</span>
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+
+        <!-- Producto -->
+        <div class="mb-2">
+          <label class="form-label small">Producto</label>
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            id="movementProduct"
+            placeholder="Buscar producto…"
+            autocomplete="off"
+          />
+          <div class="invalid-feedback">
+            Seleccioná un producto
+          </div>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="mb-2">
+          <label class="form-label small">Cantidad</label>
+          <input
+            type="number"
+            class="form-control form-control-sm"
+            id="movementQuantity"
+            min="1"
+          />
+          <div class="invalid-feedback">
+            Ingresá una cantidad válida
+          </div>
+        </div>
+
+        <!-- Fecha -->
+        <div class="mb-2">
+          <label class="form-label small">Fecha</label>
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            id="movementDate"
+          />
+        </div>
+
+        <!-- Observación -->
+        <div class="mb-2">
+          <label class="form-label small">Observación</label>
+          <textarea
+            class="form-control form-control-sm"
+            id="movementNote"
+            rows="2"
+            placeholder="Opcional"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer py-2">
+        <button
+          type="button"
+          class="btn btn-secondary rounded-pill btn-sm"
+          data-bs-dismiss="modal"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-success rounded-pill btn-sm"
+          id="btnConfirmMovement"
+        >
+          Confirmar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
