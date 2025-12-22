@@ -1,5 +1,5 @@
-// MOVEMENT_SCHEMA = Esquema de movimientos de productos
 {
+  "MOVEMENT_SCHEMA": "Esquema de movimientos de productos",
   "id": "uuid",
   "productId": "uuid-del-producto",
   "type": "IN | OUT",
