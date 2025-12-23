@@ -1,0 +1,109 @@
+<div
+  class="modal fade"
+  id="expenseModal"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title d-flex align-items-center gap-2">
+          <i id="expenseIcon" class="bi bi-cash-coin text-danger"></i>
+          <span id="expenseTitle">Nuevo gasto</span>
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+
+        <!-- Concepto -->
+        <div class="mb-2">
+          <label class="form-label small">Concepto</label>
+          <select
+            class="form-select form-select-sm"
+            id="expenseConcept"
+          >
+            <option value="" selected disabled>Seleccioná un concepto...</option>
+            <option value="Pago del guardia de seguridad">Pago del guardia de seguridad</option>
+            <option value="Pago de mercancía entrante">Pago de mercancía entrante</option>
+            <option value="Pago de compras de mercancía">Pago de compras de mercancía</option>
+            <option value="Compras en dólares">Compras en dólares</option>
+          </select>
+          <div class="invalid-feedback">
+            Seleccioná un concepto
+          </div>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="mb-2">
+          <label class="form-label small">Cantidad</label>
+          <input
+            type="number"
+            class="form-control form-control-sm"
+            id="expenseAmount"
+            min="0"
+            step="0.01"
+          />
+          <div class="invalid-feedback">
+            Ingresá una cantidad válida
+          </div>
+        </div>
+
+        <!-- Fecha -->
+        <div class="mb-2">
+          <label class="form-label small">Fecha</label>
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            id="expenseDate"
+          />
+          <div class="invalid-feedback">
+            Seleccioná una fecha
+          </div>
+        </div>
+
+        <!-- Observación -->
+        <div class="mb-2">
+          <label class="form-label small">Observación</label>
+          <textarea
+            class="form-control form-control-sm"
+            id="expenseNote"
+            rows="2"
+            placeholder="Opcional"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer py-2">
+        <button
+          type="button"
+          class="btn btn-secondary rounded-pill btn-sm"
+          data-bs-dismiss="modal"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-danger rounded-pill btn-sm"
+          id="btnConfirmExpense"
+        >
+          Guardar gasto
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+

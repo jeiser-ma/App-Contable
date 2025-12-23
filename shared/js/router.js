@@ -15,6 +15,7 @@ const PAGE_HOME = "home";
 const PAGE_PRODUCTS = "products";
 const PAGE_MOVEMENTS = "movements";
 const PAGE_INVENTORY = "inventory";
+const PAGE_EXPENSES = "expenses";
 const PAGE_SETTINGS = "settings";
 
 // Configuración de páginas (centralizada)
@@ -35,6 +36,12 @@ const PAGES_CONFIG = {
     title: "Movimientos",
     icon: "bi-arrow-repeat",
     navId: "navMovements",
+    isModule: true // Módulo
+  },
+  [PAGE_EXPENSES]: {
+    title: "Gastos",
+    icon: "bi-cash-coin",
+    navId: "navExpenses",
     isModule: true // Módulo
   },
   [PAGE_INVENTORY]: {
@@ -152,12 +159,14 @@ function initBottomNav() {
   const home = document.getElementById(PAGES_CONFIG[PAGE_HOME].navId);
   const products = document.getElementById(PAGES_CONFIG[PAGE_PRODUCTS].navId);
   const movements = document.getElementById(PAGES_CONFIG[PAGE_MOVEMENTS].navId);
+  const expenses = document.getElementById(PAGES_CONFIG[PAGE_EXPENSES].navId);
   const inventory = document.getElementById(PAGES_CONFIG[PAGE_INVENTORY].navId);
   const settings = document.getElementById(PAGES_CONFIG[PAGE_SETTINGS].navId);
 
   if (home) home.onclick = () => loadPage(PAGE_HOME);
   if (products) products.onclick = () => loadPage(PAGE_PRODUCTS);
   if (movements) movements.onclick = () => loadPage(PAGE_MOVEMENTS);
+  if (expenses) expenses.onclick = () => loadPage(PAGE_EXPENSES);
   if (inventory) inventory.onclick = () => loadPage(PAGE_INVENTORY);
   if (settings) settings.onclick = () => loadPage(PAGE_SETTINGS);
 }

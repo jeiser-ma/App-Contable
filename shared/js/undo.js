@@ -82,6 +82,8 @@ function undoDelete() {
     renderMovements();
   } else if (UNDO_STATE.type === "inventory" && typeof renderInventory === "function") {
     renderInventory();
+  } else if (UNDO_STATE.type === "expenses" && typeof renderExpenses === "function") {
+    renderExpenses();
   }
 
   hideSnackbar(); // Esta función ya remueve el listener

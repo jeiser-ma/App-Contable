@@ -1,0 +1,11 @@
+{
+  "EXPENSE_SCHEMA": "Esquema de gastos",
+  "id": "uuid",
+  "concept": "Pago del guardia de seguridad",
+  "date": "2025-12-19",
+  "amount": 1500.5,
+  "note": "Pago mensual de seguridad",
+  "createdAt": "timestamp"
+}
+
+

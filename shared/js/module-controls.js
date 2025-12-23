@@ -25,6 +25,23 @@ const MODULES_CONFIG = {
     addButtonTitle: "Agregar producto",
     chips: [], // Sin chips
   },
+  expenses: {
+    searchPlaceholder: "Buscar gasto...",
+    hasSort: true,
+    sortOptions: [
+      { value: "concept", label: "Concepto" },
+      { value: "date", label: "Fecha" },
+    ],
+    hasChips: false,
+    hasDateFilter: true,
+    counterLabel: "gastos",
+    stateName: "EXPENSES_STATE",
+    renderFunction: "renderExpenses",
+    openModalFunction: "openExpenseModal",
+    addButtonId: "btnAddExpense",
+    addButtonTitle: "Agregar gasto",
+    chips: [],
+  },
   movements: {
     searchPlaceholder: "Buscar producto...",
     hasSort: false,
@@ -63,7 +80,7 @@ const MODULES_CONFIG = {
 
 /**
  * Configura y muestra los controles del módulo
- * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory")
+ * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
  * @returns {void}
  */
 function setupModuleControls(moduleName) {
@@ -427,6 +444,8 @@ function updateModuleCounterFromData() {
     data = getData("movements") || [];
   } else if (currentModule === "inventory") {
     data = getData("inventory") || [];
+  } else if (currentModule === "expenses") {
+    data = getData("expenses") || [];
   }
 
   // Por ahora mostrar total, luego se actualizará con el render
