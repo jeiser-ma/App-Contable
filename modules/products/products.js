@@ -23,6 +23,8 @@ const ID_INPUT_NAME = "inputName";
 const ID_INPUT_PRICE = "inputPrice";
 const ID_INPUT_UM = "inputUM";
 const ID_INPUT_QUANTITY = "inputQuantity";
+const ID_INPUT_LOW_STOCK_THRESHOLD = "inputLowStockThreshold";
+const ID_INPUT_CRITICAL_STOCK_THRESHOLD = "inputCriticalStockThreshold";
 //#endregion
 
 let productModal;
@@ -33,6 +35,7 @@ const PRODUCTS_STATE = {
   productToDelete: null,
   orderBy: "name",
   orderDir: "asc",
+  filterStockStatus: null, // "low" | "critical" | null
 };
 
 // Exponer el estado globalmente para module-controls.js
@@ -72,6 +75,8 @@ function openAddProductModal() {
   document.getElementById(ID_PRODUCT_MODAL_TITLE).innerText = "Nuevo producto";
   document.getElementById(ID_PRODUCT_FORM).reset();
   clearInputError(ID_INPUT_NAME);
+  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
+  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
   document.getElementById(ID_PRODUCT_ID).value = "";
   toggleModal();
 }
@@ -88,11 +93,15 @@ function openEditProductModal(id) {
 
   document.getElementById(ID_PRODUCT_MODAL_TITLE).innerText = "Editar producto";
   clearInputError(ID_INPUT_NAME);
+  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
+  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
   document.getElementById(ID_PRODUCT_ID).value = product.id;
   document.getElementById(ID_INPUT_NAME).value = product.name;
   document.getElementById(ID_INPUT_PRICE).value = product.price;
   document.getElementById(ID_INPUT_UM).value = product.um;
   document.getElementById(ID_INPUT_QUANTITY).value = product.quantity;
+  document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value = product.lowStockThreshold || "";
+  document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value = product.criticalStockThreshold || "";
   toggleModal();
 }
 
@@ -215,16 +224,35 @@ function updateClearFiltersButton() {
 // ===============================
 
 /**
- * Filtra productos usando el texto de búsqueda de PRODUCTS_STATE
+ * Filtra productos usando los criterios de PRODUCTS_STATE
  * @param {Array} products - Lista de productos a filtrar
  * @returns {Array} Lista de productos filtrados
  */
 function filterProductsByName(products) {
-  if (!PRODUCTS_STATE.searchText) return products;
+  let filtered = [...products];
 
-  return products.filter((p) =>
-    p.name.toLowerCase().includes(PRODUCTS_STATE.searchText.toLowerCase())
-  );
+  // Filtro por texto de búsqueda
+  if (PRODUCTS_STATE.searchText) {
+    filtered = filtered.filter((p) =>
+      p.name.toLowerCase().includes(PRODUCTS_STATE.searchText.toLowerCase())
+    );
+  }
+
+  // Filtro por estado de stock
+  if (PRODUCTS_STATE.filterStockStatus === "critical") {
+    filtered = filtered.filter((p) => {
+      const threshold = p.criticalStockThreshold || 0;
+      return p.quantity <= threshold;
+    });
+  } else if (PRODUCTS_STATE.filterStockStatus === "low") {
+    filtered = filtered.filter((p) => {
+      const lowThreshold = p.lowStockThreshold || 0;
+      const criticalThreshold = p.criticalStockThreshold || 0;
+      return p.quantity <= lowThreshold && p.quantity > criticalThreshold;
+    });
+  }
+
+  return filtered;
 }
 
 /**
@@ -280,11 +308,27 @@ function renderProductsList(products) {
     const node = prodTemplate.content.cloneNode(true);
 
     node.querySelector(".product-name").textContent = p.name;
-    node.querySelector(
-      ".product-meta"
-    ).innerHTML = `<i class="bi bi-boxes"></i> ${p.quantity} 
+    
+    // Determinar color y icono según el stock
+    const criticalThreshold = p.criticalStockThreshold || 0;
+    const lowThreshold = p.lowStockThreshold || 0;
+    let quantityColor = "";
+    let quantityIcon = "bi-boxes";
+    
+    if (p.quantity <= criticalThreshold) {
+      quantityColor = "text-danger";
+      quantityIcon = "bi-exclamation-triangle-fill";
+    } else if (p.quantity <= lowThreshold) {
+      quantityColor = "text-warning";
+      quantityIcon = "bi-exclamation-triangle-fill";
+    }
+    
+    const metaEl = node.querySelector(".product-meta");
+    if (metaEl) {
+      metaEl.innerHTML = `<i class="bi ${quantityIcon} ${quantityColor}"></i> <span class="${quantityColor}">${p.quantity}</span> 
       • <i class="bi bi-currency-dollar"></i> ${p.price} 
       • <i class="bi bi-flask-florence"></i> ${p.um}`;
+    }
 
     node.querySelector(".btn-edit").onclick = () => openEditProductModal(p.id);
     node.querySelector(".btn-delete").onclick = () =>
@@ -322,10 +366,14 @@ function saveProductFromModal() {
   const price = Number(document.getElementById(ID_INPUT_PRICE).value);
   const um = document.getElementById(ID_INPUT_UM).value.trim();
   const quantity = Number(document.getElementById(ID_INPUT_QUANTITY).value);
+  const lowStockThreshold = Number(document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value);
+  const criticalStockThreshold = Number(document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value);
 
   let products = getData("products");
 
   clearInputError(ID_INPUT_NAME);
+  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
+  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
 
   // nombre obligatorio
   if (!name) {
@@ -343,11 +391,22 @@ function saveProductFromModal() {
     return;
   }
 
+  // Umbrales obligatorios
+  if (!lowStockThreshold || lowStockThreshold < 0) {
+    setInputError(ID_INPUT_LOW_STOCK_THRESHOLD, "El umbral de stock bajo es obligatorio");
+    return;
+  }
+
+  if (!criticalStockThreshold || criticalStockThreshold < 0) {
+    setInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD, "El umbral de stock crítico es obligatorio");
+    return;
+  }
+
   // Si hay un id de producto es una edición si no, es un alta de producto
   if (id) {
     // EDITAR
     products = products.map((p) =>
-      p.id === id ? { ...p, name, price, um, quantity } : p
+      p.id === id ? { ...p, name, price, um, quantity, lowStockThreshold, criticalStockThreshold } : p
     );
   } else {
     // ALTA
@@ -357,6 +416,8 @@ function saveProductFromModal() {
       price,
       um,
       quantity,
+      lowStockThreshold,
+      criticalStockThreshold,
     });
   }
 

@@ -15,7 +15,7 @@ const MODULES_CONFIG = {
       { value: "price", label: "Precio" },
       { value: "quantity", label: "Cantidad" },
     ],
-    hasChips: false,
+    hasChips: true,
     hasDateFilter: false,
     counterLabel: "productos",
     stateName: "PRODUCTS_STATE",
@@ -23,7 +23,10 @@ const MODULES_CONFIG = {
     openModalFunction: "openAddProductModal",
     addButtonId: "btnAddProduct",
     addButtonTitle: "Agregar producto",
-    chips: [], // Sin chips
+    chips: [
+      { id: "filterLowStock", label: "Stock bajo", icon: "bi-box", colorClass: "warning", filterKey: "filterStockStatus", filterValue: "low" },
+      { id: "filterCriticalStock", label: "Stock crítico", icon: "bi-box", colorClass: "danger", filterKey: "filterStockStatus", filterValue: "critical" },
+    ],
   },
   expenses: {
     searchPlaceholder: "Buscar gasto...",
@@ -229,14 +232,18 @@ function setupModuleControls(moduleName) {
   const filterOut = document.getElementById("filterOut");
   const filterWarehouse = document.getElementById("filterWarehouse");
   const filterStore = document.getElementById("filterStore");
+  const filterLowStock = document.getElementById("filterLowStock");
+  const filterCriticalStock = document.getElementById("filterCriticalStock");
   
   if (filterIn) filterIn.classList.add("d-none");
   if (filterOut) filterOut.classList.add("d-none");
   if (filterWarehouse) filterWarehouse.classList.add("d-none");
   if (filterStore) filterStore.classList.add("d-none");
+  if (filterLowStock) filterLowStock.classList.add("d-none");
+  if (filterCriticalStock) filterCriticalStock.classList.add("d-none");
   
   // Remover clases active de todos los chips
-  [filterIn, filterOut, filterWarehouse, filterStore].forEach(chip => {
+  [filterIn, filterOut, filterWarehouse, filterStore, filterLowStock, filterCriticalStock].forEach(chip => {
     if (chip) chip.classList.remove("active");
   });
   
@@ -335,7 +342,7 @@ function setupModuleControls(moduleName) {
         });
       } else {
         // Si no hay chips, asegurarse de que todos estén ocultos
-        [filterIn, filterOut, filterWarehouse, filterStore].forEach(chip => {
+        [filterIn, filterOut, filterWarehouse, filterStore, filterLowStock, filterCriticalStock].forEach(chip => {
           if (chip) {
             chip.classList.add("d-none");
             chip.classList.remove("active");
