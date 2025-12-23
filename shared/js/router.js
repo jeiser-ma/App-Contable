@@ -14,13 +14,14 @@ const ID_MODULE_ICON = "moduleIcon";
 const PAGE_HOME = "home";
 const PAGE_PRODUCTS = "products";
 const PAGE_MOVEMENTS = "movements";
+const PAGE_INVENTORY = "inventory";
 const PAGE_SETTINGS = "settings";
 
 // Configuración de páginas (centralizada)
 const PAGES_CONFIG = {
   [PAGE_HOME]: {
     title: "Inicio",
-    icon: "bi-house",
+    icon: "bi-house-door",
     navId: "navHome",
     isModule: false // Página compartida
   },
@@ -32,8 +33,14 @@ const PAGES_CONFIG = {
   },
   [PAGE_MOVEMENTS]: {
     title: "Movimientos",
-    icon: "bi-arrow-left-right",
+    icon: "bi-arrow-repeat",
     navId: "navMovements",
+    isModule: true // Módulo
+  },
+  [PAGE_INVENTORY]: {
+    title: "Inventario",
+    icon: "bi-clipboard-check",
+    navId: "navInventory",
     isModule: true // Módulo
   },
   [PAGE_SETTINGS]: {
@@ -78,6 +85,12 @@ function loadPage(page) {
       setActiveNav(page);
       setPageTitle(page);
 
+      // Ocultar controles del módulo si no es un módulo
+      const pageConfig = PAGES_CONFIG[page];
+      if (!pageConfig || !pageConfig.isModule) {
+        hideModuleControls();
+      }
+
       // Hook por página (función que se ejecuta cuando se carga la página)
       // La función debe tener el nombre onPageNameLoaded
       // Por ejemplo: onProductsLoaded, onMovementsLoaded, onSettingsLoaded etc.
@@ -118,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Cargamos la página inicial
     console.log("Loading home page")
-    loadPage(PAGE_MOVEMENTS); //poner el home
+    loadPage(PAGE_INVENTORY); //poner el home
 
     // Iniciamos la navbar inferior para que se pueda navegar entre las páginas
     console.log("Iniciando bottom navbar")
@@ -139,11 +152,13 @@ function initBottomNav() {
   const home = document.getElementById(PAGES_CONFIG[PAGE_HOME].navId);
   const products = document.getElementById(PAGES_CONFIG[PAGE_PRODUCTS].navId);
   const movements = document.getElementById(PAGES_CONFIG[PAGE_MOVEMENTS].navId);
+  const inventory = document.getElementById(PAGES_CONFIG[PAGE_INVENTORY].navId);
   const settings = document.getElementById(PAGES_CONFIG[PAGE_SETTINGS].navId);
 
   if (home) home.onclick = () => loadPage(PAGE_HOME);
   if (products) products.onclick = () => loadPage(PAGE_PRODUCTS);
   if (movements) movements.onclick = () => loadPage(PAGE_MOVEMENTS);
+  if (inventory) inventory.onclick = () => loadPage(PAGE_INVENTORY);
   if (settings) settings.onclick = () => loadPage(PAGE_SETTINGS);
 }
 

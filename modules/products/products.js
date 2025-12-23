@@ -8,6 +8,7 @@ const BTN_ID_ADD_PRODUCT = "btnAddProduct";
 const BTN_ID_SAVE_PRODUCT = "btnSaveProduct";
 const BTN_ID_CLEAR_SEARCH = "btnClearSearch";
 const BTN_ID_ORDER_DIR = "orderDir";
+const BTN_ID_CLEAR_FILTERS_PRODUCTS = "btnClearFiltersProducts";  
 
 // IDs de otros elementos
 const ID_ORDER_BY = "orderBy";
@@ -34,6 +35,9 @@ const PRODUCTS_STATE = {
   orderDir: "asc",
 };
 
+// Exponer el estado globalmente para module-controls.js
+window.PRODUCTS_STATE = PRODUCTS_STATE;
+
 // ===============================
 // Hook que llama el router
 // ===============================
@@ -43,20 +47,21 @@ const PRODUCTS_STATE = {
  * Inicializa el modal, los controles de búsqueda y ordenamiento,
  * y configura los event listeners de los botones
  */
-function onProductsPageLoaded() {
-  // cargamos el modal de productos
+async function onProductsPageLoaded() {
+  // Cargar modal de productos
   console.log("Loading product-modal");
-  loadModal("product-modal", "products").then(() => {
-    // Inicializar el modal después de cargarlo
-    initModal(MODAL_ID_PRODUCT);
+  await loadModal("product-modal", "products");
+  
+  // Inicializar el modal después de cargarlo
+  initModal(MODAL_ID_PRODUCT);
 
-    initProductSearch();
-    initProductOrdering();
-    renderProducts();
+  // Configurar controles del módulo
+  setupModuleControls("products");
 
-    document.getElementById(BTN_ID_ADD_PRODUCT).onclick = openAddProductModal;
-    document.getElementById(BTN_ID_SAVE_PRODUCT).onclick = saveProductFromModal;
-  });
+  // Configurar botón de guardar del modal
+  document.getElementById(BTN_ID_SAVE_PRODUCT).onclick = saveProductFromModal;
+  
+  // Nota: renderProducts() se llama automáticamente al final de setupModuleControls()
 }
 
 /**
@@ -104,6 +109,7 @@ function initProductOrdering() {
 
   orderBy.onchange = () => {
     PRODUCTS_STATE.orderBy = orderBy.value;
+    updateClearFiltersButton();
     renderProducts();
   };
 
@@ -116,6 +122,7 @@ function initProductOrdering() {
         ? '<i class="bi bi-sort-alpha-down"></i>'
         : '<i class="bi bi-sort-alpha-up"></i>';
 
+    updateClearFiltersButton();
     renderProducts();
   };
 }
@@ -134,6 +141,7 @@ function initProductSearch() {
   input.addEventListener("input", () => {
     PRODUCTS_STATE.searchText = input.value.toLowerCase();
     btnClear.classList.toggle("d-none", !PRODUCTS_STATE.searchText);
+    updateClearFiltersButton();
     renderProducts();
   });
 
@@ -141,9 +149,65 @@ function initProductSearch() {
     input.value = "";
     PRODUCTS_STATE.searchText = "";
     btnClear.classList.add("d-none");
+    updateClearFiltersButton();
     renderProducts();
     input.focus();
   };
+}
+
+/**
+ * Inicializa el botón de limpiar filtros
+ * @returns {void}
+ */
+function initClearFilters() {
+  const btnClearFilters = document.getElementById(BTN_ID_CLEAR_FILTERS_PRODUCTS);
+  if (!btnClearFilters) return;
+
+  btnClearFilters.onclick = () => {
+    // Limpiar búsqueda
+    const searchInput = document.getElementById(ID_SEARCH_PRODUCT);
+    const btnClearSearch = document.getElementById(BTN_ID_CLEAR_SEARCH);
+    if (searchInput) {
+      searchInput.value = "";
+      PRODUCTS_STATE.searchText = "";
+      if (btnClearSearch) btnClearSearch.classList.add("d-none");
+    }
+
+    // Limpiar ordenamiento
+    const orderBy = document.getElementById(ID_ORDER_BY);
+    if (orderBy) {
+      orderBy.value = "";
+      PRODUCTS_STATE.orderBy = "name";
+    }
+    PRODUCTS_STATE.orderDir = "asc";
+    const orderDirBtn = document.getElementById(BTN_ID_ORDER_DIR);
+    if (orderDirBtn) {
+      orderDirBtn.innerHTML = '<i class="bi bi-sort-alpha-down"></i>';
+    }
+
+    updateClearFiltersButton();
+    renderProducts();
+  };
+
+  updateClearFiltersButton();
+}
+
+/**
+ * Actualiza la visibilidad del botón de limpiar filtros
+ * @returns {void}
+ */
+function updateClearFiltersButton() {
+  const btnClearFilters = document.getElementById(BTN_ID_CLEAR_FILTERS_PRODUCTS);
+  if (!btnClearFilters) return;
+
+  const hasFilters = PRODUCTS_STATE.searchText || 
+                     (PRODUCTS_STATE.orderBy !== "name" || PRODUCTS_STATE.orderDir !== "asc");
+  
+  if (hasFilters) {
+    btnClearFilters.classList.remove("d-none");
+  } else {
+    btnClearFilters.classList.add("d-none");
+  }
 }
 
 // ===============================
@@ -218,9 +282,9 @@ function renderProductsList(products) {
     node.querySelector(".product-name").textContent = p.name;
     node.querySelector(
       ".product-meta"
-    ).innerHTML = `<i class="bi bi-box"></i> ${p.quantity} 
+    ).innerHTML = `<i class="bi bi-boxes"></i> ${p.quantity} 
       • <i class="bi bi-currency-dollar"></i> ${p.price} 
-      • <i class="bi bi-calculator"></i> ${p.um}`;
+      • <i class="bi bi-flask-florence"></i> ${p.um}`;
 
     node.querySelector(".btn-edit").onclick = () => openEditProductModal(p.id);
     node.querySelector(".btn-delete").onclick = () =>
@@ -242,20 +306,11 @@ function renderProducts() {
   const filtered = filterProductsByName(allProducts);
   const sorted = sortProducts(filtered);
 
-  UpdateProductsCounter(sorted.length, allProducts.length);
+  updateModuleCounter(sorted.length, allProducts.length);
   renderProductsList(sorted);
 }
 
-/**
- * Actualiza el contador de productos en el DOM
- * @param {number} current - Cantidad de productos actual
- * @param {number} total - Cantidad total de productos
- * @returns {void}
- */
-function UpdateProductsCounter(current, total) {
-  const counter = document.getElementById(ID_PRODUCTS_COUNTER);
-  counter.textContent = `${current} de ${total} Productos`;
-}
+// Función removida - ahora se usa updateModuleCounter() de components.js
 
 /**
  * Guarda el producto desde el modal

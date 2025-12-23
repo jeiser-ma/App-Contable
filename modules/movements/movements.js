@@ -4,12 +4,12 @@
 
 //#region Constants
 // IDs de botones
-const BTN_ID_ADD_IN = "btnAddIn";
-const BTN_ID_ADD_OUT = "btnAddOut";
+const BTN_ID_ADD_MOVEMENT = "btnAddMovement";
 const BTN_ID_CONFIRM_MOVEMENT = "btnConfirmMovement";
 const BTN_ID_CLEAR_SEARCH_MOVEMENT = "btnClearSearchMovement";
 const BTN_ID_FILTER_IN = "filterIn";
 const BTN_ID_FILTER_OUT = "filterOut";
+const BTN_ID_CLEAR_FILTERS_MOVEMENTS = "btnClearFiltersMovements"; 
 
 // IDs de otros elementos
 const ID_SEARCH_MOVEMENT = "searchMovement";
@@ -23,6 +23,8 @@ const ID_MOVEMENT_DATE = "movementDate";
 const ID_MOVEMENT_NOTE = "movementNote";
 const ID_MOVEMENT_TITLE = "movementTitle";
 const ID_MOVEMENT_ICON = "movementIcon";
+const ID_MOVEMENT_TYPE_IN = "movementTypeIn";
+const ID_MOVEMENT_TYPE_OUT = "movementTypeOut";
 //#endregion
 
 // Estado de la pantalla de movimientos (unificado)
@@ -33,6 +35,9 @@ const MOVEMENTS_STATE = {
   orderBy: "date",
   orderDir: "desc",
 };
+
+// Exponer el estado globalmente para module-controls.js
+window.MOVEMENTS_STATE = MOVEMENTS_STATE;
 
 // Tipo de movimiento actual (para el modal)
 let movementType = null; // "in" | "out"
@@ -49,42 +54,26 @@ let movementToDelete = null; // ID del movimiento que se va a eliminar
  * y configura los event listeners de los botones
  * @returns {void}
  */
-function onMovementsPageLoaded() {
+async function onMovementsPageLoaded() {
   console.log("onMovementsPageLoaded execution");
 
-  // Cargamos el modal de movimientos
+  // Cargar modal de movimientos
   console.log("Loading movement-modal");
-  loadModal("movement-modal", "movements")
-    .then(() => {
+  await loadModal("movement-modal", "movements");
+  
       // Inicializar el modal después de cargarlo
       initModal(MODAL_ID_MOVEMENT);
 
-      // Configurar botones de entrada y salida
-      const btnIn = document.getElementById(BTN_ID_ADD_IN);
-      const btnOut = document.getElementById(BTN_ID_ADD_OUT);
+  // Configurar controles del módulo
+  setupModuleControls("movements");
 
-      if (btnIn) {
-        btnIn.onclick = () => openMovementModal("in");
-      }
+  // Configurar botón de confirmar del modal
+  const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
+  if (btnConfirm) {
+    btnConfirm.onclick = saveMovementFromModal;
+  }
 
-      if (btnOut) {
-        btnOut.onclick = () => openMovementModal("out");
-      }
-
-      // Configurar botón de confirmar movimiento
-      const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
-      if (btnConfirm) {
-        btnConfirm.onclick = saveMovementFromModal;
-      }
-
-      // Inicializar controles
-      initMovementSearch();
-      initMovementFilters();
-      renderMovements();
-    })
-    .catch((err) => {
-      console.error("Error cargando movement-modal:", err);
-    });
+  // Nota: renderMovements() se llama automáticamente al final de setupModuleControls()
 }
 
 /**
@@ -92,8 +81,14 @@ function onMovementsPageLoaded() {
  * @param {string} type - Tipo de movimiento ("in" | "out")
  * @returns {void}
  */
-function openMovementModal(type) {
-  movementType = type;
+/**
+ * Abre el formulario para nuevo movimiento
+ * El tipo de movimiento se selecciona en el modal
+ * @returns {void}
+ */
+function openMovementModal() {
+  movementToEdit = null;
+  movementType = "in"; // Por defecto entrada
 
   // Asegurar que el modal esté inicializado
   initModal(MODAL_ID_MOVEMENT);
@@ -103,6 +98,8 @@ function openMovementModal(type) {
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
   const dateInput = document.getElementById(ID_MOVEMENT_DATE);
   const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
+  const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
+  const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
 
   if (!title || !icon || !btnConfirm || !dateInput || !productInput) {
     console.error("No se encontraron los elementos del modal");
@@ -112,14 +109,34 @@ function openMovementModal(type) {
   // Reset del formulario
   resetMovementForm();
 
-  if (type === "in") {
-    title.textContent = "Entrada de producto";
-    icon.className = "bi bi-plus-circle text-success";
-    btnConfirm.className = "btn btn-success rounded-pill btn-sm";
-  } else {
-    title.textContent = "Salida de producto";
-    icon.className = "bi bi-dash-circle text-danger";
-    btnConfirm.className = "btn btn-danger rounded-pill btn-sm";
+  // Configurar tipo por defecto (entrada)
+  if (typeIn) {
+    typeIn.checked = true;
+  }
+  if (typeOut) {
+    typeOut.checked = false;
+  }
+
+  // Actualizar UI según tipo
+  updateMovementTypeUI();
+
+  // Configurar listeners para el toggle de tipo
+  if (typeIn) {
+    typeIn.onchange = () => {
+      if (typeIn.checked) {
+        movementType = "in";
+        updateMovementTypeUI();
+      }
+    };
+  }
+
+  if (typeOut) {
+    typeOut.onchange = () => {
+      if (typeOut.checked) {
+        movementType = "out";
+        updateMovementTypeUI();
+      }
+    };
   }
 
   // Fecha por defecto = hoy
@@ -130,6 +147,28 @@ function openMovementModal(type) {
 
   // Mostrar el formulario después de hacer todos los ajustes
   showModal();
+}
+
+/**
+ * Actualiza la UI del modal según el tipo de movimiento seleccionado
+ * @returns {void}
+ */
+function updateMovementTypeUI() {
+  const title = document.getElementById(ID_MOVEMENT_TITLE);
+  const icon = document.getElementById(ID_MOVEMENT_ICON);
+  const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
+
+  if (!title || !icon || !btnConfirm) return;
+
+  if (movementType === "in") {
+    title.textContent = movementToEdit ? "Editar entrada de producto" : "Entrada de producto";
+    icon.className = "bi bi-arrow-right text-success";
+    btnConfirm.className = "btn btn-success rounded-pill btn-sm";
+  } else {
+    title.textContent = movementToEdit ? "Editar salida de producto" : "Salida de producto";
+    icon.className = "bi bi-arrow-left text-danger";
+    btnConfirm.className = "btn btn-danger rounded-pill btn-sm";
+  }
 }
 
 /** 
@@ -176,6 +215,7 @@ function initMovementSearch() {
   input.addEventListener("input", () => {
     MOVEMENTS_STATE.searchText = input.value.toLowerCase();
     btnClear.classList.toggle("d-none", !MOVEMENTS_STATE.searchText);
+    updateClearFiltersButton();
     renderMovements();
   });
 
@@ -183,6 +223,7 @@ function initMovementSearch() {
     input.value = "";
     MOVEMENTS_STATE.searchText = "";
     btnClear.classList.add("d-none");
+    updateClearFiltersButton();
     renderMovements();
     input.focus();
   };
@@ -208,6 +249,7 @@ function initMovementFilters() {
         filterIn.classList.add("active");
         if (filterOut) filterOut.classList.remove("active");
       }
+      updateClearFiltersButton();
       renderMovements();
     };
   }
@@ -222,6 +264,7 @@ function initMovementFilters() {
         filterOut.classList.add("active");
         if (filterIn) filterIn.classList.remove("active");
       }
+      updateClearFiltersButton();
       renderMovements();
     };
   }
@@ -229,6 +272,7 @@ function initMovementFilters() {
   if (filterDate) {
     filterDate.onchange = () => {
       MOVEMENTS_STATE.filterDate = filterDate.value || null;
+      updateClearFiltersButton();
       renderMovements();
     };
   }
@@ -340,10 +384,10 @@ function renderMovementsList(movements) {
     // Configurar icono según tipo (IN = + verde, OUT = - rojo)
     if (m.type === "IN") {
       iconDiv.classList.add("bg-success");
-      iconI.className = "bi bi-plus text-white";
+      iconI.className = "bi bi-plu bi-arrow-right text-white";
     } else {
       iconDiv.classList.add("bg-danger");
-      iconI.className = "bi bi-dash text-white";
+      iconI.className = "bi bi-das bi-arrow-left text-white";
     }
 
     // Configurar contenido
@@ -358,7 +402,7 @@ function renderMovementsList(movements) {
     });
 
     // Mostrar cantidad con icono de caja (similar a productos)
-    meta.innerHTML = `<i class="bi bi-calendar"></i> ${formattedDate} • <i class="bi bi-box"></i> ${m.quantity} `;
+    meta.innerHTML = `<i class="bi bi-calendar"></i> ${formattedDate} • <i class="bi bi-boxes"></i> ${m.quantity} `;
 
     // Configurar botones de acción
     node.querySelector(".btn-edit-movement").onclick = () => openEditMovementModal(m.id);
@@ -380,22 +424,11 @@ function renderMovements() {
   const filtered = filterMovements(allMovements);
   const sorted = sortMovements(filtered);
 
-  updateMovementsCounter(sorted.length, allMovements.length);
+  updateModuleCounter(sorted.length, allMovements.length);
   renderMovementsList(sorted);
 }
 
-/**
- * Actualiza el contador de movimientos en el DOM
- * @param {number} current - Cantidad de movimientos actual
- * @param {number} total - Cantidad total de movimientos
- * @returns {void}
- */
-function updateMovementsCounter(current, total) {
-  const counter = document.getElementById(ID_MOVEMENTS_COUNTER);
-  if (counter) {
-    counter.textContent = `${current} de ${total} movimientos`;
-  }
-}
+// Función removida - ahora se usa updateModuleCounter() de components.js
 
 // ===============================
 // Guardado
@@ -407,18 +440,25 @@ function updateMovementsCounter(current, total) {
  * @returns {void}
  */
 function saveMovementFromModal() {
-  if (!movementType) {
-    console.error("No se ha definido el tipo de movimiento");
-    return;
-  }
-
   const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
   const quantityInput = document.getElementById(ID_MOVEMENT_QUANTITY);
   const dateInput = document.getElementById(ID_MOVEMENT_DATE);
   const noteInput = document.getElementById(ID_MOVEMENT_NOTE);
+  const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
+  const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
 
   if (!productInput || !quantityInput || !dateInput) {
     console.error("No se encontraron los campos del formulario");
+    return;
+  }
+
+  // Obtener tipo de movimiento del selector
+  if (typeIn && typeIn.checked) {
+    movementType = "in";
+  } else if (typeOut && typeOut.checked) {
+    movementType = "out";
+  } else {
+    console.error("No se ha seleccionado el tipo de movimiento");
     return;
   }
 
@@ -673,22 +713,46 @@ function openEditMovementModal(id) {
   const quantityInput = document.getElementById(ID_MOVEMENT_QUANTITY);
   const dateInput = document.getElementById(ID_MOVEMENT_DATE);
   const noteInput = document.getElementById(ID_MOVEMENT_NOTE);
+  const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
+  const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
 
   if (!title || !icon || !btnConfirm || !productInput || !quantityInput || !dateInput) {
     console.error("No se encontraron los elementos del modal");
     return;
   }
 
-  // Configurar título e icono según tipo
-  if (movement.type === "IN") {
-    title.textContent = "Editar entrada de producto";
-    icon.className = "bi bi-plus-circle text-success";
-    btnConfirm.className = "btn btn-success rounded-pill btn-sm";
-  } else {
-    title.textContent = "Editar salida de producto";
-    icon.className = "bi bi-dash-circle text-danger";
-    btnConfirm.className = "btn btn-danger rounded-pill btn-sm";
+  // Configurar tipo en el selector
+  if (typeIn && typeOut) {
+    if (movement.type === "IN") {
+      typeIn.checked = true;
+      typeOut.checked = false;
+    } else {
+      typeIn.checked = false;
+      typeOut.checked = true;
+    }
   }
+
+  // Configurar listeners para el toggle de tipo
+  if (typeIn) {
+    typeIn.onchange = () => {
+      if (typeIn.checked) {
+        movementType = "in";
+        updateMovementTypeUI();
+      }
+    };
+  }
+
+  if (typeOut) {
+    typeOut.onchange = () => {
+      if (typeOut.checked) {
+        movementType = "out";
+        updateMovementTypeUI();
+      }
+    };
+  }
+
+  // Actualizar UI según tipo
+  updateMovementTypeUI();
 
   // Llenar campos con datos del movimiento
   productInput.value = product.name;
