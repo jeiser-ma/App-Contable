@@ -1,11 +1,9 @@
 {
-  "INVENTORY_SCHEMA": "Esquema de conteos de inventario",
   "id": "uuid",
   "productId": "uuid-del-producto",
-  "location": "WAREHOUSE | STORE",
-  "quantity": 10,
+  "warehouseQuantity": 10,
+  "storeQuantity": 10,
   "date": "2025-12-19",
-  "note": "Conteo diario almacén",
-  "createdAt": "timestamp"
+  "createdAt": "timestamp",
+  "status": "CONFIRMED"
 }
-

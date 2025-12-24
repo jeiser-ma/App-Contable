@@ -66,18 +66,15 @@ const MODULES_CONFIG = {
     searchPlaceholder: "Buscar producto...",
     hasSort: false,
     sortOptions: [],
-    hasChips: true,
+    hasChips: false,
     hasDateFilter: true,
-    counterLabel: "conteos",
+    counterLabel: "inventarios",
     stateName: "INVENTORY_STATE",
     renderFunction: "renderInventory",
-    openModalFunction: "openInventoryModal",
-    addButtonId: "btnAddInventory",
-    addButtonTitle: "Nuevo conteo",
-    chips: [
-      { id: "filterWarehouse", label: "Almacén", icon: "bi-houses", colorClass: "dark", filterKey: "filterLocation", filterValue: "WAREHOUSE" },
-      { id: "filterStore", label: "Tienda", icon: "bi-shop", colorClass: "success", filterKey: "filterLocation", filterValue: "STORE" },
-    ],
+    openModalFunction: null, // No hay botón de agregar, se abre desde las cards
+    addButtonId: null,
+    addButtonTitle: null,
+    chips: [],
   },
 };
 
@@ -206,24 +203,26 @@ function setupModuleControls(moduleName) {
     if (sortContainer) sortContainer.classList.add("d-none");
   }
 
-  // 3. Configurar botón de acción (agregar)
+  // 3. Configurar botón de acción (agregar) - solo si existe
   const actionButtonsContainer = document.getElementById("moduleActionButtons");
   if (actionButtonsContainer) {
     actionButtonsContainer.innerHTML = "";
     
-    const button = document.createElement("button");
-    button.id = config.addButtonId;
-    button.innerHTML = '<i class="bi bi-plus fs-5"></i>';
-    button.className = "btn btn-primary rounded-circle d-flex align-items-center justify-content-center";
-    button.setAttribute("style", "width: 40px; height: 40px");
-    button.setAttribute("title", config.addButtonTitle);
-    button.onclick = () => {
-      const openModalFn = window[config.openModalFunction];
-      if (openModalFn && typeof openModalFn === "function") {
-        openModalFn();
-      }
-    };
-    actionButtonsContainer.appendChild(button);
+    if (config.addButtonId && config.openModalFunction) {
+      const button = document.createElement("button");
+      button.id = config.addButtonId;
+      button.innerHTML = '<i class="bi bi-plus fs-5"></i>';
+      button.className = "btn btn-primary rounded-circle d-flex align-items-center justify-content-center";
+      button.setAttribute("style", "width: 40px; height: 40px");
+      button.setAttribute("title", config.addButtonTitle);
+      button.onclick = () => {
+        const openModalFn = window[config.openModalFunction];
+        if (openModalFn && typeof openModalFn === "function") {
+          openModalFn();
+        }
+      };
+      actionButtonsContainer.appendChild(button);
+    }
   }
 
   // 4. Configurar chips de filtro (fijos en el layout, solo mostrar/ocultar)
@@ -298,7 +297,15 @@ function setupModuleControls(moduleName) {
   if (dateFilter) {
     if (config.hasDateFilter) {
       dateFilter.classList.remove("d-none");
-      dateFilter.value = "";
+      
+      // Para inventory, establecer fecha de hoy por defecto
+      if (moduleName === "inventory") {
+        const today = new Date().toISOString().split("T")[0];
+        dateFilter.value = today;
+        updateModuleState("filterDate", today);
+      } else {
+        dateFilter.value = "";
+      }
       
       dateFilter.onchange = () => {
         console.log(`Date filter changed: ${dateFilter.value || null}`);

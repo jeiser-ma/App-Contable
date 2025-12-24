@@ -1,38 +1,83 @@
-<div class="container-fluid">
-
-  <!-- Lista de inventarios -->
-  <div class="container-fluid px-2 py-2">
-    <div id="inventoryList" class="d-grid gap-2">
-      <!-- items -->
+  
+  <!-- Lista de productos pendientes -->
+  <div class="mb-4">
+    <h6 class="fw-semibold mb-2">
+      <i class="bi bi-clipboard-minus text-secondary"></i> Pendientes
+    </h6>
+    <div id="pendingInventoryList" class="d-grid gap-2">
+      <!-- items pendientes -->
     </div>
   </div>
 
-  <!-- TEMPLATE: Conteo de inventario -->
-  <template id="inventoryCardTemplate">
+  <!-- Lista de productos realizados -->
+  <div class="mb-4">
+    <h6 class="fw-semibold mb-2">
+      <i class="bi bi-clipboard-check text-success"></i> Realizados
+    </h6>
+    <div id="completedInventoryList" class="d-grid gap-2">
+      <!-- items realizados -->
+    </div>
+  </div>
+
+  <!-- TEMPLATE: Card de inventario pendiente -->
+  <template id="pendingInventoryCardTemplate">
     <div class="card shadow-sm">
       <div class="card-body py-1 px-3">
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-3 me-2">
             <!-- Icono -->
             <div
-              class="rounded-circle d-flex align-items-center justify-content-center inventory-icon"
+              class="rounded-circle d-flex align-items-center justify-content-center bg-light"
               style="width:36px;height:36px"
             >
-              <i class="bi inventory-icon-i text-white"></i>
+              <i class="bi bi-clipboard-minus text-secondary"></i>
             </div>
 
             <!-- Info -->
             <div class="flex-grow-1">
-              <div class="fw-semibold inventory-product"></div>
-              <div class="text-muted small inventory-meta"></div>
+              <div class="fw-semibold pending-product-name"></div>
+              <div class="text-muted small pending-product-meta">
+                <i class="bi bi-houses text-primary me-2"> -- </i> • <i class="bi bi-shop-window text-success ms-2"> -- </i> 
+              </div>
             </div>
           </div>
 
           <!-- Botones de acción -->
           <div class="d-flex gap-2">
-            <button class="btn btn-warning rounded-circle btn-sm btn-edit-inventory">
-              <i class="bi bi-pencil"></i>
+            <button class="btn btn-primary rounded-circle btn-sm btn-add-inventory">
+              <i class="bi bi-plus-lg"></i>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- TEMPLATE: Card de inventario realizado -->
+  <template id="completedInventoryCardTemplate">
+    <div class="card shadow-sm">
+      <div class="card-body py-1 px-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <!-- Icono -->
+            <div
+              class="rounded-circle d-flex align-items-center justify-content-center bg-success"
+              style="width:36px;height:36px"
+            >
+              <i class="bi bi-clipboard-check text-white"></i>
+            </div>
+
+            <!-- Info -->
+            <div class="flex-grow-1">
+              <div class="fw-semibold completed-product-name"></div>
+              <div class="text-muted small completed-product-meta">
+                <i class="bi bi-houses text-primary me-2 warehouse-qty"></i> • <i class="bi bi-shop-window text-success ms-2 store-qty"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="d-flex gap-2">
             <button class="btn btn-danger rounded-circle btn-sm btn-delete-inventory">
               <i class="bi bi-trash"></i>
             </button>

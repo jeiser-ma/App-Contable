@@ -1,0 +1,136 @@
+<div
+  class="modal fade"
+  id="inventoryModal"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title d-flex align-items-center gap-2">
+          <i id="inventoryIcon" class="bi bi-houses text-primary"></i>
+          <span id="inventoryTitle">Conteo de inventario</span>
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+
+        <!-- Toggle Button: Almacén / Tienda -->
+        <div class="mb-3">
+          <label class="form-label small">Ubicación</label>
+          <div class="btn-group w-100 gap-4" role="group" id="locationToggle">
+            <input
+              type="radio"
+              class="btn-check"
+              name="inventoryLocation"
+              id="locationWarehouse"
+              value="WAREHOUSE"
+              checked
+            />
+            <label
+              class="btn btn-outline-primary rounded-pill"
+              for="locationWarehouse"
+            >
+              <i class="bi bi-houses"></i> Almacén
+            </label>
+
+            <input
+              type="radio"
+              class="btn-check"
+              name="inventoryLocation"
+              id="locationStore"
+              value="STORE"
+            />
+            <label
+              class="btn btn-outline-success rounded-pill"
+              for="locationStore"
+            >
+              <i class="bi bi-shop"></i> Tienda
+            </label>
+          </div>
+        </div>
+
+        <!-- Producto -->
+        <div class="mb-2">
+          <label class="form-label small">Producto</label>
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            id="inventoryProduct"
+            placeholder="Buscar producto…"
+            autocomplete="off"
+          />
+          <div class="invalid-feedback">
+            Seleccioná un producto
+          </div>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="mb-2">
+          <label class="form-label small">Cantidad</label>
+          <input
+            type="number"
+            class="form-control form-control-sm"
+            id="inventoryQuantity"
+            min="0"
+          />
+          <div class="invalid-feedback">
+            Ingresá una cantidad válida
+          </div>
+        </div>
+
+        <!-- Fecha -->
+        <div class="mb-2">
+          <label class="form-label small">Fecha</label>
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            id="inventoryDate"
+          />
+        </div>
+
+        <!-- Observación -->
+        <div class="mb-2">
+          <label class="form-label small">Observación</label>
+          <textarea
+            class="form-control form-control-sm"
+            id="inventoryNote"
+            rows="2"
+            placeholder="Opcional"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer py-2">
+        <button
+          type="button"
+          class="btn btn-secondary rounded-pill btn-sm"
+          data-bs-dismiss="modal"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary rounded-pill btn-sm"
+          id="btnConfirmInventory"
+        >
+          Confirmar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+

@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Cargamos la página inicial
     console.log("Loading home page")
-    loadPage(PAGE_HOME); //poner el home
+    loadPage(PAGE_INVENTORY); //poner el home
 
     // Iniciamos la navbar inferior para que se pueda navegar entre las páginas
     console.log("Iniciando bottom navbar")
