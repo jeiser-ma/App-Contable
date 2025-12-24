@@ -91,6 +91,14 @@ function setupModuleControls(moduleName) {
   }
 
   currentModule = moduleName;
+  
+  // Verificar que el estado del módulo esté disponible
+  const state = window[config.stateName];
+  if (!state) {
+    console.error(`Estado ${config.stateName} no encontrado para el módulo: ${moduleName}`);
+    return;
+  }
+  
   const controls = document.getElementById("moduleControls");
   if (!controls) return;
 
@@ -407,8 +415,9 @@ function updateModuleState(key, value) {
   
   const state = window[config.stateName];
   if (state) {
+    const oldValue = state[key];
     state[key] = value;
-    console.log(`updateModuleState: ${currentModule}.${key} = ${value}`, state);
+    console.log(`updateModuleState: ${currentModule}.${key} = ${value} (was: ${oldValue})`, state);
   } else {
     console.error(`updateModuleState: state ${config.stateName} not found in window`);
   }

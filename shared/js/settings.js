@@ -13,6 +13,9 @@ const ID_INPUT_NEW_CONCEPT = "inputNewConcept";
 const ID_BTN_ADD_CONCEPT = "btnAddConcept";
 const ID_CONCEPTS_LIST = "conceptsList";
 const ID_CONCEPT_ERROR_FEEDBACK = "conceptErrorFeedback";
+
+const ID_INPUT_SALARY_PERCENTAGE = "inputSalaryPercentage";
+const ID_BTN_SAVE_SALARY_PERCENTAGE = "btnSaveSalaryPercentage";
 //#endregion
 
 /**
@@ -32,6 +35,10 @@ function onSettingsPageLoaded() {
   // Configurar event listeners
   setupUnitsListeners();
   setupConceptsListeners();
+  setupSalaryPercentageListener();
+  
+  // Cargar porcentaje de salario actual
+  loadSalaryPercentage();
 }
 
 /**
@@ -468,5 +475,56 @@ function clearConceptError() {
     feedback.style.display = "none";
     feedback.classList.remove("d-block");
   }
+}
+
+/**
+ * Configura el event listener para el porcentaje de salario
+ * @returns {void}
+ */
+function setupSalaryPercentageListener() {
+  const btnSave = document.getElementById(ID_BTN_SAVE_SALARY_PERCENTAGE);
+  if (!btnSave) return;
+  
+  btnSave.onclick = saveSalaryPercentage;
+}
+
+/**
+ * Carga el porcentaje de salario actual
+ * @returns {void}
+ */
+function loadSalaryPercentage() {
+  const input = document.getElementById(ID_INPUT_SALARY_PERCENTAGE);
+  if (!input) return;
+  
+  const percentage = getData("salaryPercentage");
+  input.value = percentage !== null && percentage !== undefined ? percentage : 1.7;
+}
+
+/**
+ * Guarda el porcentaje de salario
+ * @returns {void}
+ */
+function saveSalaryPercentage() {
+  const input = document.getElementById(ID_INPUT_SALARY_PERCENTAGE);
+  if (!input) return;
+  
+  const value = parseFloat(input.value);
+  if (isNaN(value) || value < 0 || value > 100) {
+    showSnackbar("Ingresá un porcentaje válido (0-100)");
+    input.focus();
+    return;
+  }
+  
+  setData("salaryPercentage", value);
+  showSnackbar("Porcentaje de salario guardado");
+}
+
+/**
+ * Obtiene el porcentaje de salario configurado
+ * @returns {number} Porcentaje de salario (default: 1.7)
+ */
+function getSalaryPercentage() {
+  const percentage = getData("salaryPercentage");
+  return percentage !== null && percentage !== undefined ? percentage : 1.7;
 }
 

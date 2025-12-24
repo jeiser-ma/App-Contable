@@ -1,0 +1,29 @@
+{
+  "id": "uuid",
+  "date": "2025-12-24",
+  "products": [
+    {
+      "productId": "uuid-del-producto",
+      "yesterdayStock": 100,
+      "yesterdayEntries": 10,
+      "yesterdayExits": 5,
+      "todayInventory": 105,
+      "sales": 0,
+      "unitPrice": 10,
+      "amount": 0
+    }
+  ],
+  "cashSales": 0,
+  "transferSales": 0,
+  "totalSales": 0,
+  "totalExpenses": 0,
+  "totalAmount": 0,
+  "difference": 0,
+  "salaryPercentage": 1.7,
+  "nominalSalary": 0,
+  "realSalary": 0,
+  "closed": false,
+  "createdAt": "timestamp",
+  "closedAt": null
+}
+

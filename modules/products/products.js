@@ -274,29 +274,82 @@ function updateClearFiltersButton() {
  * @returns {Array} Lista de productos filtrados
  */
 function filterProductsByName(products) {
+  console.log("=== filterProductsByName INICIADO ===");
+  console.log("Parámetro products:", products);
+  
+  if (!products || !Array.isArray(products)) {
+    console.log("ERROR: products no es un array válido");
+    return [];
+  }
+  
+  // Asegurarse de usar el estado actualizado desde window
+  const state = window.PRODUCTS_STATE || PRODUCTS_STATE;
+  console.log("Estado obtenido:", state);
+  
+  if (!state) {
+    console.error("PRODUCTS_STATE no está disponible");
+    return products;
+  }
+  
+  console.log("filterProductsByName - Estado recibido:", {
+    searchText: state.searchText,
+    filterStockStatus: state.filterStockStatus,
+    searchTextType: typeof state.searchText,
+    searchTextLength: state.searchText ? state.searchText.length : 0
+  });
+  
   let filtered = [...products];
+  console.log(`filterProductsByName - Productos iniciales: ${filtered.length}`);
 
   // Filtro por texto de búsqueda
-  if (PRODUCTS_STATE.searchText) {
-    filtered = filtered.filter((p) =>
-      p.name.toLowerCase().includes(PRODUCTS_STATE.searchText.toLowerCase())
-    );
+  const searchText = state.searchText ? String(state.searchText).trim() : "";
+  console.log(`filterProductsByName - searchText procesado: "${searchText}" (length: ${searchText.length})`);
+  
+  if (searchText && searchText.length > 0) {
+    console.log(`Filtrando por búsqueda: "${searchText}"`);
+    const beforeCount = filtered.length;
+    filtered = filtered.filter((p) => {
+      if (!p || !p.name) return false;
+      const matches = p.name.toLowerCase().includes(searchText.toLowerCase());
+      return matches;
+    });
+    console.log(`Productos después de búsqueda: ${filtered.length} (antes: ${beforeCount})`);
+  } else {
+    console.log("No hay texto de búsqueda, saltando filtro de búsqueda");
   }
 
   // Filtro por estado de stock
-  if (PRODUCTS_STATE.filterStockStatus === "critical") {
+  const stockStatus = state.filterStockStatus;
+  console.log(`filterProductsByName - stockStatus: "${stockStatus}" (type: ${typeof stockStatus})`);
+  
+  if (stockStatus === "critical") {
+    console.log("Filtrando por stock crítico");
+    const beforeCount = filtered.length;
     filtered = filtered.filter((p) => {
+      if (!p) return false;
       const threshold = p.criticalStockThreshold || 0;
-      return p.quantity <= threshold;
+      const matches = p.quantity !== undefined && p.quantity <= threshold;
+      return matches;
     });
-  } else if (PRODUCTS_STATE.filterStockStatus === "low") {
+    console.log(`Productos después de filtro crítico: ${filtered.length} (antes: ${beforeCount})`);
+  } else if (stockStatus === "low") {
+    console.log("Filtrando por stock bajo");
+    const beforeCount = filtered.length;
     filtered = filtered.filter((p) => {
+      if (!p) return false;
       const lowThreshold = p.lowStockThreshold || 0;
       const criticalThreshold = p.criticalStockThreshold || 0;
-      return p.quantity <= lowThreshold && p.quantity > criticalThreshold;
+      const matches = p.quantity !== undefined && 
+             p.quantity <= lowThreshold && 
+             p.quantity > criticalThreshold;
+      return matches;
     });
+    console.log(`Productos después de filtro bajo: ${filtered.length} (antes: ${beforeCount})`);
+  } else {
+    console.log(`No hay filtro de stock activo (stockStatus: ${stockStatus})`);
   }
 
+  console.log(`filterProductsByName - Productos finales: ${filtered.length}`);
   return filtered;
 }
 
@@ -306,9 +359,13 @@ function filterProductsByName(products) {
  * @returns {Array} Lista de productos ordenados
  */
 function sortProducts(products) {
+  // Asegurarse de usar el estado actualizado desde window
+  const state = window.PRODUCTS_STATE || PRODUCTS_STATE;
+  if (!state) return products;
+  
   return [...products].sort((a, b) => {
-    let v1 = a[PRODUCTS_STATE.orderBy];
-    let v2 = b[PRODUCTS_STATE.orderBy];
+    let v1 = a[state.orderBy];
+    let v2 = b[state.orderBy];
 
     // Normalizar strings para comparación
     if (typeof v1 === "string") {
@@ -316,8 +373,8 @@ function sortProducts(products) {
       v2 = v2.toLowerCase();
     }
 
-    if (v1 < v2) return PRODUCTS_STATE.orderDir === "asc" ? -1 : 1;
-    if (v1 > v2) return PRODUCTS_STATE.orderDir === "asc" ? 1 : -1;
+    if (v1 < v2) return state.orderDir === "asc" ? -1 : 1;
+    if (v1 > v2) return state.orderDir === "asc" ? 1 : -1;
     return 0;
   });
 }
@@ -389,14 +446,49 @@ function renderProductsList(products) {
  * @returns {void}
  */
 function renderProducts() {
-  const allProducts = getData("products");
+  console.log("renderProducts() llamado");
+  const allProducts = getData("products") || [];
+  console.log(`Total de productos: ${allProducts.length}`);
+
+  // Verificar que PRODUCTS_STATE esté disponible
+  const state = window.PRODUCTS_STATE || PRODUCTS_STATE;
+  if (!state) {
+    console.error("PRODUCTS_STATE no está disponible");
+    return;
+  }
+  
+  console.log("Estado actual:", {
+    searchText: state.searchText,
+    filterStockStatus: state.filterStockStatus,
+    orderBy: state.orderBy,
+    orderDir: state.orderDir
+  });
 
   // Primero filtrar, luego ordenar
-  const filtered = filterProductsByName(allProducts);
+  console.log("Llamando a filterProductsByName()...");
+  console.log("Tipo de filterProductsByName:", typeof filterProductsByName);
+  console.log("filterProductsByName es función?", typeof filterProductsByName === "function");
+  console.log("filterProductsByName.toString():", filterProductsByName.toString().substring(0, 200));
+  
+  let filtered;
+  try {
+    console.log("ANTES de llamar filterProductsByName");
+    filtered = filterProductsByName(allProducts);
+    console.log("DESPUÉS de llamar filterProductsByName");
+    console.log(`Productos filtrados: ${filtered.length}`);
+  } catch (error) {
+    console.error("ERROR en filterProductsByName:", error);
+    console.error("Stack trace:", error.stack);
+    return;
+  }
+  
+  console.log("Llamando a sortProducts()...");
   const sorted = sortProducts(filtered);
+  console.log(`Productos ordenados: ${sorted.length}`);
 
   updateModuleCounter(sorted.length, allProducts.length);
   renderProductsList(sorted);
+  console.log("renderProducts() completado");
 }
 
 // Función removida - ahora se usa updateModuleCounter() de components.js

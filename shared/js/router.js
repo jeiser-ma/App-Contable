@@ -16,6 +16,7 @@ const PAGE_PRODUCTS = "products";
 const PAGE_MOVEMENTS = "movements";
 const PAGE_INVENTORY = "inventory";
 const PAGE_EXPENSES = "expenses";
+const PAGE_ACCOUNTING = "accounting";
 const PAGE_SETTINGS = "settings";
 
 // Configuración de páginas (centralizada)
@@ -49,6 +50,12 @@ const PAGES_CONFIG = {
     icon: "bi-clipboard-check",
     navId: "navInventory",
     isModule: true // Módulo
+  },
+  [PAGE_ACCOUNTING]: {
+    title: "Contabilidad",
+    icon: "bi-calculator",
+    navId: "navAccounting",
+    isModule: false // Página compartida
   },
   [PAGE_SETTINGS]: {
     title: "Ajustes",
@@ -138,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Cargamos la página inicial
     console.log("Loading home page")
-    loadPage(PAGE_INVENTORY); //poner el home
+    loadPage(PAGE_ACCOUNTING); //poner el home
 
     // Iniciamos la navbar inferior para que se pueda navegar entre las páginas
     console.log("Iniciando bottom navbar")
@@ -161,6 +168,7 @@ function initBottomNav() {
   const movements = document.getElementById(PAGES_CONFIG[PAGE_MOVEMENTS].navId);
   const expenses = document.getElementById(PAGES_CONFIG[PAGE_EXPENSES].navId);
   const inventory = document.getElementById(PAGES_CONFIG[PAGE_INVENTORY].navId);
+  const accounting = document.getElementById(PAGES_CONFIG[PAGE_ACCOUNTING].navId);
   const settings = document.getElementById(PAGES_CONFIG[PAGE_SETTINGS].navId);
 
   if (home) home.onclick = () => loadPage(PAGE_HOME);
@@ -168,6 +176,7 @@ function initBottomNav() {
   if (movements) movements.onclick = () => loadPage(PAGE_MOVEMENTS);
   if (expenses) expenses.onclick = () => loadPage(PAGE_EXPENSES);
   if (inventory) inventory.onclick = () => loadPage(PAGE_INVENTORY);
+  if (accounting) accounting.onclick = () => loadPage(PAGE_ACCOUNTING);
   if (settings) settings.onclick = () => loadPage(PAGE_SETTINGS);
 }
 
