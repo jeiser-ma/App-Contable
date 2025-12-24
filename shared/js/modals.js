@@ -149,12 +149,14 @@ function confirmDelete() {
   }
 
   // Llama a la función específica según el tipo
-  const confirmFunction = window[`confirmDelete${DELETE_STATE.type.charAt(0).toUpperCase() + DELETE_STATE.type.slice(1)}`];
+  // Manejar casos especiales: "unit" -> "Unit", "concept" -> "Concept"
+  let functionName = DELETE_STATE.type.charAt(0).toUpperCase() + DELETE_STATE.type.slice(1);
+  const confirmFunction = window[`confirmDelete${functionName}`];
   
   if (confirmFunction && typeof confirmFunction === "function") {
     confirmFunction();
   } else {
-    console.error(`No se encontró la función confirmDelete${DELETE_STATE.type.charAt(0).toUpperCase() + DELETE_STATE.type.slice(1)}`);
+    console.error(`No se encontró la función confirmDelete${functionName}`);
   }
 }
 

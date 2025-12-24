@@ -3,6 +3,7 @@
 const UNDO_STATE = {
   data: null,
   type: null,
+  index: null, // Para unidades y conceptos (guardar posición original)
   buttonListener: null,
   timer: null
 };
@@ -42,6 +43,7 @@ function showSnackbar(text) {
 function clearUndoState() {
   UNDO_STATE.data = null;
   UNDO_STATE.type = null;
+  UNDO_STATE.index = null;
 }
 
 /**
@@ -71,19 +73,37 @@ function hideSnackbar() {
 function undoDelete() {
   if (!UNDO_STATE.data || !UNDO_STATE.type) return;
 
-  const data = getData(UNDO_STATE.type);
-  data.push(UNDO_STATE.data);
-  setData(UNDO_STATE.type, data);
+  // Manejar unidades de medida y conceptos de gastos (tienen índice)
+  if (UNDO_STATE.type === "units" || UNDO_STATE.type === "expenseConcepts") {
+    const data = getData(UNDO_STATE.type);
+    const index = UNDO_STATE.index !== undefined ? UNDO_STATE.index : data.length;
+    
+    // Insertar en la posición original
+    data.splice(index, 0, UNDO_STATE.data);
+    setData(UNDO_STATE.type, data);
+    
+    // Renderizar
+    if (UNDO_STATE.type === "units" && typeof renderUnits === "function") {
+      renderUnits();
+    } else if (UNDO_STATE.type === "expenseConcepts" && typeof renderConcepts === "function") {
+      renderConcepts();
+    }
+  } else {
+    // Manejar otros tipos (productos, movimientos, etc.)
+    const data = getData(UNDO_STATE.type);
+    data.push(UNDO_STATE.data);
+    setData(UNDO_STATE.type, data);
 
-  // Renderizar según el tipo
-  if (UNDO_STATE.type === "products" && typeof renderProducts === "function") {
-    renderProducts();
-  } else if (UNDO_STATE.type === "movements" && typeof renderMovements === "function") {
-    renderMovements();
-  } else if (UNDO_STATE.type === "inventory" && typeof renderInventory === "function") {
-    renderInventory();
-  } else if (UNDO_STATE.type === "expenses" && typeof renderExpenses === "function") {
-    renderExpenses();
+    // Renderizar según el tipo
+    if (UNDO_STATE.type === "products" && typeof renderProducts === "function") {
+      renderProducts();
+    } else if (UNDO_STATE.type === "movements" && typeof renderMovements === "function") {
+      renderMovements();
+    } else if (UNDO_STATE.type === "inventory" && typeof renderInventory === "function") {
+      renderInventory();
+    } else if (UNDO_STATE.type === "expenses" && typeof renderExpenses === "function") {
+      renderExpenses();
+    }
   }
 
   hideSnackbar(); // Esta función ya remueve el listener

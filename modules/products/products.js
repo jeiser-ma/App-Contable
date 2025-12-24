@@ -78,6 +78,10 @@ function openAddProductModal() {
   clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
   clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
   document.getElementById(ID_PRODUCT_ID).value = "";
+  
+  // Cargar unidades de medida en el select
+  loadUnitsIntoSelect();
+  
   toggleModal();
 }
 
@@ -98,11 +102,52 @@ function openEditProductModal(id) {
   document.getElementById(ID_PRODUCT_ID).value = product.id;
   document.getElementById(ID_INPUT_NAME).value = product.name;
   document.getElementById(ID_INPUT_PRICE).value = product.price;
-  document.getElementById(ID_INPUT_UM).value = product.um;
   document.getElementById(ID_INPUT_QUANTITY).value = product.quantity;
   document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value = product.lowStockThreshold || "";
   document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value = product.criticalStockThreshold || "";
+  
+  // Cargar unidades de medida en el select y seleccionar la del producto
+  loadUnitsIntoSelect();
+  const umSelect = document.getElementById(ID_INPUT_UM);
+  if (umSelect && product.um) {
+    umSelect.value = product.um;
+  }
+  
   toggleModal();
+}
+
+/**
+ * Carga las unidades de medida en el select del modal de productos
+ * @returns {void}
+ */
+function loadUnitsIntoSelect() {
+  const select = document.getElementById(ID_INPUT_UM);
+  if (!select) return;
+  
+  // Limpiar opciones existentes (excepto la primera)
+  const firstOption = select.querySelector('option[value=""]');
+  select.innerHTML = "";
+  if (firstOption) {
+    select.appendChild(firstOption);
+  } else {
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = "Seleccioná una unidad...";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    select.appendChild(defaultOption);
+  }
+  
+  // Obtener unidades de medida
+  const units = getUnits();
+  
+  // Agregar opciones
+  units.forEach(unit => {
+    const option = document.createElement("option");
+    option.value = unit;
+    option.textContent = unit;
+    select.appendChild(option);
+  });
 }
 
 /**

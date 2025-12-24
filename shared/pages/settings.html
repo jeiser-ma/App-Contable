@@ -1,10 +1,69 @@
-<div class="container mt-5">
-  <h5>
-    <i class="bi bi-gear"></i>
-    Ajustes
-  </h5>
+<div class="container-fluid px-3 py-3 mt-5">
+  
 
-  <p class="text-muted">
-    Configuración de la aplicación (pendiente).
-  </p>
+  <!-- Sección: Unidades de Medida -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-beaker text-primary fs-5"></i>
+      <h6 class="mb-0 fw-semibold">Unidades de Medida</h6>
+    </div>
+
+    <!-- Campo de texto + botón agregar -->
+    <div class="d-flex gap-2 mb-3">
+      <div class="flex-grow-1 d-inline-flex">
+        <input
+          type="text"
+          class="form-control form-control-sm rounded-pill"
+          id="inputNewUnit"
+          placeholder="Nueva unidad de medida..."
+        />
+        <div class="invalid-feedback" id="unitErrorFeedback"></div>
+      </div>
+      <button
+        class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
+        id="btnAddUnit"
+        style="width: 40px; height: 40px; flex-shrink: 0;"
+      >
+        <i class="bi bi-plus fs-5"></i>
+      </button>
+    </div>
+
+    <!-- Chips de unidades de medida -->
+    <div id="unitsList" class="d-flex flex-wrap gap-2">
+      <!-- Se llenan dinámicamente -->
+    </div>
+  </div>
+
+  <!-- Sección: Conceptos de Gastos -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-cash-coin text-primary fs-5"></i>
+      <h6 class="mb-0 fw-semibold">Conceptos de Gastos</h6>
+    </div>
+
+    <!-- Campo de texto + botón agregar -->
+    <div class="d-flex gap-2 mb-3">
+      <div class="flex-grow-1 d-inline-flex">
+        <input
+          type="text"
+          class="form-control form-control-sm rounded-pill"
+          id="inputNewConcept"
+          placeholder="Nuevo concepto de gastos..."
+        />
+        <div class="invalid-feedback" id="conceptErrorFeedback"></div>
+      </div>
+      <button
+        class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
+        id="btnAddConcept"
+        style="width: 40px; height: 40px; flex-shrink: 0;"
+      >
+        <i class="bi bi-plus fs-5"></i>
+      </button>
+    </div>
+
+    <!-- Chips de conceptos de gastos -->
+    <div id="conceptsList" class="d-flex flex-wrap gap-2">
+      <!-- Se llenan dinámicamente -->
+    </div>
+  </div>
 </div>

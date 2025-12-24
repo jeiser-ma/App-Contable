@@ -39,7 +39,13 @@
 
           <div class="mb-2">
             <label class="form-label">Unidad de medida</label>
-            <input type="text" class="form-control" id="inputUM" />
+            <select class="form-select" id="inputUM">
+              <option value="" selected disabled>Seleccioná una unidad...</option>
+              <!-- Se llenan dinámicamente -->
+            </select>
+            <div class="invalid-feedback">
+              Seleccioná una unidad de medida
+            </div>
           </div>
 
           <div class="mb-2">

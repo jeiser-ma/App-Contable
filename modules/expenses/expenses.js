@@ -77,6 +77,9 @@ function openExpenseModal() {
   title.textContent = "Nuevo gasto";
   icon.className = "bi bi-cash-coin text-danger";
 
+  // Cargar conceptos de gastos en el select
+  loadExpenseConceptsIntoSelect();
+
   // Limpiar formulario
   conceptInput.value = "";
   amountInput.value = "";
@@ -130,7 +133,7 @@ function saveExpenseFromModal() {
     conceptInput.classList.add("is-invalid");
     const fb = conceptInput.nextElementSibling;
     if (fb && fb.classList.contains("invalid-feedback")) {
-      fb.textContent = "Ingresá un concepto";
+      fb.textContent = "Seleccioná un concepto";
     }
     return;
   }
@@ -214,7 +217,12 @@ function openEditExpenseModal(id) {
   title.textContent = "Editar gasto";
   icon.className = "bi bi-cash-coin text-danger";
 
-  conceptInput.value = expense.concept;
+  // Cargar conceptos de gastos en el select y seleccionar el del gasto
+  loadExpenseConceptsIntoSelect();
+  if (conceptInput && expense.concept) {
+    conceptInput.value = expense.concept;
+  }
+
   amountInput.value = expense.amount;
   dateInput.value = expense.date;
   if (noteInput) noteInput.value = expense.note || "";
@@ -222,6 +230,40 @@ function openEditExpenseModal(id) {
   clearExpenseErrors();
 
   showModal();
+}
+
+/**
+ * Carga los conceptos de gastos en el select del modal
+ * @returns {void}
+ */
+function loadExpenseConceptsIntoSelect() {
+  const select = document.getElementById(ID_EXPENSE_CONCEPT);
+  if (!select) return;
+  
+  // Limpiar opciones existentes (excepto la primera)
+  const firstOption = select.querySelector('option[value=""]');
+  select.innerHTML = "";
+  if (firstOption) {
+    select.appendChild(firstOption);
+  } else {
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = "Seleccioná un concepto...";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    select.appendChild(defaultOption);
+  }
+  
+  // Obtener conceptos de gastos
+  const concepts = getExpenseConcepts();
+  
+  // Agregar opciones
+  concepts.forEach(concept => {
+    const option = document.createElement("option");
+    option.value = concept;
+    option.textContent = concept;
+    select.appendChild(option);
+  });
 }
 
 /**
