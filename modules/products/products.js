@@ -327,7 +327,7 @@ function renderProductsList(products) {
     if (metaEl) {
       metaEl.innerHTML = `<i class="bi ${quantityIcon} ${quantityColor}"></i> <span class="${quantityColor}">${p.quantity}</span> 
       • <i class="bi bi-currency-dollar"></i> ${p.price} 
-      • <i class="bi bi-flask-florence"></i> ${p.um}`;
+      • <i class="bi bi-beaker small"></i> ${p.um}`;
     }
 
     node.querySelector(".btn-edit").onclick = () => openEditProductModal(p.id);
