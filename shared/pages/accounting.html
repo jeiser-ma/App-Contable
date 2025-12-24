@@ -11,7 +11,7 @@
   </div>
 
   <!-- Alerta de productos sin inventario -->
-  <div id="alertMissingInventory" class="alert alert-warning d-none d-inline-flex align-items-center gap-2">
+  <div id="alertMissingInventory" class="alert alert-warning d-none">
     <i class="bi bi-exclamation-triangle"></i>
     <strong>Faltan productos por hacerle el inventario</strong>
     <button class="btn btn-sm btn-warning rounded-pill" onclick="goToInventory()">
@@ -20,7 +20,7 @@
   </div>
 
   <!-- Alerta de gastos sin registrar -->
-  <div id="alertNoExpenses" class="alert alert-info d-none">
+  <div id="alertNoExpenses" class="alert alert-danger d-none">
     <i class="bi bi-info-circle"></i>
     <strong>No hay gastos registrados para el día de ayer</strong>
     <button class="btn btn-sm btn-info rounded-pill" onclick="goToExpenses()">
