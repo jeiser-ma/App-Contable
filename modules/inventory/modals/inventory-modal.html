@@ -21,55 +21,58 @@
         <div class="mb-3">
           <label class="form-label small">Producto</label>
           <div class="alert alert-light mb-0">
-            <i class="bi bi-box"></i>
-            <span class="fw-semibold" id="inventoryProductLabel">
+            <div class="fw-semibold" id="inventoryProductLabel">
               Seleccionando producto...
-            </span>
+            </div>
+            <div class="small text-muted mt-1">
+              <i class="bi bi-box"></i>
+              <span id="inventoryProductStock">--</span>
+            </div>
           </div>
         </div>
 
         <!-- Cantidades -->
-        <div class="d-flex gap-4">
-          <!-- Cantidad en almacén -->
-          <div class="mb-3 flex-grow-1">
-            <label class="form-label small">Almacén</label>
-            <div class="input-group input-group-sm rounded-pill overflow-hidden border">
-              <span class="input-group-text bg-primary text-white border-0 px-4">
-                <i class="bi bi-houses"></i>
-              </span>
-              <input
-                type="number"
-                id="locationWarehouseInput"
-                class="form-control border-0 rounded-0"
-                placeholder="Cantidad..."
-                min="0"
-                required
-              />
+        <div>
+          <div class="d-flex gap-4 mb-2">
+            <!-- Cantidad en almacén -->
+            <div class="flex-grow-1">
+              <label class="form-label small">Almacén</label>
+              <div class="input-group input-group-sm rounded-pill overflow-hidden border">
+                <span class="input-group-text bg-primary text-white border-0 px-4">
+                  <i class="bi bi-houses"></i>
+                </span>
+                <input
+                  type="number"
+                  id="locationWarehouseInput"
+                  class="form-control border-0 rounded-0"
+                  placeholder="Cantidad..."
+                  min="0"
+                  step="0.01"
+                />
+              </div>
             </div>
-            <div class="invalid-feedback">
-              Ingresá una cantidad válida
+
+            <!-- Cantidad en área de ventas -->
+            <div class="flex-grow-1">
+              <label class="form-label small">Área de ventas</label>
+              <div class="input-group input-group-sm rounded-pill overflow-hidden border">
+                <span class="input-group-text bg-success text-white border-0 px-4">
+                  <i class="bi bi-shop-window"></i>
+                </span>
+                <input
+                  type="number"
+                  id="locationStoreInput"
+                  class="form-control border-0 rounded-0"
+                  placeholder="Cantidad..."
+                  min="0"
+                  step="0.01"
+                />
+              </div>
             </div>
           </div>
-
-          <!-- Cantidad en área de ventas -->
-          <div class="mb-3 flex-grow-1">
-            <label class="form-label small">Área de ventas</label>
-            <div class="input-group input-group-sm rounded-pill overflow-hidden border">
-              <span class="input-group-text bg-success text-white border-0 px-4">
-                <i class="bi bi-shop-window"></i>
-              </span>
-              <input
-                type="number"
-                id="locationStoreInput"
-                class="form-control border-0 rounded-0"
-                placeholder="Cantidad..."
-                min="0"
-                required
-              />
-            </div>
-            <div class="invalid-feedback">
-              Ingresá una cantidad válida
-            </div>
+          <!-- Mensaje de error compartido -->
+          <div class="invalid-feedback" id="inventoryErrorFeedback" style="display: none;">
+            <!-- Mensaje de error se setea por JS -->
           </div>
         </div>
 

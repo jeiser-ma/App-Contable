@@ -47,7 +47,7 @@ const PAGES_CONFIG = {
   },
   [PAGE_INVENTORY]: {
     title: "Inventario",
-    icon: "bi-clipboard-check",
+    icon: "bi-clipboard-data",
     navId: "navInventory",
     isModule: true // Módulo
   },
