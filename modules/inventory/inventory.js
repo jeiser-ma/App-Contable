@@ -357,9 +357,10 @@ function filterProductsByName(products) {
 /**
  * Renderiza la lista de productos pendientes
  * @param {Array} products - Lista de productos pendientes
+ * @param {boolean} allComplete - Indica si todos los productos tienen inventario completo
  * @returns {void}
  */
-function renderPendingInventoryList(products) {
+function renderPendingInventoryList(products, allComplete = false) {
   const list = document.getElementById(ID_PENDING_INVENTORY_LIST);
   const template = document.getElementById(ID_PENDING_CARD_TEMPLATE);
 
@@ -368,12 +369,15 @@ function renderPendingInventoryList(products) {
   list.innerHTML = "";
 
   if (products.length === 0) {
-    list.innerHTML = `
-      <div class="text-center text-muted py-4">
-        <i class="bi bi-check-circle"></i>
-        <p class="mb-0">Todos los productos tienen inventario del día</p>
-      </div>
-    `;
+    // Solo mostrar mensaje si todos los productos tienen inventario completo (ambos valores)
+    if (allComplete) {
+      list.innerHTML = `
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-check-circle"></i>
+          <p class="mb-0">Todos los productos tienen inventario del día</p>
+        </div>
+      `;
+    }
     return;
   }
 
@@ -605,8 +609,14 @@ function renderInventory() {
   const completed = completedInventory.length;
   updateModuleCounter(completed, total);
 
+  // Mostrar mensaje "Todos los productos tienen inventario del día" solo si:
+  // - No hay productos pendientes
+  // - No hay productos parciales
+  // - Todos los productos tienen inventario completo (ambos valores) o tienen stock cero
+  const allProductsHaveCompleteInventory = pendingProducts.length === 0 && filteredPartialInventory.length === 0;
+  
   // Renderizar listas
-  renderPendingInventoryList(pendingProducts);
+  renderPendingInventoryList(pendingProducts, allProductsHaveCompleteInventory);
   renderPartialInventoryList(filteredPartialInventory);
   renderCompletedInventoryList(filteredCompletedInventory);
 }

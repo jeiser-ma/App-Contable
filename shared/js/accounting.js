@@ -251,9 +251,9 @@ function renderAccountingProducts() {
         <div class="fw-semibold mb-2">${product.name}</div>
         <div class="d-flex flex-wrap gap-2 small text-muted">
           <span><i class="bi bi-box text-primary"></i> ${ap.yesterdayStock}</span>
-          <span><i class="bi bi-plus-circle text-success"></i> +${ap.yesterdayEntries}</span>
-          <span><i class="bi bi-dash-circle text-danger"></i> -${ap.yesterdayExits}</span>
-          <span><i class="bi bi-plus-circle text-success"></i> ${ap.todayInventory !== null ? ap.todayInventory : '--'}</span>
+          <span><i class="bi bi-arrow-right-circle text-success"></i> +${ap.yesterdayEntries}</span>
+          <span><i class="bi bi-arrow-left-circle text-danger"></i> -${ap.yesterdayExits}</span>
+          <span><i class="bi bi-box text-success"></i> ${ap.todayInventory !== null ? ap.todayInventory : '--'}</span>
           <span>VENTAS ${ap.sales !== null && ap.sales !== undefined ? ap.sales : '--'}</span>
           <span>PU $${ap.unitPrice.toFixed(2)}</span>
           <span>IMP $${ap.amount.toFixed(2)}</span>
