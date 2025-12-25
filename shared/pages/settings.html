@@ -1,10 +1,16 @@
 <div class="container-fluid px-3 py-3 mt-5">
   <!-- Sección: Unidades de Medida -->
   <div class="mb-4">
-    <div class="d-flex align-items-center gap-2 mb-3">
+    <div class="d-flex align-items-center gap-2">
       <i class="bi bi-beaker text-primary fs-5"></i>
       <h6 class="mb-0 fw-semibold">Unidades de Medida</h6>
     </div>
+
+    <!-- Texto informativo -->
+    <small class="text-muted d-flex align-items-center gap-1 pb-3 px-3">
+      <i class="bi bi-info-circle"></i>
+      <span>Unidades utilizadas para medir las cantidades de los productos</span>
+    </small>
 
     <!-- Campo de texto + botón agregar -->
     <div class="d-flex gap-2 mb-3">
@@ -26,6 +32,7 @@
       </button>
     </div>
 
+
     <!-- Chips de unidades de medida -->
     <div id="unitsList" class="d-flex flex-wrap gap-2">
       <!-- Se llenan dinámicamente -->
@@ -34,10 +41,16 @@
 
   <!-- Sección: Conceptos de Gastos -->
   <div class="mb-4">
-    <div class="d-flex align-items-center gap-2 mb-3">
+    <div class="d-flex align-items-center gap-2">
       <i class="bi bi-cash-coin text-primary fs-5"></i>
       <h6 class="mb-0 fw-semibold">Conceptos de Gastos</h6>
     </div>
+    
+    <!-- Texto informativo -->
+    <small class="text-muted d-flex align-items-center gap-1 pb-3 px-3">
+      <i class="bi bi-info-circle"></i>
+      <span>Conceptos utilizados para categorizar los gastos registrados</span>
+    </small>
 
     <!-- Campo de texto + botón agregar -->
     <div class="d-flex gap-2 mb-3">
@@ -59,6 +72,7 @@
       </button>
     </div>
 
+
     <!-- Chips de conceptos de gastos -->
     <div id="conceptsList" class="d-flex flex-wrap gap-2">
       <!-- Se llenan dinámicamente -->
@@ -67,14 +81,19 @@
 
   <!-- Sección: Porcentaje de Salario -->
   <div class="mb-4">
-    <div class="d-flex align-items-center gap-2 mb-3">
+    <div class="d-flex align-items-center gap-2">
       <i class="bi bi-percent text-primary fs-5"></i>
       <h6 class="mb-0 fw-semibold">Porcentaje de Salario</h6>
     </div>
 
+    <!-- Texto informativo -->
+    <small class="text-muted d-flex align-items-center gap-1 px-3 pb-3">
+      <i class="bi bi-info-circle"></i>
+      <span>Porcentaje utilizado para calcular el salario del vendedor</span>
+    </small>
 
     <div class="d-flex gap-2">
-      <div class="flex-grow-1 d-inline-flex">
+      <div class="flex-grow-1 d-inline-flex flex-column">
         <div
           class="input-group input-group rounded-pill overflow-hidden border"
         >
@@ -91,6 +110,7 @@
             <i class="bi bi-percent"></i>
           </span>
         </div>
+        <div class="invalid-feedback" id="salaryPercentageErrorFeedback"></div>
       </div>
       <button
           class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
@@ -101,7 +121,5 @@
         </button>
     </div>
 
-    <small class="text-muted px-3"> Porcentaje utilizado para calcular el salario del vendedor </small
-    >
   </div>
 </div>

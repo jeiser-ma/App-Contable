@@ -16,6 +16,7 @@ const ID_CONCEPT_ERROR_FEEDBACK = "conceptErrorFeedback";
 
 const ID_INPUT_SALARY_PERCENTAGE = "inputSalaryPercentage";
 const ID_BTN_SAVE_SALARY_PERCENTAGE = "btnSaveSalaryPercentage";
+const ID_SALARY_PERCENTAGE_ERROR_FEEDBACK = "salaryPercentageErrorFeedback";
 //#endregion
 
 /**
@@ -508,15 +509,57 @@ function saveSalaryPercentage() {
   const input = document.getElementById(ID_INPUT_SALARY_PERCENTAGE);
   if (!input) return;
   
+  // Limpiar error previo
+  clearSalaryPercentageError();
+  
   const value = parseFloat(input.value);
   if (isNaN(value) || value < 0 || value > 100) {
-    showSnackbar("Ingresá un porcentaje válido (0-100)");
+    setSalaryPercentageError("Ingresá un porcentaje válido (0-100)");
     input.focus();
     return;
   }
   
   setData("salaryPercentage", value);
-  showSnackbar("Porcentaje de salario guardado");
+  // No mostrar snackbar, es un valor simple de modificar
+}
+
+/**
+ * Muestra un error en el campo de porcentaje de salario
+ * @param {string} message - Mensaje de error a mostrar
+ * @returns {void}
+ */
+function setSalaryPercentageError(message) {
+  const input = document.getElementById(ID_INPUT_SALARY_PERCENTAGE);
+  const feedback = document.getElementById(ID_SALARY_PERCENTAGE_ERROR_FEEDBACK);
+  
+  if (input) {
+    input.classList.add("is-invalid");
+  }
+  
+  if (feedback) {
+    feedback.textContent = message;
+    feedback.style.display = "block";
+    feedback.classList.add("d-block");
+  }
+}
+
+/**
+ * Limpia el error del campo de porcentaje de salario
+ * @returns {void}
+ */
+function clearSalaryPercentageError() {
+  const input = document.getElementById(ID_INPUT_SALARY_PERCENTAGE);
+  const feedback = document.getElementById(ID_SALARY_PERCENTAGE_ERROR_FEEDBACK);
+  
+  if (input) {
+    input.classList.remove("is-invalid");
+  }
+  
+  if (feedback) {
+    feedback.textContent = "";
+    feedback.style.display = "none";
+    feedback.classList.remove("d-block");
+  }
 }
 
 /**
