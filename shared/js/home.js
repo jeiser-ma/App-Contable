@@ -9,7 +9,13 @@
  */
 function onHomePageLoaded() {
   console.log("onHomePageLoaded execution");
-  updateDashboard();
+  
+  // Usar setTimeout para asegurar que el DOM esté completamente renderizado
+  setTimeout(() => {
+    updateDashboard();
+    setupClickableCards();
+    updateAccountingSummary();
+  }, 100);
 }
 
 /**
@@ -17,15 +23,20 @@ function onHomePageLoaded() {
  * @returns {void}
  */
 function updateDashboard() {
+  console.log("updateDashboard ejecutado");
+  
   // Obtener datos
   const products = getData("products") || [];
   const movements = getData("movements") || [];
   const expenses = getData("expenses") || [];
   const inventory = getData("inventory") || [];
 
+  console.log("Total productos:", products.length);
+
   // 1. Total de productos
   const totalProducts = products.length;
   updateMetric("totalProducts", totalProducts);
+  console.log("totalProducts actualizado:", totalProducts);
 
   // 2. Productos con stock bajo
   const lowStockCount = products.filter((p) => {
@@ -34,6 +45,7 @@ function updateDashboard() {
     return p.quantity <= lowThreshold && p.quantity > criticalThreshold;
   }).length;
   updateMetric("lowStockProducts", lowStockCount);
+  console.log("lowStockProducts actualizado:", lowStockCount);
 
   // 3. Productos con stock crítico
   const criticalStockCount = products.filter((p) => {
@@ -41,6 +53,7 @@ function updateDashboard() {
     return p.quantity <= criticalThreshold;
   }).length;
   updateMetric("criticalStockProducts", criticalStockCount);
+  console.log("criticalStockProducts actualizado:", criticalStockCount);
 
   // 4. Total de movimientos
   const totalMovements = movements.length;
@@ -115,6 +128,9 @@ function updateMetric(id, value) {
   const element = document.getElementById(id);
   if (element) {
     element.textContent = value;
+    console.log(`updateMetric: ${id} = ${value}`);
+  } else {
+    console.warn(`updateMetric: No se encontró el elemento con id "${id}"`);
   }
 }
 
@@ -129,5 +145,298 @@ function formatCurrency(amount) {
     currency: "USD",
     minimumFractionDigits: 2,
   }).format(amount);
+}
+
+/**
+ * Configura las cards clicables (stock bajo y crítico)
+ * @returns {void}
+ */
+function setupClickableCards() {
+  console.log("setupClickableCards ejecutado");
+  
+  const cardLowStock = document.getElementById("cardLowStock");
+  const cardCriticalStock = document.getElementById("cardCriticalStock");
+  const btnViewAccountingDetails = document.getElementById("btnViewAccountingDetails");
+  
+  console.log("cardLowStock:", cardLowStock);
+  console.log("cardCriticalStock:", cardCriticalStock);
+  console.log("btnViewAccountingDetails:", btnViewAccountingDetails);
+  
+  if (cardLowStock) {
+    // Remover listener anterior si existe
+    cardLowStock.removeEventListener("click", cardLowStock._clickHandler);
+    cardLowStock._clickHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("Card stock bajo clickeada");
+      navigateToProductsWithFilter("low");
+    };
+    cardLowStock.addEventListener("click", cardLowStock._clickHandler);
+  } else {
+    console.error("No se encontró cardLowStock");
+  }
+  
+  if (cardCriticalStock) {
+    // Remover listener anterior si existe
+    cardCriticalStock.removeEventListener("click", cardCriticalStock._clickHandler);
+    cardCriticalStock._clickHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("Card stock crítico clickeada");
+      navigateToProductsWithFilter("critical");
+    };
+    cardCriticalStock.addEventListener("click", cardCriticalStock._clickHandler);
+  } else {
+    console.error("No se encontró cardCriticalStock");
+  }
+  
+  if (btnViewAccountingDetails) {
+    // Remover listener anterior si existe
+    btnViewAccountingDetails.removeEventListener("click", btnViewAccountingDetails._clickHandler);
+    btnViewAccountingDetails._clickHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("Botón ver detalles clickeado");
+      if (typeof loadPage === "function") {
+        loadPage("accounting");
+        // Establecer la fecha de hoy en el filtro de contabilidad
+        setTimeout(() => {
+          const dateFilter = document.getElementById("accountingDateFilter");
+          if (dateFilter) {
+            dateFilter.value = getToday();
+            // Disparar el evento change para cargar la contabilidad de hoy
+            if (dateFilter.onchange) {
+              dateFilter.onchange();
+            } else {
+              const event = new Event("change");
+              dateFilter.dispatchEvent(event);
+            }
+          }
+        }, 300);
+      }
+    };
+    btnViewAccountingDetails.addEventListener("click", btnViewAccountingDetails._clickHandler);
+  } else {
+    console.error("No se encontró btnViewAccountingDetails");
+  }
+}
+
+/**
+ * Navega a la página de productos con un filtro aplicado
+ * @param {string} filterType - Tipo de filtro ("low" o "critical")
+ * @returns {void}
+ */
+function navigateToProductsWithFilter(filterType) {
+  if (typeof loadPage === "function") {
+    loadPage("products");
+    
+    // Esperar a que se cargue la página y luego aplicar el filtro
+    setTimeout(() => {
+      if (typeof setupModuleControls === "function") {
+        // Asegurar que los controles estén configurados
+        setupModuleControls("products");
+        
+        // Aplicar el filtro
+        const filterValue = filterType === "low" ? "low" : "critical";
+        if (window.PRODUCTS_STATE) {
+          window.PRODUCTS_STATE.filterStockStatus = filterValue;
+          
+          // Activar el chip correspondiente
+          const chipId = filterType === "low" ? "filterLowStock" : "filterCriticalStock";
+          const chip = document.getElementById(chipId);
+          if (chip) {
+            chip.classList.add("active");
+            // Desactivar el otro chip si está activo
+            const otherChipId = filterType === "low" ? "filterCriticalStock" : "filterLowStock";
+            const otherChip = document.getElementById(otherChipId);
+            if (otherChip) {
+              otherChip.classList.remove("active");
+            }
+          }
+          
+          // Renderizar productos con el filtro aplicado
+          if (typeof renderProducts === "function") {
+            renderProducts();
+          }
+        }
+      }
+    }, 300);
+  }
+}
+
+/**
+ * Obtiene la fecha de hoy en formato YYYY-MM-DD
+ * @returns {string} Fecha de hoy
+ */
+function getToday() {
+  return new Date().toISOString().split("T")[0];
+}
+
+/**
+ * Obtiene la fecha de ayer en formato YYYY-MM-DD
+ * @param {string} date - Fecha en formato YYYY-MM-DD
+ * @returns {string} Fecha de ayer
+ */
+function getYesterday(date) {
+  const d = new Date(date + "T00:00:00");
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split("T")[0];
+}
+
+/**
+ * Obtiene el porcentaje de salario desde settings
+ * @returns {number} Porcentaje de salario (por defecto 1.7)
+ */
+function getSalaryPercentage() {
+  // Intentar usar la función de settings.js si está disponible
+  if (typeof window.getSalaryPercentage === "function") {
+    return window.getSalaryPercentage();
+  }
+  // Si no está disponible, leer usando getData
+  const percentage = getData("salaryPercentage");
+  return percentage !== null && percentage !== undefined ? percentage : 1.7;
+}
+
+/**
+ * Calcula y actualiza el resumen de contabilidad del día
+ * @returns {void}
+ */
+function updateAccountingSummary() {
+  const today = getToday();
+  const yesterday = getYesterday(today);
+  
+  // Obtener datos
+  const allAccounting = getData("accounting") || [];
+  let accounting = allAccounting.find(a => a.date === today);
+  
+  // Si no existe, crear uno nuevo
+  if (!accounting) {
+    accounting = createTodayAccounting(today, yesterday);
+  }
+  
+  // Actualizar valores en el DOM
+  updateMetric("accountingTotalAmount", formatCurrency(accounting.totalAmount || 0));
+  updateMetric("accountingTotalExpenses", formatCurrency(accounting.totalExpenses || 0));
+  updateMetric("accountingTotalSales", formatCurrency(accounting.totalSales || 0));
+  
+  // Calcular diferencia
+  const difference = (accounting.totalAmount || 0) - (accounting.totalSales || 0);
+  updateMetric("accountingDifference", formatCurrency(difference));
+  
+  // Aplicar color e icono según la diferencia
+  const differenceElement = document.getElementById("accountingDifference");
+  const differenceIcon = document.getElementById("accountingDifferenceIcon");
+  
+  if (differenceElement && differenceIcon) {
+    // Remover clases de color anteriores
+    differenceElement.classList.remove("text-success", "text-danger", "text-primary");
+    differenceIcon.className = "bi";
+    
+    if (difference === 0) {
+      differenceElement.classList.add("text-success");
+      differenceIcon.classList.add("bi-check-circle-fill", "text-success");
+    } else if (difference < 0) {
+      differenceElement.classList.add("text-danger");
+      differenceIcon.classList.add("bi-x-circle-fill", "text-danger");
+    } else {
+      differenceElement.classList.add("text-primary");
+      differenceIcon.classList.add("bi-arrow-up-circle-fill", "text-primary");
+    }
+  }
+}
+
+/**
+ * Crea un objeto de contabilidad para hoy
+ * @param {string} today - Fecha de hoy en formato YYYY-MM-DD
+ * @param {string} yesterday - Fecha de ayer en formato YYYY-MM-DD
+ * @returns {Object} Objeto de contabilidad
+ */
+function createTodayAccounting(today, yesterday) {
+  const products = getData("products") || [];
+  const movements = getData("movements") || [];
+  const inventory = getData("inventory") || [];
+  const expenses = getData("expenses") || [];
+  
+  // Obtener contabilidad de ayer (si existe y está cerrada)
+  const allAccounting = getData("accounting") || [];
+  const yesterdayAccounting = allAccounting.find(a => a.date === yesterday && a.closed);
+  
+  const accountingProducts = products.map(product => {
+    // Stock de ayer
+    let yesterdayStock = product.quantity;
+    if (yesterdayAccounting) {
+      const yesterdayProduct = yesterdayAccounting.products.find(p => p.productId === product.id);
+      if (yesterdayProduct) {
+        yesterdayStock = yesterdayProduct.yesterdayStock + yesterdayProduct.yesterdayEntries - yesterdayProduct.yesterdayExits;
+      }
+    }
+    
+    // Entradas de ayer
+    const yesterdayEntries = movements
+      .filter(m => m.date === yesterday && m.type === "IN" && m.productId === product.id)
+      .reduce((sum, m) => sum + m.quantity, 0);
+    
+    // Salidas de ayer
+    const yesterdayExits = movements
+      .filter(m => m.date === yesterday && m.type === "OUT" && m.productId === product.id)
+      .reduce((sum, m) => sum + m.quantity, 0);
+    
+    // Inventario de hoy
+    const todayInventory = inventory.find(inv => inv.date === today && inv.productId === product.id && inv.status === "CONFIRMED");
+    let todayInventoryQty = null;
+    if (todayInventory) {
+      todayInventoryQty = (todayInventory.warehouseQuantity || 0) + (todayInventory.storeQuantity || 0);
+    }
+    
+    // Ventas = stock ayer + entradas ayer - salidas ayer - inventario hoy
+    const sales = todayInventoryQty !== null 
+      ? yesterdayStock + yesterdayEntries - yesterdayExits - todayInventoryQty
+      : 0;
+    
+    return {
+      productId: product.id,
+      yesterdayStock: yesterdayStock,
+      yesterdayEntries: yesterdayEntries,
+      yesterdayExits: yesterdayExits,
+      todayInventory: todayInventoryQty,
+      sales: sales,
+      unitPrice: product.price || 0,
+      amount: sales * (product.price || 0)
+    };
+  });
+  
+  // Gastos de ayer
+  const yesterdayExpenses = expenses.filter(e => e.date === yesterday);
+  const totalExpenses = yesterdayExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  
+  // Obtener ventas de contabilidad existente (si existe)
+  let cashSales = 0;
+  let transferSales = 0;
+  const existingAccounting = allAccounting.find(a => a.date === today);
+  if (existingAccounting) {
+    cashSales = existingAccounting.cashSales || 0;
+    transferSales = existingAccounting.transferSales || 0;
+  }
+  
+  const totalAmount = accountingProducts.reduce((sum, p) => sum + p.amount, 0);
+  const totalSales = cashSales + transferSales;
+  
+  return {
+    id: existingAccounting?.id || crypto.randomUUID(),
+    date: today,
+    products: accountingProducts,
+    cashSales: cashSales,
+    transferSales: transferSales,
+    totalSales: totalSales,
+    totalExpenses: totalExpenses,
+    totalAmount: totalAmount,
+    difference: totalAmount - totalSales,
+    salaryPercentage: getSalaryPercentage(),
+    nominalSalary: 0,
+    realSalary: 0,
+    closed: existingAccounting?.closed || false,
+    createdAt: existingAccounting?.createdAt || new Date().toISOString(),
+    closedAt: existingAccounting?.closedAt || null
+  };
 }
 
