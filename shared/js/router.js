@@ -150,6 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Iniciamos la navbar inferior para que se pueda navegar entre las páginas
     console.log("Iniciando bottom navbar")
     initBottomNav();
+    
+    // Iniciamos la navegación (menú contextual y botón adicionar)
+    if (typeof initNavigation === "function") {
+      initNavigation();
+    }
   
     // Activamos el botón de la página inicial
     console.log("Setting active vab buton HOME")
@@ -164,20 +169,12 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function initBottomNav() {
   const home = document.getElementById(PAGES_CONFIG[PAGE_HOME].navId);
-  const products = document.getElementById(PAGES_CONFIG[PAGE_PRODUCTS].navId);
-  const movements = document.getElementById(PAGES_CONFIG[PAGE_MOVEMENTS].navId);
-  const expenses = document.getElementById(PAGES_CONFIG[PAGE_EXPENSES].navId);
-  const inventory = document.getElementById(PAGES_CONFIG[PAGE_INVENTORY].navId);
   const accounting = document.getElementById(PAGES_CONFIG[PAGE_ACCOUNTING].navId);
-  const settings = document.getElementById(PAGES_CONFIG[PAGE_SETTINGS].navId);
 
   if (home) home.onclick = () => loadPage(PAGE_HOME);
-  if (products) products.onclick = () => loadPage(PAGE_PRODUCTS);
-  if (movements) movements.onclick = () => loadPage(PAGE_MOVEMENTS);
-  if (expenses) expenses.onclick = () => loadPage(PAGE_EXPENSES);
-  if (inventory) inventory.onclick = () => loadPage(PAGE_INVENTORY);
   if (accounting) accounting.onclick = () => loadPage(PAGE_ACCOUNTING);
-  if (settings) settings.onclick = () => loadPage(PAGE_SETTINGS);
+  
+  // El botón "Adicionar" se configura en navigation.js
 }
 
 /**

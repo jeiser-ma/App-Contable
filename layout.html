@@ -45,25 +45,80 @@
           </div>
         </div>
 
-        <!-- Derecha: botón salir -->
-        <button
-          id="btnLogout"
-          class="btn btn-sm rounded-circle btn-light d-flex align-items-center justify-content-center"
-          style="width: 36px; height: 36px"
-          title="Salir"
-        >
-          <i class="bi bi-box-arrow-right"></i>
-        </button>
+        <!-- Derecha: menú contextual + botón salir -->
+        <div class="d-flex align-items-center gap-2">
+          <!-- Botón salir -->
+          <button
+            id="btnLogout"
+            class="btn btn-sm rounded-circle btn-light d-flex align-items-center justify-content-center"
+            style="width: 36px; height: 36px"
+            title="Salir"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+
+          <!-- Menú contextual -->
+          <div class="dropdown">
+            <button
+              class="btn btn-sm rounded-circle btn-light d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+              type="button"
+              id="contextMenuButton"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Menú"
+            >
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul
+              class="dropdown-menu dropdown-menu-end"
+              aria-labelledby="contextMenuButton"
+            >
+              <li>
+                <a class="dropdown-item" href="#" id="contextMenuProducts">
+                  <i class="bi bi-box text-primary"></i> Productos
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" id="contextMenuMovements">
+                  <i class="bi bi-arrow-repeat text-success"></i> Movimientos
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" id="contextMenuExpenses">
+                  <i class="bi bi-cash-coin text-danger"></i> Gastos
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" id="contextMenuInventory">
+                  <i class="bi bi-clipboard-data text-info"></i> Inventario
+                </a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" href="#" id="contextMenuSettings">
+                  <i class="bi bi-gear text-warning"></i> Ajustes
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </nav>
 
     <!-- ===== COMPONENTES REUTILIZABLES (OCULTOS POR DEFECTO) ===== -->
-    <div id="moduleControls" class="container-fluid d-none" style="padding: 10px 15px; padding-top: 70px;">
+    <div
+      id="moduleControls"
+      class="container-fluid d-none"
+      style="padding: 10px 15px; padding-top: 70px"
+    >
       <!-- Header: Buscador + Ordenamiento + Botones de acción -->
       <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
         <!-- Buscador -->
         <div class="flex-grow-1">
-          <div class="input-group input-group-sm rounded-pill overflow-hidden border h-100">
+          <div
+            class="input-group input-group-sm rounded-pill overflow-hidden border h-100"
+          >
             <span class="input-group-text bg-primary text-white border-0 px-3">
               <i class="bi bi-search"></i>
             </span>
@@ -85,14 +140,16 @@
 
         <!-- Control de ordenamiento (opcional) -->
         <div class="w-auto" id="moduleSortContainer">
-          <div class="input-group input-group-sm rounded-pill overflow-hidden border h-100">
-            <select
-              class="form-select border-0 rounded-0"
-              id="moduleOrderBy"
-            >
+          <div
+            class="input-group input-group-sm rounded-pill overflow-hidden border h-100"
+          >
+            <select class="form-select border-0 rounded-0" id="moduleOrderBy">
               <option value="" disabled selected>Ordenar…</option>
             </select>
-            <button class="btn btn-primary border-0 rounded-0" id="moduleOrderDir">
+            <button
+              class="btn btn-primary border-0 rounded-0"
+              id="moduleOrderDir"
+            >
               <i class="bi bi-sort-alpha-down"></i>
             </button>
           </div>
@@ -113,14 +170,14 @@
             id="filterIn"
             class="btn btn-outline-success rounded-pill btn-chip d-none"
           >
-          <i class="bi bi-arrow-right"></i> Entradas
+            <i class="bi bi-arrow-right"></i> Entradas
           </button>
           <!-- Chip: Salidas (Movements) -->
           <button
             id="filterOut"
             class="btn btn-outline-danger rounded-pill btn-chip d-none"
           >
-          <i class="bi bi-arrow-left"></i> Salidas
+            <i class="bi bi-arrow-left"></i> Salidas
           </button>
           <!-- Chip: Almacén (Inventory) -->
           <button
@@ -176,19 +233,16 @@
     </div>
 
     <!-- ===== CONTENIDO DINÁMICO ===== -->
-    <main
-      id="app"
-      class="container-fluid px-2"
-    >
+    <main id="app" class="container-fluid px-2">
       <!-- AQUÍ SE INYECTAN LAS PÁGINAS -->
     </main>
 
     <!-- ===== NAVBAR INFERIOR (MÓVIL) ===== -->
     <nav class="navbar navbar-light bg-light fixed-bottom border-top">
-      <div class="container-fluid d-flex justify-content-around">
+      <div class="container-fluid">
         <!-- HOME -->
         <button
-          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
+          class="btn btn-link rounded-pill text-decoration-none flex-fill bottom-nav-btn"
           id="navHome"
         >
           <div class="text-center">
@@ -196,50 +250,21 @@
             <small>Inicio</small>
           </div>
         </button>
-        <!-- PRODUCTOS -->
-        <button
-          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
-          id="navProducts"
-        >
-          <div class="text-center">
-            <i class="bi bi-box fs-4"></i><br />
-            <small>Productos</small>
-          </div>
-        </button>
 
-        <!-- MOVIMIENTOS -->
-        <button
-          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
-          id="navMovements"
-        >
-          <div class="text-center">
-            <i class="bi bi-arrow-repeat fs-4"></i><br />
-            <small>Movimientos</small>
-          </div>
-        </button>
-        <!-- GASTOS -->
-        <button
-          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
-          id="navExpenses"
-        >
-          <div class="text-center">
-            <i class="bi bi-cash-coin fs-4"></i><br />
-            <small>Gastos</small>
-          </div>
-        </button>
-        <!-- INVENTARIO -->
-        <button
-          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
-          id="navInventory"
-        >
-          <div class="text-center">
-            <i class="bi bi-clipboard-data fs-4"></i><br />
-            <small>Inventario</small>
-          </div>
-        </button>
+        <!-- BOTÓN ADICIONAR (con cards flotantes) -->
+          <button
+            class="btn btn-link rounded-pill text-decoration-none flex-fill bottom-nav-btn"
+            id="navAdd"
+          >
+            <div class="text-center">
+              <i class="bi bi-plus-circle-fill fs-1"></i><br />
+              <small>Adicionar</small>
+            </div>
+          </button>
+
         <!-- CONTABILIDAD -->
         <button
-          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
+          class="btn btn-link rounded-pill text-decoration-none flex-fill bottom-nav-btn"
           id="navAccounting"
         >
           <div class="text-center">
@@ -247,14 +272,75 @@
             <small>Contabilidad</small>
           </div>
         </button>
-        <!-- SETTINGS -->
+      </div>
+
+      <!-- Cards flotantes -->
+      <div id="floatingCards" class="floating-cards d-none">
+        <!-- Card: Agregar Producto -->
         <button
-          class="btn btn-link rounded-pill text-decoration-none bottom-nav-btn"
-          id="navSettings"
+          class="card shadow-sm bg-light p-2 floating-card"
+          id="floatingCardProduct"
         >
-          <div class="text-center">
-            <i class="bi bi-gear fs-4"></i><br />
-            <small>Ajustes</small>
+          <div class="d-inline-flex align-items-center gap-3">
+            <div
+              class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+            >
+              <i class="bi bi-box text-white"></i>
+            </div>
+            <span class="flex-grow-1 text-start text-muted">Agregar Producto</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </div>
+        </button>
+
+        <!-- Card: Agregar Movimiento -->
+        <button
+          class="card shadow-sm bg-light p-2 floating-card"
+          id="floatingCardMovement"
+        >
+          <div class="d-flex align-items-center gap-3">
+            <div
+              class="rounded-circle bg-success d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+            >
+              <i class="bi bi-arrow-repeat text-white"></i>
+            </div>
+            <span class="flex-grow-1 text-start text-muted">Agregar Movimiento</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </div>
+        </button>
+
+        <!-- Card: Agregar Gasto -->
+        <button
+          class="card shadow-sm bg-light p-2 floating-card"
+          id="floatingCardExpense"
+        >
+          <div class="d-flex align-items-center gap-3">
+            <div
+              class="rounded-circle bg-danger d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+            >
+              <i class="bi bi-cash-coin text-white"></i>
+            </div>
+            <span class="flex-grow-1 text-start text-muted">Agregar Gasto</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </div>
+        </button>
+
+        <!-- Card: Realizar Inventario -->
+        <button
+          class="card shadow-sm bg-light p-2 floating-card"
+          id="floatingCardInventory"
+        >
+          <div class="d-flex align-items-center gap-3">
+            <div
+              class="rounded-circle bg-info d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+            >
+              <i class="bi bi-clipboard-data text-white"></i>
+            </div>
+            <span class="flex-grow-1 text-start text-muted">Realizar Inventario</span>
+            <i class="bi bi-chevron-right text-muted"></i>
           </div>
         </button>
       </div>
@@ -272,12 +358,13 @@
     <script src="shared/js/modals.js"></script>
     <script src="shared/js/undo.js"></script>
     <script src="shared/js/module-controls.js"></script>
-    
+    <script src="shared/js/navigation.js"></script>
+
     <!-- Páginas compartidas JS -->
     <script src="shared/js/home.js"></script>
     <script src="shared/js/accounting.js"></script>
     <script src="shared/js/settings.js"></script>
-    
+
     <!-- Módulos JS -->
     <script src="modules/products/products.js"></script>
     <script src="modules/movements/movements.js"></script>
