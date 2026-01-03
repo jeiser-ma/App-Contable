@@ -33,7 +33,7 @@ function loadModal(name, module = null) {
     path = `modules/${module}/modals/${name}.html`;
   } else {
     // Modal compartido (confirm-delete, etc.)
-    path = `shared/pages/modals/${name}.html`;
+    path = `components/modals/${name}.html`;
   }
   
   return fetch(path)
@@ -59,7 +59,7 @@ function loadModal(name, module = null) {
  * @param {string} name - Nombre del componente a cargar
  */
 function loadComponent(name) {
-  return fetch(`shared/pages/components/${name}.html`)
+  return fetch(`components/${name}/${name}.html`)
     .then((r) => {
       if (!r.ok) {
         throw new Error(`No se pudo cargar el componente ${name}`);

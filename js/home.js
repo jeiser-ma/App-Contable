@@ -61,23 +61,7 @@ function updateDashboard() {
 
   // 5. Total de gastos (suma de todos los gastos)
   const totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
-  updateMetric("totalExpenses", formatCurrency(totalExpenses));
-
-  // 6. Gastos del mes actual
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-  const monthlyExpenses = expenses
-    .filter((e) => {
-      if (!e.date) return false;
-      const expenseDate = new Date(e.date + "T00:00:00");
-      return (
-        expenseDate.getMonth() === currentMonth &&
-        expenseDate.getFullYear() === currentYear
-      );
-    })
-    .reduce((sum, e) => sum + (e.amount || 0), 0);
-  updateMetric("monthlyExpenses", formatCurrency(monthlyExpenses));
+  updateMetric("accountingTotalExpenses", formatCurrency(totalExpenses));
 
   // 7. Valor total del inventario (suma de precio * cantidad de todos los productos)
   const inventoryValue = products.reduce(
@@ -86,36 +70,6 @@ function updateDashboard() {
   );
   updateMetric("inventoryValue", formatCurrency(inventoryValue));
 
-  // 8. Movimientos del mes actual
-  const monthlyMovements = movements.filter((m) => {
-    if (!m.date) return false;
-    const movementDate = new Date(m.date + "T00:00:00");
-    return (
-      movementDate.getMonth() === currentMonth &&
-      movementDate.getFullYear() === currentYear
-    );
-  }).length;
-  updateMetric("monthlyMovements", monthlyMovements);
-
-  // 9. Últimos movimientos (últimos 5)
-  const recentMovements = movements
-    .sort((a, b) => {
-      const dateA = new Date(a.date + "T00:00:00");
-      const dateB = new Date(b.date + "T00:00:00");
-      return dateB - dateA;
-    })
-    .slice(0, 5);
-  updateMetric("recentMovementsCount", recentMovements.length);
-
-  // 10. Últimos gastos (últimos 5)
-  const recentExpenses = expenses
-    .sort((a, b) => {
-      const dateA = new Date(a.date + "T00:00:00");
-      const dateB = new Date(b.date + "T00:00:00");
-      return dateB - dateA;
-    })
-    .slice(0, 5);
-  updateMetric("recentExpensesCount", recentExpenses.length);
 }
 
 /**
