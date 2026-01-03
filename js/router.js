@@ -2,69 +2,10 @@
 // Router - App Contable
 // ===============================
 
-//#region Constants
-// IDs principales
-const ID_APP = "app";
 
-// IDs de título de página
-const ID_PAGE_TITLE = "pageTitle";
-const ID_MODULE_ICON = "moduleIcon";
-
-// Nombres de páginas
-const PAGE_HOME = "home";
-const PAGE_PRODUCTS = "products";
-const PAGE_MOVEMENTS = "movements";
-const PAGE_INVENTORY = "inventory";
-const PAGE_EXPENSES = "expenses";
-const PAGE_ACCOUNTING = "accounting";
-const PAGE_SETTINGS = "settings";
-
-// Configuración de páginas (centralizada)
-const PAGES_CONFIG = {
-  [PAGE_HOME]: {
-    title: "Inicio",
-    icon: "bi-house-door",
-    navId: "navHome",
-    isModule: false // Página compartida
-  },
-  [PAGE_PRODUCTS]: {
-    title: "Productos",
-    icon: "bi-box",
-    navId: "navProducts",
-    isModule: true // Módulo
-  },
-  [PAGE_MOVEMENTS]: {
-    title: "Movimientos",
-    icon: "bi-arrow-repeat",
-    navId: "navMovements",
-    isModule: true // Módulo
-  },
-  [PAGE_EXPENSES]: {
-    title: "Gastos",
-    icon: "bi-cash-coin",
-    navId: "navExpenses",
-    isModule: true // Módulo
-  },
-  [PAGE_INVENTORY]: {
-    title: "Inventario",
-    icon: "bi-clipboard-data",
-    navId: "navInventory",
-    isModule: true // Módulo
-  },
-  [PAGE_ACCOUNTING]: {
-    title: "Contabilidad",
-    icon: "bi-calculator",
-    navId: "navAccounting",
-    isModule: false // Página compartida
-  },
-  [PAGE_SETTINGS]: {
-    title: "Ajustes",
-    icon: "bi-gear",
-    navId: "navSettings",
-    isModule: false // Página compartida
-  }
-};
-//#endregion
+//==============================================
+//#region loaders
+//==============================================
 
 /**
  * Carga una página HTML y la inserta en el DOM
@@ -79,7 +20,7 @@ function loadPage(page) {
   // Determinar la ruta según si es módulo o página compartida
   const path = isModule 
     ? `modules/${page}/${page}.html`
-    : `shared/pages/${page}.html`;
+    : `pages/${page}.html`;
   
   fetch(path)
     .then((response) => {
@@ -90,10 +31,10 @@ function loadPage(page) {
     })
     .then((html) => {
       console.log("HTML cargado OK");
-      const app = document.getElementById(ID_APP);
-      if (!app) return;
+      const pagesContainer = document.getElementById(ID_PAGES_CONTAINER);
+      if (!pagesContainer) return;
 
-      app.innerHTML = html;
+      pagesContainer.innerHTML = html;
 
       // Configuración de la navbar y el título de la página
       setActiveNav(page);
@@ -128,16 +69,81 @@ function loadPage(page) {
     })  
 }
 
+
+/**
+ * Carga un modal HTML y lo inserta en el body del documento
+ * Busca primero en modules/{module}/modals/ si es un modal de módulo,
+ * sino busca en shared/pages/modals/ para modales compartidos
+ * @param {string} name - Nombre del modal a cargar (ej: "product-modal", "confirm-delete")
+ * @param {string} module - Opcional: nombre del módulo si es un modal específico
+ */
+function loadModal(name, module = null) {
+  // Determinar la ruta según si es modal de módulo o compartido
+  let path;
+  
+  if (module) {
+    // Modal específico de un módulo
+    path = `modules/${module}/modals/${name}.html`;
+  } else {
+    // Modal compartido (confirm-delete, etc.)
+    path = `components/${name}/${name}.html`;
+  }
+  
+  return fetch(path)
+    .then((r) => {
+      if (!r.ok) {
+        throw new Error(`No se pudo cargar el modal ${name} desde ${path}`);
+      }
+      return r.text();
+    })
+    .then((html) => {
+      document.getElementById(ID_MODALS_CONTAINER).insertAdjacentHTML("beforeend", html);
+      console.log(`${name} loaded from ${path}`);
+    })
+    .catch((error) => {
+      console.error(`Error cargando modal ${name}:`, error);
+      throw error;
+    });
+}
+
+/**
+ * Carga un componente HTML y lo inserta en el body del documento
+ * Los componentes siempre están en shared/pages/components/
+ * @param {string} name - Nombre del componente a cargar
+ */
+function loadComponent(name) {
+  return fetch(`components/${name}/${name}.html`)
+    .then((r) => {
+      if (!r.ok) {
+        throw new Error(`No se pudo cargar el componente ${name}`);
+      }
+      return r.text();
+    })
+    .then((html) => {
+      document.body.insertAdjacentHTML("beforeend", html);
+      console.log(`Component ${name} loaded`);
+    })
+    .catch((error) => {
+      console.error(`Error cargando componente ${name}:`, error);
+      throw error;
+    });
+}
+
+
+//==============================================
+//#region main
+//==============================================
+
 /**
  * Página inicial al entrar al layout
  * Carga el modal confirm-delete, el componente snackbar, la página inicial y la navbar inferior
  * @returns {void}
  */
 document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById(ID_APP)) {
+  if (document.getElementById(ID_PAGES_CONTAINER)) {
     // cargamos el modal confirm-delete
     console.log("Loading confirm-delete")
-    loadModal("confirm-delete");
+    loadModal(MODAL_CONFIRM_DELETE);
 
     // Cargamos el componente snackbar para mostrar mensajes de error o éxito
     console.log("Loading component snackbar")
@@ -145,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Cargamos la página inicial
     console.log("Loading home page")
-    loadPage(PAGE_ACCOUNTING); //poner el home
+    loadPage(PAGE_HOME); //poner el home
 
     // Iniciamos la navbar inferior para que se pueda navegar entre las páginas
     console.log("Iniciando bottom navbar")
@@ -163,60 +169,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-/**
- * Inicializa la navbar inferior
- * @returns {void}
- */
-function initBottomNav() {
-  const home = document.getElementById(PAGES_CONFIG[PAGE_HOME].navId);
-  const accounting = document.getElementById(PAGES_CONFIG[PAGE_ACCOUNTING].navId);
-
-  if (home) home.onclick = () => loadPage(PAGE_HOME);
-  if (accounting) accounting.onclick = () => loadPage(PAGE_ACCOUNTING);
-  
-  // El botón "Adicionar" se configura en navigation.js
-}
-
-/**
- * Establece el botón activo en la navbar inferior
- * @param {string} page - Nombre de la página a establecer como activa
- * @returns {void}
- */
-function setActiveNav(page) {
-  // Resetear todos los botones a estado inactivo
-  Object.values(PAGES_CONFIG).forEach((config) => {
-    const btn = document.getElementById(config.navId);
-    if (btn) {
-      btn.classList.remove("btn-primary");
-      btn.classList.add("btn-link");
-    }
-  });
-
-  // Activar el botón de la página actual
-  const pageConfig = PAGES_CONFIG[page];
-  if (pageConfig) {
-    const activeBtn = document.getElementById(pageConfig.navId);
-    if (activeBtn) {
-      activeBtn.classList.remove("btn-link");
-      activeBtn.classList.add("btn-primary");
-    }
-  }
-}
-
-/**
- * Establece el título y el icono de la página
- * @param {string} page - Nombre de la página a establecer como activa
- * @returns {void}
- */
-function setPageTitle(page) {
-  const title = document.getElementById(ID_PAGE_TITLE);
-  const icon = document.getElementById(ID_MODULE_ICON);
-
-  if (!title || !icon) return;
-
-  const pageConfig = PAGES_CONFIG[page];
-  if (!pageConfig) return;
-
-  title.textContent = pageConfig.title;
-  icon.className = `bi ${pageConfig.icon} fs-5 text-white`;
-}

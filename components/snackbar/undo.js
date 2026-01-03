@@ -1,3 +1,9 @@
+//#region Constants
+const ID_BTN_UNDO = "btnUndo";
+const ID_SNACKBAR = "snackbar";
+const ID_SNACKBAR_TEXT = "snackbarText";
+
+//#endregion
 
 // Estado de la pantalla de productos (unificado)
 const UNDO_STATE = {
@@ -15,12 +21,12 @@ const UNDO_STATE = {
  * @returns {void}
  */
 function showSnackbar(text) {
-  const bar = document.getElementById("snackbar");
-  const btnUndo = document.getElementById("btnUndo");
+  const bar = document.getElementById(ID_SNACKBAR);
+  const btnUndo = document.getElementById(ID_BTN_UNDO);
   
   if (!bar || !btnUndo) return;
 
-  document.getElementById("snackbarText").textContent = text;
+  document.getElementById(ID_SNACKBAR_TEXT).textContent = text;
   bar.classList.remove("d-none");
 
   // Agregar event listener solo cuando el snackbar está visible
@@ -51,8 +57,8 @@ function clearUndoState() {
  * @returns {void}
  */
 function hideSnackbar() {
-  const bar = document.getElementById("snackbar");
-  const btnUndo = document.getElementById("btnUndo");
+  const bar = document.getElementById(ID_SNACKBAR);
+  const btnUndo = document.getElementById(ID_BTN_UNDO);
   
   if (bar) {
     bar.classList.add("d-none");

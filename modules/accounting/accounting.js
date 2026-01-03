@@ -24,8 +24,6 @@ const ID_REAL_SALARY = "realSalary";
 const ID_ALERT_MISSING_INVENTORY = "alertMissingInventory";
 const ID_ALERT_NO_EXPENSES = "alertNoExpenses";
 
-const MODAL_ID_CASH_SALES = "cashSalesModal";
-const MODAL_ID_TRANSFER_SALES = "transferSalesModal";
 //#endregion
 
 let currentDate = null;
@@ -52,10 +50,10 @@ async function onAccountingPageLoaded() {
   }
   
   // Cargar modales de ventas
-  await loadModal("cash-sales-modal");
-  await loadModal("transfer-sales-modal");
-  initModal(MODAL_ID_CASH_SALES);
-  initModal(MODAL_ID_TRANSFER_SALES);
+  await loadModal(MODAL_CASH_SALES, PAGE_ACCOUNTING);
+  await loadModal(MODAL_TRANSFER_SALES, PAGE_ACCOUNTING);
+  initModalModule(MODAL_CASH_SALES);
+  initModalModule(MODAL_TRANSFER_SALES);
   
   // Configurar botones
   document.getElementById(ID_BTN_ADD_CASH_SALES).onclick = () => openCashSalesModal();
@@ -435,12 +433,12 @@ function updateCloseButton() {
  * @returns {void}
  */
 function openCashSalesModal() {
-  initModal(MODAL_ID_CASH_SALES);
+  initModalModule(MODAL_CASH_SALES);
   const input = document.getElementById("cashSalesInput");
   if (!input || !currentAccounting) return;
   
   input.value = currentAccounting.cashSales || 0;
-  showModal();
+  showModalModules();
 }
 
 /**
@@ -448,12 +446,12 @@ function openCashSalesModal() {
  * @returns {void}
  */
 function openTransferSalesModal() {
-  initModal(MODAL_ID_TRANSFER_SALES);
+  initModalModule(MODAL_TRANSFER_SALES);
   const input = document.getElementById("transferSalesInput");
   if (!input || !currentAccounting) return;
   
   input.value = currentAccounting.transferSales || 0;
-  showModal();
+  showModalModules();
 }
 
 /**
@@ -472,7 +470,7 @@ function saveCashSales() {
   
   currentAccounting.cashSales = amount;
   saveAccounting();
-  hideModal();
+  hideModalModules();
   renderAccounting();
 }
 
@@ -492,7 +490,7 @@ function saveTransferSales() {
   
   currentAccounting.transferSales = amount;
   saveAccounting();
-  hideModal();
+  hideModalModules();
   renderAccounting();
 }
 

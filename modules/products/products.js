@@ -53,13 +53,13 @@ window.PRODUCTS_STATE = PRODUCTS_STATE;
 async function onProductsPageLoaded() {
   // Cargar modal de productos
   console.log("Loading product-modal");
-  await loadModal("product-modal", "products");
+  await loadModal(MODAL_PRODUCTS, PAGE_PRODUCTS);
   
   // Inicializar el modal después de cargarlo
-  initModal(MODAL_ID_PRODUCT);
+  initModalModule(MODAL_PRODUCTS);
 
   // Configurar controles del módulo
-  setupModuleControls("products");
+  setupModuleControls(PAGE_PRODUCTS);
 
   // Configurar botón de guardar del modal
   document.getElementById(BTN_ID_SAVE_PRODUCT).onclick = saveProductFromModal;
@@ -82,7 +82,7 @@ function openAddProductModal() {
   // Cargar unidades de medida en el select
   loadUnitsIntoSelect();
   
-  toggleModal();
+  toggleModalModules();
 }
 
 /**
@@ -113,7 +113,7 @@ function openEditProductModal(id) {
     umSelect.value = product.um;
   }
   
-  toggleModal();
+  toggleModalModules();
 }
 
 /**
@@ -559,7 +559,7 @@ function saveProductFromModal() {
   }
 
   setData("products", products);
-  toggleModal();
+  toggleModalModules();
   renderProducts();
 }
 

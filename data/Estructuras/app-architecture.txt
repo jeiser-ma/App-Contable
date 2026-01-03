@@ -1,27 +1,176 @@
 app-contable/
-├── modules/                    ← NUEVO: Módulos específicos
-│   ├── products/
-│   │   ├── products.js
-│   │   ├── products.html
-│   │   └── modals/
-│   │       └── product-modal.html
-│   └── movements/
-│       ├── movements.js
-│       ├── movements.html
-│       └── modals/
-│           └── movement-modal.html
+├── index.html                      ← Página de login (punto de entrada)
+├── layout.html                     ← Layout principal de la aplicación (después del login)
 │
-├── shared/                      ← NUEVO: Recursos compartidos
-│   ├── js/                      ← JS core de la app
-│   │   ├── router.js
-│   │   ├── modals.js
-│   │   ├── storage.js
-│   │   ├── auth.js
-│   │   └── undo.js
-│   └── pages/                   ← Páginas y componentes compartidos
-│       ├── components/
-│       │   └── snackbar.html
-│       ├── modals/
-│       │   └── confirm-delete.html
-│       ├── home.html
-│       └── settings.html
+├── js/                             ← JavaScript core de la aplicación
+│   ├── router.js                   ← Sistema de enrutamiento (carga páginas y modales)
+│   ├── configs.js                 ← Configuraciones centralizadas (PAGES_CONFIG, MODALS_CONFIG)
+│   ├── storage.js                  ← Funciones de almacenamiento (getData, setData)
+│   ├── auth.js                    ← Autenticación y gestión de sesión
+│   ├── navigation.js               ← Navegación (menú contextual, botón adicionar, cards flotantes)
+│   ├── modules-controls.js         ← Control de controles de módulos (búsqueda, ordenamiento, filtros)
+│   ├── modules-modals.js           ← Gestión de modales de módulos (initModalModule, showModalModules, etc.)
+│   ├── home.js                     ← Lógica del dashboard/home (métricas, resumen contabilidad)
+│   ├── settings.js                 ← Lógica de ajustes (unidades de medida, conceptos de gastos, porcentaje salario)
+│   └── bootstrap.bundle.min.js     ← Bootstrap JS (dependencia)
+│
+├── pages/                          ← Páginas compartidas (no son módulos)
+│   ├── home.html                   ← Dashboard/Inicio
+│   └── settings.html               ← Página de ajustes
+│
+├── modules/                        ← Módulos de la aplicación (cada módulo es independiente)
+│   ├── products/                   ← Módulo de Productos
+│   │   ├── products.html           ← Vista del módulo
+│   │   ├── products.js             ← Lógica del módulo (renderProducts, openAddProductModal, etc.)
+│   │   └── modals/
+│   │       └── products-modal.html ← Modal para agregar/editar productos
+│   │
+│   ├── movements/                  ← Módulo de Movimientos
+│   │   ├── movements.html
+│   │   ├── movements.js
+│   │   └── modals/
+│   │       └── movements-modal.html
+│   │
+│   ├── expenses/                    ← Módulo de Gastos
+│   │   ├── expenses.html
+│   │   ├── expenses.js
+│   │   └── modals/
+│   │       └── expenses-modal.html
+│   │
+│   ├── inventory/                  ← Módulo de Inventario
+│   │   ├── inventory.html
+│   │   ├── inventory.js
+│   │   └── modals/
+│   │       └── inventory-modal.html
+│   │
+│   └── accounting/                 ← Módulo de Contabilidad
+│       ├── accounting.html
+│       ├── accounting.js
+│       └── modals/
+│           ├── cash-sales-modal.html      ← Modal para ventas en efectivo
+│           └── transfer-sales-modal.html ← Modal para ventas por transferencia
+│
+├── components/                     ← Componentes reutilizables
+│   ├── confirm-delete/            ← Componente de confirmación de eliminación
+│   │   ├── confirm-delete.html
+│   │   └── confirm-delete.js
+│   │
+│   └── snackbar/                  ← Componente de notificaciones
+│       ├── snackbar.html
+│       └── undo.js                 ← Lógica de undo para snackbar
+│
+├── css/                            ← Estilos
+│   ├── bootstrap.min.css
+│   ├── bootstrap-icons.min.css
+│   ├── styles.css                  ← Estilos personalizados
+│   └── fonts/                      ← Fuentes de Bootstrap Icons
+│
+├── data/                           ← Datos y estructuras
+│   └── Estructuras/
+│       ├── app-architecture.txt    ← Este archivo
+│       ├── products.json           ← Esquema de productos
+│       ├── productMovements.json   ← Esquema de movimientos
+│       ├── expenses.json           ← Esquema de gastos
+│       ├── inventoryCount.json     ← Esquema de inventario
+│       └── accounting.json         ← Esquema de contabilidad
+│
+├── img/                            ← Imágenes
+│   └── app-icon.png                ← Icono de la aplicación
+│
+├── service-worker.js               ← Service Worker para PWA
+└── manifest.json                   ← Manifest para PWA
+
+
+// ============================================
+// ARQUITECTURA Y CONVENCIONES
+// ============================================
+
+## ESTRUCTURA DE MÓDULOS
+
+Cada módulo sigue esta estructura:
+- {module}.html: Vista HTML del módulo
+- {module}.js: Lógica JavaScript del módulo
+- modals/{modal}.html: Modales específicos del módulo
+
+Cada módulo debe:
+1. Definir un hook: on{Module}PageLoaded() que se ejecuta cuando se carga la página
+2. Definir funciones de renderizado: render{Module}()
+3. Definir funciones de modal: openAdd{Module}Modal(), openEdit{Module}Modal()
+4. Exponer el estado del módulo en window.{MODULE}_STATE para que modules-controls.js pueda acceder
+
+Ejemplo:
+- products.js define: onProductsPageLoaded(), renderProducts(), openAddProductModal()
+- Expone: window.PRODUCTS_STATE
+
+## SISTEMA DE RUTAS
+
+El router (router.js) busca páginas en:
+- Módulos: modules/{page}/{page}.html
+- Páginas compartidas: pages/{page}.html
+
+El router busca modales en:
+- Modales de módulos: modules/{module}/modals/{modal}.html
+- Componentes: components/{component}/{component}.html
+
+## CONFIGURACIÓN CENTRALIZADA
+
+configs.js contiene:
+- PAGES_CONFIG: Configuración de todas las páginas (título, icono, navId, isModule)
+- MODALS_CONFIG: Configuración de todos los modales (título, icono)
+
+## CONTROL DE MÓDULOS
+
+modules-controls.js:
+- Configuración centralizada por módulo en MODULES_CONFIG
+- Gestiona: búsqueda, ordenamiento, filtros (chips), filtro de fecha, contador
+- Requiere que el módulo exponga su estado en window.{MODULE}_STATE
+- Llama a la función de renderizado del módulo cuando cambia el estado
+
+## NAVEGACIÓN
+
+navigation.js gestiona:
+- Menú contextual (navbar superior): acceso rápido a módulos y ajustes
+- Botón adicionar (navbar inferior): muestra cards flotantes con opciones
+- Cards flotantes: acceso rápido a agregar elementos o realizar acciones
+
+## ALMACENAMIENTO
+
+storage.js proporciona:
+- getData(key): Obtiene datos del localStorage
+- setData(key, value): Guarda datos en localStorage
+
+Los datos se almacenan como JSON en localStorage con las siguientes claves:
+- "products": Lista de productos
+- "movements": Lista de movimientos
+- "expenses": Lista de gastos
+- "inventory": Lista de conteos de inventario
+- "accounting": Lista de contabilidades
+- "units": Lista de unidades de medida
+- "expenseConcepts": Lista de conceptos de gastos
+- "salaryPercentage": Porcentaje de salario
+
+## COMPONENTES
+
+Componentes reutilizables:
+- confirm-delete: Modal de confirmación para eliminar elementos
+- snackbar: Notificaciones con opción de undo
+
+## HOOKS DE PÁGINAS
+
+Cada página/módulo debe definir un hook que se ejecuta cuando se carga:
+- Formato: on{Page}PageLoaded()
+- Ejemplos:
+  - onHomePageLoaded()
+  - onProductsPageLoaded()
+  - onSettingsPageLoaded()
+  - onAccountingPageLoaded()
+
+## CONVENCIONES DE NOMBRES
+
+- Páginas: minúsculas, singular (home, products, settings)
+- Módulos: minúsculas, plural (products, movements, expenses)
+- Funciones de renderizado: render{Module}() (renderProducts, renderMovements)
+- Funciones de modal: openAdd{Module}Modal(), openEdit{Module}Modal()
+- Estados: {MODULE}_STATE (PRODUCTS_STATE, MOVEMENTS_STATE)
+- IDs de elementos: camelCase (productsList, btnAddProduct)
+- Constantes: UPPER_SNAKE_CASE (PAGE_PRODUCTS, MODAL_PRODUCTS)

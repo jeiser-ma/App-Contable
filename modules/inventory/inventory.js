@@ -16,7 +16,6 @@ const ID_INVENTORY_PRODUCT_LABEL = "inventoryProductLabel";
 const ID_LOCATION_WAREHOUSE_INPUT = "locationWarehouseInput";
 const ID_LOCATION_STORE_INPUT = "locationStoreInput";
 
-const MODAL_ID_INVENTORY = "inventoryModal";
 //#endregion
 
 // Estado de la pantalla de inventario (unificado)
@@ -49,13 +48,13 @@ async function onInventoryPageLoaded() {
 
   // Cargar modal de inventario
   console.log("Loading inventory-modal");
-  await loadModal("inventory-modal", "inventory");
+  await loadModal(MODAL_INVENTORY, PAGE_INVENTORY);
   
   // Inicializar el modal después de cargarlo
-  initModal(MODAL_ID_INVENTORY);
+  initModalModule(MODAL_INVENTORY);
 
   // Configurar controles del módulo
-  setupModuleControls("inventory");
+  setupModuleControls(PAGE_INVENTORY);
 
   // El filtro de fecha ya se configura en setupModuleControls con la fecha de hoy
 
@@ -84,7 +83,7 @@ function openInventoryModal(productId) {
     return;
   }
 
-  initModal(MODAL_ID_INVENTORY);
+  initModalModule(MODAL_INVENTORY);
 
   const productLabel = document.getElementById(ID_INVENTORY_PRODUCT_LABEL);
   const productStock = document.getElementById("inventoryProductStock");
@@ -128,7 +127,7 @@ function openInventoryModal(productId) {
   clearInputError(ID_LOCATION_WAREHOUSE_INPUT);
   clearInputError(ID_LOCATION_STORE_INPUT);
 
-  showModal();
+  showModalModules();
 }
 
 /**
@@ -277,7 +276,7 @@ function saveInventoryFromModal() {
   setData("inventory", inventory);
 
   // Cerrar modal y actualizar vista
-  hideModal();
+  hideModalModules();
   currentProductId = null;
   renderInventory();
 }

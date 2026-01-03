@@ -27,7 +27,7 @@ function onSettingsPageLoaded() {
   console.log("onSettingsPageLoaded execution");
   
   // Cargar modal de confirmación si no está cargado
-  loadModal("confirm-delete");
+  loadModal(MODAL_CONFIRM_DELETE);
   
   // Renderizar unidades de medida y conceptos
   renderUnits();

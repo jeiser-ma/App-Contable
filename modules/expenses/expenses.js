@@ -36,13 +36,13 @@ async function onExpensesPageLoaded() {
 
   // Cargar modal de gastos
   console.log("Loading expense-modal");
-  await loadModal("expense-modal", "expenses");
+  await loadModal(MODAL_EXPENSES, PAGE_EXPENSES);
 
   // Inicializar el modal después de cargarlo
-  initModal("expenseModal");
+  initModalModule(MODAL_EXPENSES);
 
   // Configurar controles del módulo (buscador, ordenamiento, fecha, botón agregar)
-  setupModuleControls("expenses");
+  setupModuleControls(PAGE_EXPENSES); 
 
   // Configurar botón de confirmar del modal
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_EXPENSE);
@@ -60,7 +60,7 @@ async function onExpensesPageLoaded() {
 function openExpenseModal() {
   EXPENSES_STATE.expenseToEdit = null;
 
-  initModal("expenseModal");
+  initModalModule(MODAL_EXPENSES);
 
   const title = document.getElementById(ID_EXPENSE_TITLE);
   const icon = document.getElementById(ID_EXPENSE_ICON);
@@ -88,7 +88,7 @@ function openExpenseModal() {
 
   clearExpenseErrors();
 
-  showModal();
+  showModalModules();
 }
 
 /**
@@ -184,7 +184,7 @@ function saveExpenseFromModal() {
   }
 
   setData("expenses", expenses);
-  hideModal();
+  hideModalModules();
   renderExpenses();
 }
 
@@ -200,7 +200,7 @@ function openEditExpenseModal(id) {
 
   EXPENSES_STATE.expenseToEdit = id;
 
-  initModal("expenseModal");
+  initModalModule(MODAL_EXPENSES);
 
   const title = document.getElementById(ID_EXPENSE_TITLE);
   const icon = document.getElementById(ID_EXPENSE_ICON);
@@ -229,7 +229,7 @@ function openEditExpenseModal(id) {
 
   clearExpenseErrors();
 
-  showModal();
+  showModalModules();
 }
 
 /**

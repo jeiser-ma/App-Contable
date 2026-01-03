@@ -59,13 +59,13 @@ async function onMovementsPageLoaded() {
 
   // Cargar modal de movimientos
   console.log("Loading movement-modal");
-  await loadModal("movement-modal", "movements");
+  await loadModal(MODAL_MOVEMENTS, PAGE_MOVEMENTS);
   
       // Inicializar el modal después de cargarlo
-      initModal(MODAL_ID_MOVEMENT);
+      initModalModule(MODAL_MOVEMENTS);
 
   // Configurar controles del módulo
-  setupModuleControls("movements");
+  setupModuleControls(PAGE_MOVEMENTS);
 
   // Configurar botón de confirmar del modal
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
@@ -91,7 +91,7 @@ function openMovementModal() {
   movementType = "in"; // Por defecto entrada
 
   // Asegurar que el modal esté inicializado
-  initModal(MODAL_ID_MOVEMENT);
+  initModalModule(MODAL_MOVEMENTS);
 
   const title = document.getElementById(ID_MOVEMENT_TITLE);
   const icon = document.getElementById(ID_MOVEMENT_ICON);
@@ -146,7 +146,7 @@ function openMovementModal() {
   initProductAutocomplete(productInput);
 
   // Mostrar el formulario después de hacer todos los ajustes
-  showModal();
+  showModalModules();
 }
 
 /**
@@ -611,7 +611,7 @@ function saveMovementFromModal() {
   }
 
   // Cerrar modal y actualizar vista
-  hideModal();
+  hideModalModules();
   movementType = null;
   renderMovements();
 }
@@ -704,7 +704,7 @@ function openEditMovementModal(id) {
   movementType = movement.type.toLowerCase();
 
   // Abrir modal con los datos del movimiento
-  initModal(MODAL_ID_MOVEMENT);
+  initModalModule(MODAL_MOVEMENTS);
 
   const title = document.getElementById(ID_MOVEMENT_TITLE);
   const icon = document.getElementById(ID_MOVEMENT_ICON);
@@ -771,7 +771,7 @@ function openEditMovementModal(id) {
   initProductAutocomplete(productInput);
 
   // Mostrar modal
-  showModal();
+  showModalModules();
 }
 
 /**
