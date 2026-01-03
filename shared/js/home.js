@@ -419,7 +419,8 @@ function createTodayAccounting(today, yesterday) {
   }
   
   const totalAmount = accountingProducts.reduce((sum, p) => sum + p.amount, 0);
-  const totalSales = cashSales + transferSales;
+  // Total de ventas incluye ventas en efectivo + transferencia + gastos
+  const totalSales = cashSales + transferSales + totalExpenses;
   
   return {
     id: existingAccounting?.id || crypto.randomUUID(),

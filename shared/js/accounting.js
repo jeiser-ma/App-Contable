@@ -321,8 +321,8 @@ function updateTotals() {
     btnTotalExpenses.innerHTML = `<i class="bi bi-cash-stack"></i> Total Gastos: $${currentAccounting.totalExpenses.toFixed(2)}`;
   }
   
-  // Total de ventas
-  currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales;
+  // Total de ventas (incluye ventas en efectivo + transferencia + gastos)
+  currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses;
   const btnTotalSales = document.getElementById(ID_BTN_TOTAL_SALES);
   if (btnTotalSales) {
     btnTotalSales.innerHTML = `<i class="bi bi-cash-stack"></i> Total Ventas: $${currentAccounting.totalSales.toFixed(2)}`;
