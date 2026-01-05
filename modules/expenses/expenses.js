@@ -57,7 +57,7 @@ async function onExpensesPageLoaded() {
  * Abre el formulario para nuevo gasto
  * @returns {void}
  */
-function openExpenseModal() {
+function openAddExpenseModal() {
   EXPENSES_STATE.expenseToEdit = null;
 
   initModalModule(MODAL_EXPENSES);

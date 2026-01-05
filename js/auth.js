@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     protectApp();
   }
 
-  const btn = document.getElementById("btnLogout");
+  const btn = document.getElementById(ID_BTN_LOGOUT);
   if (btn) {
     btn.onclick = logout;
   }

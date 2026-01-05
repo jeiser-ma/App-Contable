@@ -9,7 +9,7 @@ const BTN_ID_CONFIRM_MOVEMENT = "btnConfirmMovement";
 const BTN_ID_CLEAR_SEARCH_MOVEMENT = "btnClearSearchMovement";
 const BTN_ID_FILTER_IN = "filterIn";
 const BTN_ID_FILTER_OUT = "filterOut";
-const BTN_ID_CLEAR_FILTERS_MOVEMENTS = "btnClearFiltersMovements"; 
+const BTN_ID_CLEAR_FILTERS_MOVEMENTS = "btnClearFiltersMovements";
 
 // IDs de otros elementos
 const ID_SEARCH_MOVEMENT = "searchMovement";
@@ -60,9 +60,9 @@ async function onMovementsPageLoaded() {
   // Cargar modal de movimientos
   console.log("Loading movement-modal");
   await loadModal(MODAL_MOVEMENTS, PAGE_MOVEMENTS);
-  
-      // Inicializar el modal después de cargarlo
-      initModalModule(MODAL_MOVEMENTS);
+
+  // Inicializar el modal después de cargarlo
+  await initModalModule(MODAL_MOVEMENTS);
 
   // Configurar controles del módulo
   setupModuleControls(PAGE_MOVEMENTS);
@@ -86,7 +86,7 @@ async function onMovementsPageLoaded() {
  * El tipo de movimiento se selecciona en el modal
  * @returns {void}
  */
-function openMovementModal() {
+function openAddMovementModal() {
   movementToEdit = null;
   movementType = "in"; // Por defecto entrada
 
@@ -161,17 +161,21 @@ function updateMovementTypeUI() {
   if (!title || !icon || !btnConfirm) return;
 
   if (movementType === "in") {
-    title.textContent = movementToEdit ? "Editar entrada de producto" : "Entrada de producto";
+    title.textContent = movementToEdit
+      ? "Editar entrada de producto"
+      : "Entrada de producto";
     icon.className = "bi bi-arrow-right text-success";
     btnConfirm.className = "btn btn-success rounded-pill btn-sm";
   } else {
-    title.textContent = movementToEdit ? "Editar salida de producto" : "Salida de producto";
+    title.textContent = movementToEdit
+      ? "Editar salida de producto"
+      : "Salida de producto";
     icon.className = "bi bi-arrow-left text-danger";
     btnConfirm.className = "btn btn-danger rounded-pill btn-sm";
   }
 }
 
-/** 
+/**
  * @description Limpia todos los campos del formulario
  * @returns {void}
  * @example
@@ -302,7 +306,9 @@ function filterMovements(movements) {
 
   // Filtro por tipo (in/out)
   if (MOVEMENTS_STATE.filterType) {
-    filtered = filtered.filter((m) => m.type === MOVEMENTS_STATE.filterType.toUpperCase());
+    filtered = filtered.filter(
+      (m) => m.type === MOVEMENTS_STATE.filterType.toUpperCase()
+    );
   }
 
   // Filtro por fecha
@@ -392,7 +398,7 @@ function renderMovementsList(movements) {
 
     // Configurar contenido
     productName.textContent = product.name;
-    
+
     // Formatear fecha: "19/12/2025" desde "2025-12-19"
     const dateObj = new Date(m.date + "T00:00:00");
     const formattedDate = dateObj.toLocaleDateString("es-ES", {
@@ -405,8 +411,10 @@ function renderMovementsList(movements) {
     meta.innerHTML = `<i class="bi bi-calendar"></i> ${formattedDate} • <i class="bi bi-boxes"></i> ${m.quantity} `;
 
     // Configurar botones de acción
-    node.querySelector(".btn-edit-movement").onclick = () => openEditMovementModal(m.id);
-    node.querySelector(".btn-delete-movement").onclick = () => openDeleteMovementModal(m.id);
+    node.querySelector(".btn-edit-movement").onclick = () =>
+      openEditMovementModal(m.id);
+    node.querySelector(".btn-delete-movement").onclick = () =>
+      openDeleteMovementModal(m.id);
 
     movementsList.appendChild(node);
   });
@@ -496,7 +504,7 @@ function saveMovementFromModal() {
   // Validar stock para salidas (solo si es nuevo movimiento o si cambió la cantidad/producto)
   if (movementType === "out") {
     let availableStock = product.quantity;
-    
+
     // Si estamos editando, considerar el stock que se revertirá
     if (movementToEdit) {
       const movements = getData("movements") || [];
@@ -508,12 +516,15 @@ function saveMovementFromModal() {
         } else {
           availableStock += existingMovement.quantity; // Se revertirá la resta
         }
-      } else if (existingMovement && existingMovement.productId !== product.id) {
+      } else if (
+        existingMovement &&
+        existingMovement.productId !== product.id
+      ) {
         // Si cambió el producto, no hay efecto de reversión en el nuevo producto
         // El stock disponible es el actual
       }
     }
-    
+
     if (availableStock < quantity) {
       setInputError(
         ID_MOVEMENT_QUANTITY,
@@ -530,7 +541,7 @@ function saveMovementFromModal() {
 
   // Guardar movimiento
   const movements = getData("movements") || [];
-  
+
   if (movementToEdit) {
     // EDITAR: Buscar el movimiento existente para revertir su efecto en el stock
     const existingMovement = movements.find((m) => m.id === movementToEdit);
@@ -538,7 +549,7 @@ function saveMovementFromModal() {
       // Revertir el efecto del movimiento anterior en el producto anterior
       const oldProductId = existingMovement.productId;
       const isSameProduct = oldProductId === product.id;
-      
+
       const updatedProducts = products.map((p) => {
         // Revertir efecto en el producto anterior
         if (p.id === oldProductId) {
@@ -659,7 +670,7 @@ function clearInputError(inputId) {
  */
 function initProductAutocomplete(input) {
   const products = getData("products");
-  
+
   // Crear o actualizar el datalist
   let datalist = document.getElementById("productsDatalist");
   if (!datalist) {
@@ -716,7 +727,14 @@ function openEditMovementModal(id) {
   const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
   const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
 
-  if (!title || !icon || !btnConfirm || !productInput || !quantityInput || !dateInput) {
+  if (
+    !title ||
+    !icon ||
+    !btnConfirm ||
+    !productInput ||
+    !quantityInput ||
+    !dateInput
+  ) {
     console.error("No se encontraron los elementos del modal");
     return;
   }
@@ -791,7 +809,11 @@ function openDeleteMovementModal(id) {
   if (!product) return;
 
   const movementTypeText = movement.type === "IN" ? "entrada" : "salida";
-  openConfirmDeleteModal("movement", id, `${movementTypeText} de ${product.name}`);
+  openConfirmDeleteModal(
+    "movement",
+    id,
+    `${movementTypeText} de ${product.name}`
+  );
 }
 
 /**

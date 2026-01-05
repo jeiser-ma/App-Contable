@@ -9,6 +9,17 @@ const ID_MODALS_CONTAINER = "modals-container";
 // IDs de elementos del navbar superior
 const ID_PAGE_TITLE = "pageTitle";
 const ID_MODULE_ICON = "moduleIcon";
+const ID_BTN_LOGOUT = "btnLogout";
+const ID_BTN_CONTEXT_MENU = "btnContextMenu";
+
+
+
+// IDs de elementos del navbar inferior
+const ID_NAV_HOME = "navHome";
+const ID_NAV_ADD = "navAdd";
+const ID_NAV_ACCOUNTING = "navAccounting";
+
+//#endregion
 
 
 //==============================================
@@ -31,7 +42,7 @@ const PAGE_ACCOUNTING = "accounting";
  * @type {Object} PAGES_CONFIG
  * @property {string} title - Título de la página
  * @property {string} icon - Icono de la página
- * @property {string} navId - ID del elemento de navegación (navbar inferior)
+ * @property {string|null} navId - ID del elemento de navegación (navbar inferior) o null si no tiene navegación
  * @property {boolean} isModule - Indica si la página es un módulo
  * @info: isModule es false para las páginas compartidas y true para los módulos
  */
@@ -47,25 +58,25 @@ const PAGES_CONFIG = {
   [PAGE_PRODUCTS]: {
     title: "Productos",
     icon: "bi-box",
-    navId: "navProducts",
+    navId: null,
     isModule: true // Módulo
   },
   [PAGE_MOVEMENTS]: {
     title: "Movimientos",
     icon: "bi-arrow-repeat",
-    navId: "navMovements",
+    navId: null,
     isModule: true // Módulo
   },
   [PAGE_EXPENSES]: {
     title: "Gastos",
     icon: "bi-cash-coin",
-    navId: "navExpenses",
+    navId: null,
     isModule: true // Módulo
   },
   [PAGE_INVENTORY]: {
     title: "Inventario",
     icon: "bi-clipboard-data",
-    navId: "navInventory",
+    navId: null,
     isModule: true // Módulo
   },
   [PAGE_ACCOUNTING]: {
@@ -77,7 +88,7 @@ const PAGES_CONFIG = {
   [PAGE_SETTINGS]: {
     title: "Ajustes",
     icon: "bi-gear",
-    navId: "navSettings",
+    navId: null,
     isModule: false // Página compartida
   }
 };
@@ -148,5 +159,97 @@ const MODALS_CONFIG = {
     icon: "bi-credit-card",
   },
 };
+
+//#endregion
+
+
+
+
+//==============================================
+//#region FLOATING CARDS CONFIGS
+//==============================================
+
+//floating cards ids
+const ID_FLOATING_CARDS = "floatingCards";
+const ID_FLOATING_CARD_PRODUCT = "floatingCardProduct";
+const ID_FLOATING_CARD_MOVEMENT = "floatingCardMovement";
+const ID_FLOATING_CARD_EXPENSE = "floatingCardExpense";
+const ID_FLOATING_CARD_INVENTORY = "floatingCardInventory";
+
+/**
+ * Configuración de las cards flotantes
+ * @type {Array<Object>} FLOATING_CARDS_CONFIG
+ * @property {string} cardId - ID del elemento HTML de la card
+ * @property {string} page - Nombre de la página a cargar
+ * @property {string|null} openModalFunction - Nombre de la función para abrir el modal (null si no tiene modal)
+ */
+const FLOATING_CARDS_CONFIG = [
+  {
+    cardId: ID_FLOATING_CARD_PRODUCT,
+    page: PAGE_PRODUCTS,
+    openModalFunction: "openAddProductModal"
+  },
+  {
+    cardId: ID_FLOATING_CARD_MOVEMENT,
+    page: PAGE_MOVEMENTS,
+    openModalFunction: "openAddMovementModal"
+  },
+  {
+    cardId: ID_FLOATING_CARD_EXPENSE,
+    page: PAGE_EXPENSES,
+    openModalFunction: "openAddExpenseModal"
+  },
+  {
+    cardId: ID_FLOATING_CARD_INVENTORY,
+    page: PAGE_INVENTORY,
+    openModalFunction: null // Inventory no abre modal al hacer clic en la card
+  }
+];
+
+//#endregion
+
+
+
+
+
+//==============================================
+//#region CONTEXT MENU CONFIGS
+//==============================================  
+
+//context menu options ids
+const ID_CONTEXT_MENU_PRODUCTS = "contextMenuProducts";
+const ID_CONTEXT_MENU_MOVEMENTS = "contextMenuMovements";
+const ID_CONTEXT_MENU_EXPENSES = "contextMenuExpenses";
+const ID_CONTEXT_MENU_INVENTORY = "contextMenuInventory";
+const ID_CONTEXT_MENU_SETTINGS = "contextMenuSettings";
+
+/**
+ * Configuración del menú contextual
+ * @type {Array<Object>} CONTEXT_MENU_CONFIG
+ * @property {string} menuId - ID del elemento HTML del menú
+ * @property {string} page - Nombre de la página a cargar
+ */
+const CONTEXT_MENU_CONFIG = [
+  {
+    menuId: ID_CONTEXT_MENU_PRODUCTS,
+    page: PAGE_PRODUCTS
+  },
+  {
+    menuId: ID_CONTEXT_MENU_MOVEMENTS,
+    page: PAGE_MOVEMENTS
+  },
+  {
+    menuId: ID_CONTEXT_MENU_EXPENSES,
+    page: PAGE_EXPENSES
+  },
+  {
+    menuId: ID_CONTEXT_MENU_INVENTORY,
+    page: PAGE_INVENTORY
+  },
+  {
+    menuId: ID_CONTEXT_MENU_SETTINGS,
+    page: PAGE_SETTINGS
+  }
+];
 
 //#endregion

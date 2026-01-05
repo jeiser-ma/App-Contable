@@ -40,7 +40,7 @@ const MODULES_CONFIG = {
     counterLabel: "gastos",
     stateName: "EXPENSES_STATE",
     renderFunction: "renderExpenses",
-    openModalFunction: "openExpenseModal",
+    openModalFunction: "openAddExpenseModal",
     addButtonId: "btnAddExpense",
     addButtonTitle: "Agregar gasto",
     chips: [],
@@ -54,7 +54,7 @@ const MODULES_CONFIG = {
     counterLabel: "movimientos",
     stateName: "MOVEMENTS_STATE",
     renderFunction: "renderMovements",
-    openModalFunction: "openMovementModal",
+    openModalFunction: "openAddMovementModal",
     addButtonId: "btnAddMovement",
     addButtonTitle: "Agregar movimiento",
     chips: [

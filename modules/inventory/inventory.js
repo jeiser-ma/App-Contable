@@ -72,7 +72,7 @@ async function onInventoryPageLoaded() {
  * @param {string} productId - ID del producto
  * @returns {void}
  */
-function openInventoryModal(productId) {
+function openAddInventoryModal(productId) {
   currentProductId = productId;
 
   const products = getData("products") || [];
@@ -393,7 +393,7 @@ function renderPendingInventoryList(products, allComplete = false) {
 
     const btnAdd = node.querySelector(".btn-add-inventory");
     if (btnAdd) {
-      btnAdd.onclick = () => openInventoryModal(product.id);
+      btnAdd.onclick = () => openAddInventoryModal(product.id);
     }
 
     list.appendChild(node);
@@ -458,7 +458,7 @@ function renderPartialInventoryList(inventoryCounts) {
 
     const btnAdd = node.querySelector(".btn-add-inventory");
     if (btnAdd) {
-      btnAdd.onclick = () => openInventoryModal(inv.productId);
+      btnAdd.onclick = () => openAddInventoryModal(inv.productId);
     }
 
     const btnDelete = node.querySelector(".btn-delete-inventory");
