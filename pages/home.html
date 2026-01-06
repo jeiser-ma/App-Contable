@@ -2,88 +2,90 @@
   <h5 class="mb-3 fw-semibold">Dashboard</h5>
 
   <!-- Cards de métricas -->
-  <div class="row g-3 mb-4">
+  <div class="row mb-4 g-2">
     <div class="fw-semibold col-12">
       <i class="bi bi-box-fill text-primary fs-6"></i> Productos
     </div>
     <!-- Total de productos -->
-    <div class="col-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-body py-2 px-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <div
-              class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center px-2 py-1"
-            >
-              <i class="bi bi-boxes text-primary fs-4"></i>
-            </div>
-            <div class="text-end">
-              <div class="text-muted small">Total</div>
-              <div class="h6 fw-bold text-primary" id="totalProducts">0</div>
-            </div>
+    <div class="col-12">
+      <div class="rounded-pill bg-white shadow-sm border-0">
+        <div
+          class="d-flex justify-content-center align-items-center px-2 py-2 gap-2"
+        >
+          <i
+            class="bi bi-boxes text-white fs-4 bg-primary rounded-circle text-center"
+            style="width: 35px; height: 35px"
+          ></i>
+          <div class="text-muted small fw-bold flex-grow-1">
+            Total de productos
+          </div>
+          <div
+            class="fw-bold text-primary bg-primary bg-opacity-10 rounded-pill px-2"
+            id="totalProducts"
+          >
+            0
           </div>
         </div>
       </div>
     </div>
 
     <!-- Productos con stock bajo -->
-    <div class="col-4">
+    <div class="col-6">
       <div
-        class="card shadow-sm border-0"
+        class="rounded-4 bg-white shadow-sm border-0"
         id="cardLowStock"
         style="cursor: pointer"
       >
-        <div class="card-body py-2 px-2">
-          <div class="d-flex justify-content-between align-items-center">
-            <div
-              class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center px-2 py-1"
-            >
-              <i class="bi bi-box text-warning fs-5"></i>
-            </div>
-            <div class="text-end">
-              <div class="text-muted small mb-0">Stock bajo</div>
-              <div class="d-inline-flex align-items-center gap-2">
-                <i
-                  class="bi bi-exclamation-triangle-fill text-warning fs-6"
-                ></i>
-                <div class="h6 mb-0 fw-bold text-warning" id="lowStockProducts">
-                  0
-                </div>
+        <div
+          class="d-flex justify-content-between align-items-center px-2 py-2"
+        >
+          <i
+            class="bi bi-box text-warning fs-5 bg-warning bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center"
+            style="width: 35px; height: 35px"
+          ></i>
+
+          <div class="text-end flex-grow-1 px-2">
+            <div class="text-muted small">Stock bajo</div>
+            <div class="d-inline-flex align-items-center gap-2">
+              <i class="bi bi-exclamation-triangle-fill text-warning fs-6"></i>
+              <div class="h6 mb-0 fw-bold text-warning" id="lowStockProducts">
+                0
               </div>
             </div>
-            <i class="bi bi-chevron-right text-muted"></i>
           </div>
+          <i class="bi bi-chevron-right text-muted"></i>
         </div>
       </div>
     </div>
 
     <!-- Productos con stock crítico -->
-    <div class="col-4">
+    <div class="col-6">
       <div
-        class="card shadow-sm border-0"
-        id="cardCriticalStock"
+        class="rounded-4 bg-white shadow-sm border-0"
+        id="cardLowStock"
         style="cursor: pointer"
       >
-        <div class="card-body py-2 px-2">
-          <div class="d-flex justify-content-between align-items-center">
-            <div
-              class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center px-2 py-1"
-            >
-              <i class="bi bi-box text-danger fs-5"></i>
-            </div>
-            <div class="text-end">
-              <div class="text-muted small mb-0">Stock crítico</div>
-              <div class="d-inline-flex align-items-center gap-2">
-                <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
-                <div
-                  class="h6 mb-0 fw-bold text-danger"
-                  id="criticalStockProducts"
-                >
-                  0
-                </div>
+        <div
+          class="d-flex justify-content-between align-items-center px-2 py-2"
+        >
+          <i
+            class="bi bi-box text-danger fs-5 bg-danger bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center"
+            style="width: 35px; height: 35px"
+          ></i>
+
+          <div class="text-end flex-grow-1 px-1">
+            <div class="text-muted small">Stock crítico</div>
+            <div class="d-inline-flex align-items-center gap-2">
+              <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
+              <div
+                class="h6 mb-0 fw-bold text-danger"
+                id="cardCriticalStock"
+              >
+                0
               </div>
             </div>
-            <i class="bi bi-chevron-right text-muted"></i>
           </div>
+          <i class="bi bi-chevron-right text-muted"></i>
         </div>
       </div>
     </div>
@@ -93,116 +95,86 @@
   <div class="mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h6 class="fw-semibold mb-0">
-        <i class="bi bi-calculator text-primary"></i> Resumen de la contabilidad
-        del día
+        <i class="bi bi-calculator-fill text-primary"></i>
+        Resumen contabilidad del día
       </h6>
       <button
-        class="btn btn-sm btn-chip rounded-pill btn-outline-primary"
+        class="btn btn-chip rounded-pill btn-outline-primary"
         id="btnViewAccountingDetails"
       >
-        Ver detalles
+        Detalles
+        <i class="bi bi-chevron-right text-primary small"></i>
       </button>
     </div>
 
     <div class="row g-2">
       <!-- Importe total del inventario -->
-      <div class="col-12">
-        <div class="card shadow-sm border-0">
-          <div class=" py-1 px-3">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <div class="text-muted small">Importe total</div>
-                <div
-                  class="h5 fw-bold text-primary"
-                  id="accountingTotalAmount"
-                >
-                  $0.00
-                </div>
-              </div>
-              <div
-                class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-3"
-                style="width: 40px; height: 40px"
-              >
-                <i class="bi bi-cash-stack text-primary fs-4"></i>
-              </div>
-            </div>
+      <div
+        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
+      >
+        <div class="flex-grow-1">
+          <div class="text-muted small">Importe total</div>
+          <div class="h5 fw-bold text-primary" id="accountingTotalAmount">
+            $0.00
           </div>
         </div>
+
+        <i
+          class="bi bi-cash-stack text-primary fs-4 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"
+        ></i>
       </div>
 
       <!-- Total de gastos -->
-      <div class="col-12">
-        <div class="card shadow-sm border-0">
-          <div class=" py-1 px-3">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <div class="text-muted small">Total gastos</div>
-                <div
-                  class="h5 fw-bold text-danger"
-                  id="accountingTotalExpenses"
-                >
-                  $0.00
-                </div>
-              </div>
-              <div
-                class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-3"
-                style="width: 40px; height: 40px"
-              >
-                <i class="bi bi-cash-coin text-danger fs-4"></i>
-              </div>
-            </div>
+      <div
+        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
+      >
+        <div class="flex-grow-1">
+          <div class="text-muted small">Total gastos</div>
+          <div class="h5 fw-bold text-danger" id="accountingTotalExpenses">
+            $0.00
           </div>
         </div>
+        <i
+          class="bi bi-cash-coin text-danger fs-4 bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"
+        ></i>
       </div>
 
       <!-- Total de ventas -->
-      <div class="col-12">
-        <div class="card shadow-sm border-0">
-          <div class=" py-1 px-3">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <div class="text-muted small">Total ventas</div>
-                <div
-                  class="h5 fw-bold text-success"
-                  id="accountingTotalSales"
-                >
-                  $0.00
-                </div>
-              </div>
-              <div
-                class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-3"
-                style="width: 40px; height: 40px"
-              >
-                <i class="bi bi-cart-check text-success fs-4"></i>
-              </div>
-            </div>
+      <div
+        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
+      >
+        <div class="flex-grow-1">
+          <div class="text-muted small">Total ventas</div>
+          <div class="h5 fw-bold text-success" id="accountingTotalSales">
+            $0.00
           </div>
         </div>
+        <i
+          class="bi bi-cart-check text-success fs-4 bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"
+        ></i>
       </div>
 
       <!-- Cierre de caja (diferencia) -->
-      <div class="col-12">
-        <div class="card shadow-sm border-0">
-          <div class=" py-1 px-3">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <div class="text-muted small">Cierre de caja</div>
-                <div class="d-inline-flex align-items-center gap-2">
-                  <i class="bi bi-cash-coin text-danger" id="accountingDifferenceIcon"></i>
-                  <div class="h5 fw-bold" id="accountingDifference">
-                    $0.00
-                  </div>
-                </div>
-              </div>
-              <div
-                class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-3"
-                style="width: 40px; height: 40px"
-              >
-                <i class="bi bi-calculator text-info fs-4"></i>
-              </div>
-            </div>
+      <div
+        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
+      >
+        <div class="flex-grow-1">
+          <div class="text-muted small">Cierre de caja</div>
+          <div class="d-inline-flex gap-2">
+            <i
+              class="bi bi-cash-coin text-danger"
+              id="accountingDifferenceIcon"
+            ></i>
+            <div class="h5 fw-bold" id="accountingDifference">$0.00</div>
           </div>
         </div>
+        <i
+          class="bi bi-calculator text-info fs-4 bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"
+        ></i>
       </div>
     </div>
   </div>
