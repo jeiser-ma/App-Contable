@@ -225,41 +225,48 @@
           <i class="bi bi-funnel"></i> Limpiar filtros
         </button>
       </div>
+
     </div>
 
     <!-- ===== CONTENIDO DINÁMICO ===== -->
-    <main id="pages-container" class="container-fluid">
+    <main id="pages-container" class="container-fluid px-2">
       <!-- AQUÍ SE INYECTAN LAS PÁGINAS -->
     </main>
 
     <!-- ===== NAVBAR INFERIOR (MÓVIL) ===== -->
-    <nav class="bg-light fixed-bottom border-top px-2">
-      <div class="d-flex align-items-center w-100">
+    <nav class="navbar navbar-light bg-light fixed-bottom border-top">
+      <div class="container-fluid">
         <!-- HOME -->
         <button
-          class="btn btn-link btn-chip rounded-pill text-decoration-none bottom-nav-btn w-100"
+          class="btn btn-link rounded-pill text-decoration-none flex-fill bottom-nav-btn"
           id="navHome"
         >
-          <i class="bi bi-house-door fs-4"></i><br />
-          <small>Inicio</small>
+          <div class="text-center">
+            <i class="bi bi-house-door fs-4"></i><br />
+            <small>Inicio</small>
+          </div>
         </button>
 
         <!-- BOTÓN ADICIONAR (con cards flotantes) -->
         <button
-          class="btn btn-link btn-sm rounded-pill text-decoration-none bottom-nav-btn w-100"
+          class="btn btn-link rounded-pill text-decoration-none flex-fill bottom-nav-btn"
           id="navAdd"
         >
-          <i class="bi bi-plus-circle-fill fs-1"></i><br />
-          <small>Adicionar</small>
+          <div class="text-center">
+            <i class="bi bi-plus-circle-fill fs-1"></i><br />
+            <small>Adicionar</small>
+          </div>
         </button>
 
         <!-- CONTABILIDAD -->
         <button
-          class="btn btn-link btn-chip rounded-pill text-decoration-none bottom-nav-btn w-100"
+          class="btn btn-link rounded-pill text-decoration-none flex-fill bottom-nav-btn"
           id="navAccounting"
         >
-          <i class="bi bi-calculator fs-4"></i><br />
-          <small>Contabilidad</small>
+          <div class="text-center">
+            <i class="bi bi-calculator fs-4"></i><br />
+            <small>Contabilidad</small>
+          </div>
         </button>
       </div>
 
@@ -350,7 +357,7 @@
     <script src="js/configs.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/storage.js"></script>
-    <script src="js/router.js"></script>
+    <script src="js/router1.js"></script>
     <script src="js/modules-controls.js"></script>
     <script src="js/modules-modals.js"></script>
     <script src="js/navigation.js"></script>
