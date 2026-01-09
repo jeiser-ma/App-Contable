@@ -253,3 +253,24 @@ const CONTEXT_MENU_CONFIG = [
 ];
 
 //#endregion
+
+
+// IDs modules controls
+const ID_MODULE_CONTROLS = "moduleControls";
+const ID_CONTAINER_SEARCH_INPUT_BTN_ADD = "container-searchInput-btnAdd";
+const ID_CONTAINER_DATE_FILTER_ORDER_BY = "container-dateFilter-orderBy";
+const ID_CONTAINER_CHIPS_FILTER = "container-chipsFilter";
+const ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS = "container-listCounter-btnClearFilters";
+
+const ID_CONTAINER_SEARCH_INPUT = "container-searchInput";
+const ID_CONTAINER_BTN_ADD = "container-btnAdd";
+
+const ID_CONTAINER_DATE_FILTER = "container-dateFilter";
+const ID_CONTAINER_ORDER_BY = "container-orderBy";
+const ID_CONTAINER_ORDER_DIR = "container-orderDir";
+const ID_CONTAINER_FILTER_DATE = "container-filterDate";
+const ID_CONTAINER_FILTER_TYPE = "container-filterType";
+const ID_CONTAINER_FILTER_PRODUCT = "container-filterProduct";
+const ID_CONTAINER_FILTER_QUANTITY = "container-filterQuantity";
+
+//#endregion

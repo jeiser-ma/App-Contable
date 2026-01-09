@@ -99,284 +99,29 @@ function setupModuleControls(moduleName) {
     return;
   }
   
-  const controls = document.getElementById("moduleControls");
+  const controls = document.getElementById(ID_MODULE_CONTROLS);
   if (!controls) return;
 
   // Mostrar controles
   controls.classList.remove("d-none");
 
-  // 1. Configurar buscador
-  const searchInput = document.getElementById("moduleSearchInput");
-  const btnClearSearch = document.getElementById("moduleClearSearch");
-  
-  if (searchInput) {
-    searchInput.placeholder = config.searchPlaceholder;
-    searchInput.value = "";
-    
-    // Remover listeners previos
-    searchInput.oninput = null;
-    searchInput.removeEventListener("input", searchInput._moduleInputHandler);
-    
-    // Crear nuevo handler
-    const inputHandler = () => {
-      const value = searchInput.value.toLowerCase().trim();
-      console.log(`Search input changed: "${value}"`);
-      if (btnClearSearch) {
-        btnClearSearch.classList.toggle("d-none", !value);
-      }
-      updateModuleState("searchText", value);
-      callModuleRender();
-    };
-    
-    searchInput._moduleInputHandler = inputHandler;
-    searchInput.oninput = inputHandler;
-
-    if (btnClearSearch) {
-      btnClearSearch.onclick = null;
-      btnClearSearch.removeEventListener("click", btnClearSearch._moduleClickHandler);
-      
-      const clearHandler = () => {
-        console.log("Clear search clicked");
-        searchInput.value = "";
-        btnClearSearch.classList.add("d-none");
-        updateModuleState("searchText", "");
-        callModuleRender();
-      };
-      
-      btnClearSearch._moduleClickHandler = clearHandler;
-      btnClearSearch.onclick = clearHandler;
-    }
-  } else {
-    console.error("moduleSearchInput not found!");
-  }
-
-  // 2. Configurar ordenamiento
-  const sortContainer = document.getElementById("moduleSortContainer");
-  const orderBy = document.getElementById("moduleOrderBy");
-  const orderDir = document.getElementById("moduleOrderDir");
-  
-  if (config.hasSort && config.sortOptions.length > 0) {
-    if (sortContainer) sortContainer.classList.remove("d-none");
-    
-    if (orderBy) {
-      // Limpiar opciones
-      orderBy.innerHTML = '<option value="" disabled selected>Ordenar…</option>';
-      
-      // Agregar opciones
-      config.sortOptions.forEach(opt => {
-        const option = document.createElement("option");
-        option.value = opt.value;
-        option.textContent = opt.label;
-        orderBy.appendChild(option);
-      });
-
-      // Establecer valor inicial del ordenamiento
-      const initialState = getModuleState("orderBy");
-      if (initialState && orderBy) {
-        orderBy.value = initialState;
-      }
-      
-      // Establecer dirección inicial
-      const initialDir = getModuleState("orderDir");
-      if (orderDir) {
-        orderDir.innerHTML = (initialDir === "desc")
-          ? '<i class="bi bi-sort-alpha-up"></i>'
-          : '<i class="bi bi-sort-alpha-down"></i>';
-      }
-
-      orderBy.onchange = () => {
-        if (orderBy.value) {
-          console.log(`Order by changed: ${orderBy.value}`);
-          updateModuleState("orderBy", orderBy.value);
-          callModuleRender();
-        }
-      };
-
-      if (orderDir) {
-        orderDir.onclick = () => {
-          const currentDir = getModuleState("orderDir");
-          const newDir = currentDir === "asc" ? "desc" : "asc";
-          updateModuleState("orderDir", newDir);
-          
-          // Actualizar icono
-          orderDir.innerHTML = newDir === "asc"
-            ? '<i class="bi bi-sort-alpha-down"></i>'
-            : '<i class="bi bi-sort-alpha-up"></i>';
-          
-          callModuleRender();
-        };
-      }
-    }
-  } else {
-    if (sortContainer) sortContainer.classList.add("d-none");
-  }
-
-  // 3. Configurar botón de acción (agregar) - solo si existe
-  const actionButtonsContainer = document.getElementById("moduleActionButtons");
-  if (actionButtonsContainer) {
-    actionButtonsContainer.innerHTML = "";
-    
-    if (config.addButtonId && config.openModalFunction) {
-      const button = document.createElement("button");
-      button.id = config.addButtonId;
-      button.innerHTML = '<i class="bi bi-plus fs-5"></i>';
-      button.className = "btn btn-primary rounded-circle d-flex align-items-center justify-content-center";
-      button.setAttribute("style", "width: 40px; height: 40px");
-      button.setAttribute("title", config.addButtonTitle);
-      button.onclick = () => {
-        const openModalFn = window[config.openModalFunction];
-        if (openModalFn && typeof openModalFn === "function") {
-          openModalFn();
-        }
-      };
-      actionButtonsContainer.appendChild(button);
-    }
-  }
-
-  // 4. Configurar chips de filtro (fijos en el layout, solo mostrar/ocultar)
-  // Ocultar todos los chips primero
-  const filterIn = document.getElementById("filterIn");
-  const filterOut = document.getElementById("filterOut");
-  const filterWarehouse = document.getElementById("filterWarehouse");
-  const filterStore = document.getElementById("filterStore");
-  const filterLowStock = document.getElementById("filterLowStock");
-  const filterCriticalStock = document.getElementById("filterCriticalStock");
-  
-  if (filterIn) filterIn.classList.add("d-none");
-  if (filterOut) filterOut.classList.add("d-none");
-  if (filterWarehouse) filterWarehouse.classList.add("d-none");
-  if (filterStore) filterStore.classList.add("d-none");
-  if (filterLowStock) filterLowStock.classList.add("d-none");
-  if (filterCriticalStock) filterCriticalStock.classList.add("d-none");
-  
-  // Remover clases active de todos los chips
-  [filterIn, filterOut, filterWarehouse, filterStore, filterLowStock, filterCriticalStock].forEach(chip => {
-    if (chip) chip.classList.remove("active");
-  });
-  
-  // Configurar chips según el módulo
-  if (config.hasChips && config.chips.length > 0) {
-    config.chips.forEach(chip => {
-      const chipElement = document.getElementById(chip.id);
-      if (chipElement) {
-        // Mostrar el chip
-        chipElement.classList.remove("d-none");
-        
-        // Configurar onclick
-        chipElement.onclick = null;
-        chipElement.removeEventListener("click", chipElement._moduleChipHandler);
-        
-        const chipHandler = () => {
-          console.log(`Chip clicked: ${chip.id}, filterKey: ${chip.filterKey}, filterValue: ${chip.filterValue}`);
-          const currentValue = getModuleState(chip.filterKey);
-          console.log(`Current value: ${currentValue}`);
-          
-          if (currentValue === chip.filterValue) {
-            // Desactivar filtro
-            console.log("Deactivating filter");
-            updateModuleState(chip.filterKey, null);
-            chipElement.classList.remove("active");
-          } else {
-            // Activar este filtro y desactivar otros del mismo grupo
-            console.log("Activating filter");
-            updateModuleState(chip.filterKey, chip.filterValue);
-            chipElement.classList.add("active");
-            
-            // Desactivar otros chips del mismo grupo
-            config.chips.forEach(otherChip => {
-              if (otherChip.id !== chip.id && otherChip.filterKey === chip.filterKey) {
-                const otherElement = document.getElementById(otherChip.id);
-                if (otherElement) otherElement.classList.remove("active");
-              }
-            });
-          }
-          
-          callModuleRender();
-        };
-        
-        chipElement._moduleChipHandler = chipHandler;
-        chipElement.onclick = chipHandler;
-      }
-    });
-  }
-
-  // 5. Configurar filtro de fecha
-  const dateFilter = document.getElementById("moduleFilterDate");
-  if (dateFilter) {
-    if (config.hasDateFilter) {
-      dateFilter.classList.remove("d-none");
-      
-      // Para inventory, establecer fecha de hoy por defecto
-      if (moduleName === "inventory") {
-        const today = new Date().toISOString().split("T")[0];
-        dateFilter.value = today;
-        updateModuleState("filterDate", today);
-      } else {
-        dateFilter.value = "";
-      }
-      
-      dateFilter.onchange = () => {
-        console.log(`Date filter changed: ${dateFilter.value || null}`);
-        updateModuleState("filterDate", dateFilter.value || null);
-        callModuleRender();
-      };
-    } else {
-      dateFilter.classList.add("d-none");
-    }
-  }
-
-  // 6. Configurar botón limpiar filtros (siempre visible, limpia todo)
-  const btnClearFilters = document.getElementById("moduleClearFilters");
-  if (btnClearFilters) {
-    btnClearFilters.onclick = () => {
-      // Limpiar buscador
-      if (searchInput) {
-        searchInput.value = "";
-        updateModuleState("searchText", "");
-        if (btnClearSearch) btnClearSearch.classList.add("d-none");
-      }
-
-      // Limpiar ordenamiento (si existe)
-      if (config.hasSort && orderBy) {
-        orderBy.value = "";
-        updateModuleState("orderBy", config.sortOptions[0]?.value || "name");
-        updateModuleState("orderDir", "asc");
-        if (orderDir) {
-          orderDir.innerHTML = '<i class="bi bi-sort-alpha-down"></i>';
-        }
-      }
-
-      // Limpiar chips (si existen)
-      if (config.hasChips) {
-        config.chips.forEach(chip => {
-          updateModuleState(chip.filterKey, null);
-          const chipElement = document.getElementById(chip.id);
-          if (chipElement) {
-            chipElement.classList.remove("active");
-          }
-        });
-      } else {
-        // Si no hay chips, asegurarse de que todos estén ocultos
-        [filterIn, filterOut, filterWarehouse, filterStore, filterLowStock, filterCriticalStock].forEach(chip => {
-          if (chip) {
-            chip.classList.add("d-none");
-            chip.classList.remove("active");
-          }
-        });
-      }
-
-      // Limpiar filtro de fecha (si existe)
-      if (config.hasDateFilter && dateFilter) {
-        dateFilter.value = "";
-        updateModuleState("filterDate", null);
-      }
-
-      callModuleRender();
-    };
-  }
-
-  // 7. Actualizar contador inicial
+  // Configurar controles
+  // 1. Buscador
+  setupSearchInput(moduleName);
+  // 2. Botón de agregar
+  setupBtnAdd(moduleName);
+  // 3. Ordenamiento
+  setupOrderBy(moduleName);
+  // 4. Filtro de fecha
+  setupDateFilter(moduleName);
+  // 5. Filtros de chips
+  setupChipsFilter(moduleName);
+  // 6. Contador
   updateModuleCounterFromData();
+  //setupListCounter(moduleName);
+  // 7. Botón de limpiar filtros
+  setupBtnClearFilters(moduleName);
+
   
   // 8. Renderizar inicialmente
   callModuleRender();
@@ -480,7 +225,7 @@ function updateModuleCounterFromData() {
  * @returns {void}
  */
 function hideModuleControls() {
-  const controls = document.getElementById("moduleControls");
+  const controls = document.getElementById(ID_MODULE_CONTROLS);
   if (controls) {
     controls.classList.add("d-none");
   }

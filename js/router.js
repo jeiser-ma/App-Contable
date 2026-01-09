@@ -109,7 +109,7 @@ async function loadModal(name, module = null) {
  * @param {string} name - Nombre del componente a cargar
  * @returns {Promise<void>}
  */
-async function loadComponent(name) {
+async function loadComponent(name, module = null) {
   try {
     const response = await fetch(`components/${name}/${name}.html`);
     if (!response.ok) {
@@ -117,7 +117,12 @@ async function loadComponent(name) {
     }
     
     const html = await response.text();
-    document.body.insertAdjacentHTML("beforeend", html);
+    const componentsContainer = document.getElementById(ID_COMPONENTS_CONTAINER);
+    if (module) {
+      componentsContainer.insertAdjacentHTML("beforeend", html);
+    } else {
+      document.body.insertAdjacentHTML("beforeend", html);
+    }
     console.log(`Component ${name} loaded`);
   } catch (error) {
     console.error(`Error cargando componente ${name}:`, error);
