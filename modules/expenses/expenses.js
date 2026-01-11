@@ -43,7 +43,7 @@ async function onExpensesPageLoaded() {
 
   
   // Configurar controles del módulo (buscador, ordenamiento, fecha, botón agregar)
-  setupModuleControls(PAGE_EXPENSES); 
+  setupExpensesControls(); 
 
   // Configurar botón de confirmar del modal
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_EXPENSE);
@@ -51,8 +51,32 @@ async function onExpensesPageLoaded() {
     btnConfirm.onclick = saveExpenseFromModal;
   }
 
-  // Nota: renderExpenses() se llama automáticamente al final de setupModuleControls()
+  // Renderizar la lista de gastos
+  renderExpenses();
 }
+
+
+/**
+ * Configura los controles del módulo de gastos
+ * @param {string} pageName - Nombre de la página
+ * @returns {void}
+ */
+async function setupExpensesControls() {
+  // Limpiar el contenido de los controles del módulo
+  clearModuleControlsContent();
+
+  // Mostrar los controles del módulo
+  showModuleControls();
+
+
+  // Cargar el control de botón de agregar
+  await loadModuleControl(CONTROL_BTN_ADD);
+  // Configurar el botón de agregar
+  setupBtnAdd(openAddExpenseModal);
+  
+}
+
+
 
 /**
  * Abre el formulario para nuevo gasto

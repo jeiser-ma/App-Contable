@@ -1,9 +1,29 @@
+
+
+/**
+ * Configura el botón de agregar
+ * @param {function} openModalFn - Función para abrir el modal
+ * @returns {void}
+ */
+function setupBtnAdd(openModalFn) {
+  const btnAdd = document.getElementById(ID_BTN_ADD);
+  if (btnAdd) {
+    btnAdd.onclick = () => {
+      if (openModalFn && typeof openModalFn === "function") {
+        openModalFn();
+      }
+    };
+  }
+}
+
+
+///ELIMINAR ESTA FUNCION LUEGO
 /**
  * Configura y muestra los controles del módulo
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
  * @returns {void}
  */
-function setupBtnAdd(moduleName) {
+function setupBtnAdd111(moduleName) {
   // 3. Configurar botón de acción (agregar) - solo si existe
   const actionButtonsContainer = document.getElementById("moduleActionButtons");
   if (actionButtonsContainer) {
@@ -25,16 +45,5 @@ function setupBtnAdd(moduleName) {
       };
       actionButtonsContainer.appendChild(button);
     }
-  }
-}
-
-function initBtnAdd(openModalFn) {
-  const btnAdd = document.getElementById(ID_BTN_ADD);
-  if (btnAdd) {
-    btnAdd.onclick = () => {
-      if (openModalFn && typeof openModalFn === "function") {
-        openModalFn();
-      }
-    };
   }
 }

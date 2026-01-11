@@ -24,8 +24,22 @@ const MODULES_CONFIG = {
     addButtonId: "btnAddProduct",
     addButtonTitle: "Agregar producto",
     chips: [
-      { id: "filterLowStock", label: "Stock bajo", icon: "bi-box", colorClass: "warning", filterKey: "filterStockStatus", filterValue: "low" },
-      { id: "filterCriticalStock", label: "Stock crítico", icon: "bi-box", colorClass: "danger", filterKey: "filterStockStatus", filterValue: "critical" },
+      {
+        id: "filterLowStock",
+        label: "Stock bajo",
+        icon: "bi-box",
+        colorClass: "warning",
+        filterKey: "filterStockStatus",
+        filterValue: "low",
+      },
+      {
+        id: "filterCriticalStock",
+        label: "Stock crítico",
+        icon: "bi-box",
+        colorClass: "danger",
+        filterKey: "filterStockStatus",
+        filterValue: "critical",
+      },
     ],
   },
   expenses: {
@@ -58,8 +72,22 @@ const MODULES_CONFIG = {
     addButtonId: "btnAddMovement",
     addButtonTitle: "Agregar movimiento",
     chips: [
-      { id: "filterIn", label: "Entradas", icon: null, colorClass: "success", filterKey: "filterType", filterValue: "in" },
-      { id: "filterOut", label: "Salidas", icon: null, colorClass: "danger", filterKey: "filterType", filterValue: "out" },
+      {
+        id: "filterIn",
+        label: "Entradas",
+        icon: null,
+        colorClass: "success",
+        filterKey: "filterType",
+        filterValue: "in",
+      },
+      {
+        id: "filterOut",
+        label: "Salidas",
+        icon: null,
+        colorClass: "danger",
+        filterKey: "filterType",
+        filterValue: "out",
+      },
     ],
   },
   inventory: {
@@ -78,8 +106,6 @@ const MODULES_CONFIG = {
   },
 };
 
-
-
 /**
  * Oculta los controles del módulo
  * @returns {void}
@@ -92,16 +118,43 @@ function hideModuleControls() {
   currentModule = null;
 }
 
+/**
+ * Oculta los controles del módulo
+ * @returns {void}
+ */
+function showModuleControls() {
+  const controls = document.getElementById(ID_MODULES_CONTROLS_CONTAINER);
+  if (controls) {
+    controls.classList.remove("d-none");
+  }
+  currentModule = null;
+}
 
+/**
+ * Limpia el contenido de los controles del módulo
+ * @returns {void}
+ */
+function clearModuleControlsContent() {
+  const controls = document.getElementById(ID_MODULES_CONTROLS_CONTAINER);
 
+  const row1 = document.getElementById(ID_CONTAINER_SEARCH_INPUT_BTN_ADD);
+  const row2 = document.getElementById(ID_CONTAINER_DATE_FILTER_ORDER_BY);
+  const row3 = document.getElementById(ID_CONTAINER_CHIPS_FILTER);
+  const row4 = document.getElementById(ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS);
 
-
-
-
-
-
-
-
+  if (row1) {
+    row1.innerHTML = "";
+  }
+  if (row2) {
+    row2.innerHTML = "";
+  }
+  if (row3) {
+    row3.innerHTML = "";
+  }
+  if (row4) {
+    row4.innerHTML = "";
+  }
+}
 
 /**
  * Configura y muestra los controles del módulo
@@ -116,14 +169,16 @@ function setupModuleControls(moduleName) {
   }
 
   currentModule = moduleName;
-  
+
   // Verificar que el estado del módulo esté disponible
   const state = window[config.stateName];
   if (!state) {
-    console.error(`Estado ${config.stateName} no encontrado para el módulo: ${moduleName}`);
+    console.error(
+      `Estado ${config.stateName} no encontrado para el módulo: ${moduleName}`
+    );
     return;
   }
-  
+
   const container = document.getElementById(ID_MODULES_CONTROLS_CONTAINER);
   if (!container) return;
 
@@ -147,7 +202,6 @@ function setupModuleControls(moduleName) {
   // 7. Botón de limpiar filtros
   setupBtnClearFilters(moduleName);
 
-  
   // 8. Renderizar inicialmente
   callModuleRender();
 }
@@ -161,7 +215,7 @@ function getModuleState(key) {
   if (!currentModule) return null;
   const config = MODULES_CONFIG[currentModule];
   if (!config) return null;
-  
+
   const state = window[config.stateName];
   return state ? state[key] : null;
 }
@@ -179,17 +233,24 @@ function updateModuleState(key, value) {
   }
   const config = MODULES_CONFIG[currentModule];
   if (!config) {
-    console.warn(`updateModuleState: config not found for module ${currentModule}`);
+    console.warn(
+      `updateModuleState: config not found for module ${currentModule}`
+    );
     return;
   }
-  
+
   const state = window[config.stateName];
   if (state) {
     const oldValue = state[key];
     state[key] = value;
-    console.log(`updateModuleState: ${currentModule}.${key} = ${value} (was: ${oldValue})`, state);
+    console.log(
+      `updateModuleState: ${currentModule}.${key} = ${value} (was: ${oldValue})`,
+      state
+    );
   } else {
-    console.error(`updateModuleState: state ${config.stateName} not found in window`);
+    console.error(
+      `updateModuleState: state ${config.stateName} not found in window`
+    );
   }
 }
 
@@ -204,20 +265,21 @@ function callModuleRender() {
   }
   const config = MODULES_CONFIG[currentModule];
   if (!config) {
-    console.warn(`callModuleRender: config not found for module ${currentModule}`);
+    console.warn(
+      `callModuleRender: config not found for module ${currentModule}`
+    );
     return;
   }
-  
+
   const renderFn = window[config.renderFunction];
   if (renderFn && typeof renderFn === "function") {
-    console.log(`callModuleRender: calling ${config.renderFunction} for ${currentModule}`);
+    console.log(
+      `callModuleRender: calling ${config.renderFunction} for ${currentModule}`
+    );
     renderFn();
   } else {
-    console.error(`callModuleRender: function ${config.renderFunction} not found or not a function`);
+    console.error(
+      `callModuleRender: function ${config.renderFunction} not found or not a function`
+    );
   }
 }
-
-
-
-
-
