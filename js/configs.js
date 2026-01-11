@@ -255,6 +255,14 @@ const CONTEXT_MENU_CONFIG = [
 //#endregion
 
 
+
+
+
+
+//==============================================
+//#region MODULES CONTROLS CONFIGS
+//==============================================  
+
 // IDs modules controls
 const ID_MODULE_CONTROLS = "moduleControls";
 const ID_CONTAINER_SEARCH_INPUT_BTN_ADD = "container-searchInput-btnAdd";
