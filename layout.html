@@ -106,6 +106,11 @@
       </div>
     </nav>
 
+
+
+    <!-- ===== CONTENIDO DINÁMICO ===== -->
+    <main class="container-fluid">
+      
     <!-- ===== COMPONENTES REUTILIZABLES (OCULTOS POR DEFECTO) ===== -->
     <div id="moduleControls" class="px-2 d-non" style="padding-top: 70px">
       <!-- Fila de filtros: Buscador + Botones Add -->
@@ -143,10 +148,12 @@
         <!-- Se inserta el componente btn-clear-filters -->
       </div>
     </div>
+    <!-- ===== FIN COMPONENTES REUTILIZABLES ===== -->
 
-    <!-- ===== CONTENIDO DINÁMICO ===== -->
-    <main id="pages-container" class="container-fluid">
+
       <!-- AQUÍ SE INYECTAN LAS PÁGINAS -->
+       <div id="pages-container"></div>
+       <!-- ===== FIN PÁGINAS ===== -->
     </main>
 
     <!-- ===== NAVBAR INFERIOR (MÓVIL) ===== -->
@@ -260,6 +267,9 @@
 
     <!-- ===== AQUI SE CARGAN LOS MODALS ===== -->
     <div id="modals-container"></div>
+
+    <!-- ===== AQUI SE CARGAN LOS COMPONENTES REUTILIZABLES ===== -->
+    <div id="components-container"></div>
 
     <!-- ===== SCRIPTS ===== -->
     <!-- Core/Shared JS -->

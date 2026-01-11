@@ -5,13 +5,14 @@
 // IDs containers del layout
 const ID_PAGES_CONTAINER = "pages-container";
 const ID_MODALS_CONTAINER = "modals-container";
+const ID_COMPONENTS_CONTAINER = "components-container";
+
 
 // IDs de elementos del navbar superior
 const ID_PAGE_TITLE = "pageTitle";
 const ID_MODULE_ICON = "moduleIcon";
 const ID_BTN_LOGOUT = "btnLogout";
 const ID_BTN_CONTEXT_MENU = "btnContextMenu";
-
 
 
 // IDs de elementos del navbar inferior
