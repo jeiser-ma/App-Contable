@@ -264,22 +264,79 @@ const CONTEXT_MENU_CONFIG = [
 //#region MODULES CONTROLS CONFIGS
 //==============================================  
 
+
+// Nombres de los componentes de los módulos 
+//fila 1
+const COMPONENT_SEARCH_INPUT = "search-input";
+const COMPONENT_BTN_ADD = "btn-add";
+//fila 2
+const COMPONENT_DATE_FILTER = "date-filter";
+const COMPONENT_ORDER_BY = "order-by";
+//fila 3
+const COMPONENT_CHIPS_FILTER = "chips-filter";
+//fila 4
+const COMPONENT_LIST_COUNTER = "list-counter";
+const COMPONENT_BTN_CLEAR_FILTERS = "btn-clear-filters";
+
 // IDs modules controls
-const ID_MODULE_CONTROLS = "moduleControls";
+// id del contenedor general de los controles de los módulos
+const ID_MODULES_CONTROLS_CONTAINER = "modules-controls-container";
+// ids de los contenedores de los diferentes controles
 const ID_CONTAINER_SEARCH_INPUT_BTN_ADD = "container-searchInput-btnAdd";
 const ID_CONTAINER_DATE_FILTER_ORDER_BY = "container-dateFilter-orderBy";
 const ID_CONTAINER_CHIPS_FILTER = "container-chipsFilter";
 const ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS = "container-listCounter-btnClearFilters";
 
+// ids de los componentes específicos
 const ID_CONTAINER_SEARCH_INPUT = "container-searchInput";
 const ID_CONTAINER_BTN_ADD = "container-btnAdd";
 
 const ID_CONTAINER_DATE_FILTER = "container-dateFilter";
 const ID_CONTAINER_ORDER_BY = "container-orderBy";
 const ID_CONTAINER_ORDER_DIR = "container-orderDir";
-const ID_CONTAINER_FILTER_DATE = "container-filterDate";
-const ID_CONTAINER_FILTER_TYPE = "container-filterType";
-const ID_CONTAINER_FILTER_PRODUCT = "container-filterProduct";
-const ID_CONTAINER_FILTER_QUANTITY = "container-filterQuantity";
+
+const ID_LIST_COUNTER  = "list-counter";
+const ID_BTN_CLEAR_FILTERS = "btn-clear-filters";
+
+
+
+
+/**
+ * @description: Configuración de los componentes de los módulos (modules controls)
+ * @type {Object} MODULES_CONTROLS_CONFIG
+ * @property {string} containerId - ID del elemento HTML del contenedor
+ * @property {string} componentName - Nombre del componente a cargar
+ */
+const MODULES_CONTROLS_CONFIG = {
+  [COMPONENT_SEARCH_INPUT]: {
+    containerId: ID_CONTAINER_SEARCH_INPUT_BTN_ADD,
+    componentName: COMPONENT_SEARCH_INPUT
+  },
+  [COMPONENT_BTN_ADD]: {
+    containerId: ID_CONTAINER_SEARCH_INPUT_BTN_ADD,
+    componentName: COMPONENT_BTN_ADD
+  },
+  [COMPONENT_DATE_FILTER]: {
+    containerId: ID_CONTAINER_DATE_FILTER_ORDER_BY,
+    componentName: COMPONENT_DATE_FILTER
+  },
+  [COMPONENT_ORDER_BY]: {
+    containerId: ID_CONTAINER_DATE_FILTER_ORDER_BY,
+    componentName: COMPONENT_ORDER_BY
+  },
+  [COMPONENT_CHIPS_FILTER]: {
+    containerId: ID_CONTAINER_CHIPS_FILTER,
+    componentName: COMPONENT_CHIPS_FILTER
+  },
+  [COMPONENT_LIST_COUNTER]: {
+    containerId: ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS,
+    componentName: COMPONENT_LIST_COUNTER
+  },
+  [COMPONENT_BTN_CLEAR_FILTERS]: {
+    containerId: ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS,
+    componentName: COMPONENT_BTN_CLEAR_FILTERS
+  }
+};
+
 
 //#endregion

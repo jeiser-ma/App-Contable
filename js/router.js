@@ -109,7 +109,7 @@ async function loadModal(name, module = null) {
  * @param {string} name - Nombre del componente a cargar
  * @returns {Promise<void>}
  */
-async function loadComponent(name, module = null) {
+async function loadComponent(name) {
   try {
     const response = await fetch(`components/${name}/${name}.html`);
     if (!response.ok) {
@@ -118,17 +118,47 @@ async function loadComponent(name, module = null) {
     
     const html = await response.text();
     const componentsContainer = document.getElementById(ID_COMPONENTS_CONTAINER);
-    if (module) {
-      componentsContainer.insertAdjacentHTML("beforeend", html);
-    } else {
-      document.body.insertAdjacentHTML("beforeend", html);
-    }
+    componentsContainer.insertAdjacentHTML("beforeend", html);
     console.log(`Component ${name} loaded`);
   } catch (error) {
     console.error(`Error cargando componente ${name}:`, error);
     throw error;
   }
 }
+
+
+
+/**
+ * Carga un componente HTML y lo inserta en el body del documento
+ * Los componentes siempre están en components/{name}/
+ * @param {string} name - Nombre del control a cargar
+ * @returns {Promise<void>}
+ */
+async function loadModuleControl(name) {
+  try {
+    const response = await fetch(`components/${name}/${name}.html`);
+    if (!response.ok) {
+      throw new Error(`No se pudo cargar el control ${name}`);
+    }
+    
+    const html = await response.text();
+    const config = MODULES_CONTROLS_CONFIG[name];
+    if (!config) {
+      throw new Error(`No se encontró la configuración del control ${name}`);
+    }
+    const controlContainer = document.getElementById(config.containerId);
+    if (!controlContainer) {
+      throw new Error(`No se encontró el contenedor del control ${name}`);
+    }
+    controlContainer.insertAdjacentHTML("beforeend", html);
+    console.log(`Control ${name} loaded`);
+  } catch (error) {
+    console.error(`Error cargando control ${name}:`, error);
+    throw error;
+  }
+}
+
+
 
 //==============================================
 //#region main

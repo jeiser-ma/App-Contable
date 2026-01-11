@@ -99,11 +99,11 @@ function setupModuleControls(moduleName) {
     return;
   }
   
-  const controls = document.getElementById(ID_MODULE_CONTROLS);
-  if (!controls) return;
+  const container = document.getElementById(ID_MODULES_CONTROLS_CONTAINER);
+  if (!container) return;
 
   // Mostrar controles
-  controls.classList.remove("d-none");
+  container.classList.remove("d-none");
 
   // Configurar controles
   // 1. Buscador
@@ -117,7 +117,7 @@ function setupModuleControls(moduleName) {
   // 5. Filtros de chips
   setupChipsFilter(moduleName);
   // 6. Contador
-  updateModuleCounterFromData();
+  updateModuleCounterFromData(moduleName);
   //setupListCounter(moduleName);
   // 7. Botón de limpiar filtros
   setupBtnClearFilters(moduleName);
@@ -225,7 +225,7 @@ function updateModuleCounterFromData() {
  * @returns {void}
  */
 function hideModuleControls() {
-  const controls = document.getElementById(ID_MODULE_CONTROLS);
+  const controls = document.getElementById(ID_MODULES_CONTROLS_CONTAINER);
   if (controls) {
     controls.classList.add("d-none");
   }
