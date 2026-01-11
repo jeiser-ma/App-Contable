@@ -36,3 +36,21 @@ function updateModuleCounterFromData() {
     // Por ahora mostrar total, luego se actualizará con el render
     counter.textContent = `0 de ${data.length} ${config.counterLabel}`;
   }
+
+  
+/**
+ * Actualiza el contador del módulo
+ * @param {number} current - Cantidad actual
+ * @param {number} total - Cantidad total
+ * @returns {void}
+ */
+function updateListCounter(current, total) {
+  if (!currentModule) return;
+  const config = MODULES_CONFIG[currentModule];
+  if (!config) return;
+  
+  const counter = document.getElementById("moduleCounter");
+  if (counter) {
+    counter.textContent = `${current} de ${total} ${config.counterLabel}`;
+  }
+}

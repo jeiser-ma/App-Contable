@@ -27,3 +27,14 @@ function setupBtnAdd(moduleName) {
     }
   }
 }
+
+function initBtnAdd(openModalFn) {
+  const btnAdd = document.getElementById(ID_BTN_ADD);
+  if (btnAdd) {
+    btnAdd.onclick = () => {
+      if (openModalFn && typeof openModalFn === "function") {
+        openModalFn();
+      }
+    };
+  }
+}

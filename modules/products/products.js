@@ -486,12 +486,11 @@ function renderProducts() {
   const sorted = sortProducts(filtered);
   console.log(`Productos ordenados: ${sorted.length}`);
 
-  updateModuleCounter(sorted.length, allProducts.length);
+  updateListCounter(sorted.length, allProducts.length);
   renderProductsList(sorted);
   console.log("renderProducts() completado");
 }
 
-// Función removida - ahora se usa updateModuleCounter() de components.js
 
 /**
  * Guarda el producto desde el modal

@@ -432,11 +432,10 @@ function renderMovements() {
   const filtered = filterMovements(allMovements);
   const sorted = sortMovements(filtered);
 
-  updateModuleCounter(sorted.length, allMovements.length);
+  updateListCounter(sorted.length, allMovements.length);
   renderMovementsList(sorted);
 }
 
-// Función removida - ahora se usa updateModuleCounter() de components.js
 
 // ===============================
 // Guardado

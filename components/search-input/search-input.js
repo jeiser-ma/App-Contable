@@ -53,3 +53,28 @@ function setupSearchInput(moduleName) {
   }
 }
 
+
+/**
+ * Obtiene el valor del buscador
+ * @returns {string}
+ */
+function getModuleSearchValue() {
+  const searchInput = document.getElementById("moduleSearchInput");
+  return searchInput ? searchInput.value.toLowerCase().trim() : "";
+}
+
+/**
+ * Limpia el buscador
+ * @returns {void}
+ */
+function clearModuleSearch() {
+  const searchInput = document.getElementById("moduleSearchInput");
+  const btnClearSearch = document.getElementById("moduleClearSearch");
+  if (searchInput) {
+    searchInput.value = "";
+    updateModuleState("searchText", "");
+    if (btnClearSearch) {
+      btnClearSearch.classList.add("d-none");
+    }
+  }
+}

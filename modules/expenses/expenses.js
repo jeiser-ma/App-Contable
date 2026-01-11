@@ -41,6 +41,7 @@ async function onExpensesPageLoaded() {
   // Inicializar el modal después de cargarlo
   initModalModule(MODAL_EXPENSES);
 
+  
   // Configurar controles del módulo (buscador, ordenamiento, fecha, botón agregar)
   setupModuleControls(PAGE_EXPENSES); 
 
@@ -432,7 +433,7 @@ function renderExpenses() {
   const filtered = filterExpenses(allExpenses);
   const sorted = sortExpenses(filtered);
 
-  updateModuleCounter(sorted.length, allExpenses.length);
+  updateListCounter(sorted.length, allExpenses.length);
   renderExpensesList(sorted);
 }
 

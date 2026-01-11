@@ -606,7 +606,7 @@ function renderInventory() {
   // Actualizar contador (solo completados)
   const total = allProducts.length;
   const completed = completedInventory.length;
-  updateModuleCounter(completed, total);
+  updateListCounter(completed, total);
 
   // Mostrar mensaje "Todos los productos tienen inventario del día" solo si:
   // - No hay productos pendientes

@@ -54,6 +54,7 @@ async function onAccountingPageLoaded() {
   await loadModal(MODAL_TRANSFER_SALES, PAGE_ACCOUNTING);
   initModalModule(MODAL_CASH_SALES);
   initModalModule(MODAL_TRANSFER_SALES);
+
   
   // Configurar botones
   document.getElementById(ID_BTN_ADD_CASH_SALES).onclick = () => openCashSalesModal();

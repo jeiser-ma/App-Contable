@@ -78,6 +78,31 @@ const MODULES_CONFIG = {
   },
 };
 
+
+
+/**
+ * Oculta los controles del módulo
+ * @returns {void}
+ */
+function hideModuleControls() {
+  const controls = document.getElementById(ID_MODULES_CONTROLS_CONTAINER);
+  if (controls) {
+    controls.classList.add("d-none");
+  }
+  currentModule = null;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Configura y muestra los controles del módulo
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
@@ -192,84 +217,7 @@ function callModuleRender() {
   }
 }
 
-/**
- * Actualiza el contador del módulo desde los datos
- * @returns {void}
- */
-function updateModuleCounterFromData() {
-  if (!currentModule) return;
-  const config = MODULES_CONFIG[currentModule];
-  if (!config) return;
-  
-  const counter = document.getElementById("moduleCounter");
-  if (!counter) return;
 
-  // Obtener datos según el módulo
-  let data = [];
-  if (currentModule === "products") {
-    data = getData("products") || [];
-  } else if (currentModule === "movements") {
-    data = getData("movements") || [];
-  } else if (currentModule === "inventory") {
-    data = getData("inventory") || [];
-  } else if (currentModule === "expenses") {
-    data = getData("expenses") || [];
-  }
 
-  // Por ahora mostrar total, luego se actualizará con el render
-  counter.textContent = `0 de ${data.length} ${config.counterLabel}`;
-}
 
-/**
- * Oculta los controles del módulo
- * @returns {void}
- */
-function hideModuleControls() {
-  const controls = document.getElementById(ID_MODULES_CONTROLS_CONTAINER);
-  if (controls) {
-    controls.classList.add("d-none");
-  }
-  currentModule = null;
-}
 
-/**
- * Actualiza el contador del módulo
- * @param {number} current - Cantidad actual
- * @param {number} total - Cantidad total
- * @returns {void}
- */
-function updateModuleCounter(current, total) {
-  if (!currentModule) return;
-  const config = MODULES_CONFIG[currentModule];
-  if (!config) return;
-  
-  const counter = document.getElementById("moduleCounter");
-  if (counter) {
-    counter.textContent = `${current} de ${total} ${config.counterLabel}`;
-  }
-}
-
-/**
- * Obtiene el valor del buscador
- * @returns {string}
- */
-function getModuleSearchValue() {
-  const searchInput = document.getElementById("moduleSearchInput");
-  return searchInput ? searchInput.value.toLowerCase().trim() : "";
-}
-
-/**
- * Limpia el buscador
- * @returns {void}
- */
-function clearModuleSearch() {
-  const searchInput = document.getElementById("moduleSearchInput");
-  const btnClearSearch = document.getElementById("moduleClearSearch");
-  if (searchInput) {
-    searchInput.value = "";
-    updateModuleState("searchText", "");
-    if (btnClearSearch) {
-      btnClearSearch.classList.add("d-none");
-    }
-  }
-}
