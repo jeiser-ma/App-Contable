@@ -289,9 +289,9 @@ const ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS = "container-listCounter-btnCl
 
 // ids de los componentes específicos
 const ID_CONTAINER_SEARCH_INPUT = "container-searchInput";
-const ID_BTN_ADD = "control-btn-add";
+const ID_CONTROL_BTN_ADD = "control-btn-add";
 
-const ID_CONTAINER_DATE_FILTER = "container-dateFilter";
+const ID_CONTROL_DATE_FILTER = "control-date-filter";
 const ID_CONTAINER_ORDER_BY = "container-orderBy";
 const ID_CONTAINER_ORDER_DIR = "container-orderDir";
 

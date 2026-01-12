@@ -6,7 +6,7 @@
  * @returns {void}
  */
 function setupBtnAdd(openModalFn) {
-  const btnAdd = document.getElementById(ID_BTN_ADD);
+  const btnAdd = document.getElementById(ID_CONTROL_BTN_ADD);
   if (btnAdd) {
     btnAdd.onclick = () => {
       if (openModalFn && typeof openModalFn === "function") {

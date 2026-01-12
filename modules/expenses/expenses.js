@@ -73,6 +73,13 @@ async function setupExpensesControls() {
   await loadModuleControl(CONTROL_BTN_ADD);
   // Configurar el botón de agregar
   setupBtnAdd(openAddExpenseModal);
+
+
+  // Cargar el control de filtro de fecha
+  await loadModuleControl(CONTROL_DATE_FILTER);
+  // Configurar el filtro de fecha
+  setupDateFilter(EXPENSES_STATE, renderExpenses);
+  
   
 }
 
