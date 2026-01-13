@@ -76,6 +76,22 @@ const PAGES_CONFIG = {
     sortOptions: [
       { value: "concept", label: "Concepto" },
       { value: "date", label: "Fecha" },
+    ],
+    chips: [
+      {
+        id: "chip-filter-salaries",
+        label: "Sueldos",
+        icon: "bi-cash-coin",
+        color: "btn-outline-warning",
+        value: "salaries",
+      },
+      {
+        id: "chip-filter-dollars",
+        label: "Dólares",
+        icon: "bi-currency-dollar",
+        color: "btn-outline-danger",
+        value: "dollars",
+      },
     ]
   },
   [PAGE_INVENTORY]: {
@@ -292,21 +308,30 @@ const ID_CONTAINER_CHIPS_FILTER = "container-chipsFilter";
 const ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS = "container-listCounter-btnClearFilters";
 
 // ids de los componentes específicos
-const ID_CONTAINER_SEARCH_INPUT = "container-searchInput";
-const ID_CONTROL_BTN_ADD = "control-btn-add";
+const ID_CONTAINER_SEARCH_INPUT = "container-searchInput"; // contenedor del search input
+const ID_CONTROL_BTN_ADD = "control-btn-add"; // botón de agregar
 
+// ids de los componentes de la date filter
 const ID_CONTROL_DATE_FILTER = "control-date-filter";
 
-const ID_CONTROL_ORDER_BY_CONTAINER = "control-order-by-container";
-const ID_CONTROL_ORDER_BY = "control-order-by";
-const ID_CONTROL_ORDER_DIR = "control-order-dir";
-const ID_CONTROL_ORDER_DIR_ICON = "control-order-dir-icon";
+// ids de los componentes de los order by
+const ID_CONTROL_ORDER_BY_CONTAINER = "control-order-by-container"; // contenedor del order by
+const ID_CONTROL_ORDER_BY = "control-order-by"; // order by
+const ID_CONTROL_ORDER_DIR = "control-order-dir"; // order dir
+const ID_CONTROL_ORDER_DIR_ICON = "control-order-dir-icon"; // icono del order dir
 
-const ID_CONTROL_LIST_COUNTER  = "control-list-counter";
-const ID_BTN_CLEAR_FILTERS = "btn-clear-filters";
+// ids de los componentes de los chips filter
+const ID_CONTROL_CHIPS_FILTER_TEMPLATE = "control-chips-filter-template"; // template del chip
+const CLASS_CONTROL_CHIPS_FILTER_BUTTON = "chip-filter-button"; // botón del chip
+const CLASS_CONTROL_CHIPS_FILTER_ICON = "chip-filter-icon"; // icono del chip
+const CLASS_CONTROL_CHIPS_FILTER_LABEL = "chip-filter-label"; // label del chip
 
 
+// ids de los componentes de los list counter
+const ID_CONTROL_LIST_COUNTER = "control-list-counter"; // contador de elementos
 
+// ids de los componentes de los btn clear filters
+ID_CONTROL_BTN_CLEAR_FILTERS = "control-btn-clear-filters"; // botón de limpiar filtros
 
 /**
  * @description: Configuración de los componentes de los módulos (modules controls)

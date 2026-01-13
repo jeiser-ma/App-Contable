@@ -9,6 +9,7 @@
 function updateListCounter(current, total, moduleName) {
   const counter = document.getElementById(ID_CONTROL_LIST_COUNTER);
   if (counter) {
+    // Obtener el label desde la configuración de la página
     let label = moduleName ? PAGES_CONFIG[moduleName].title : "elementos";
     counter.textContent = `${current} de ${total} ${label}`;
   }

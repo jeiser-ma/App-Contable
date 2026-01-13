@@ -1,5 +1,6 @@
 /**
  * Configura el botón de agregar
+ * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
  * @param {object} moduleState - Estado del módulo
  * @param {function} renderFn - Función para renderizar la lista
  * @returns {void}
@@ -63,9 +64,6 @@ function setupOrderBy(moduleName, moduleState, renderFn) {
     };
   }
 }
-
-
-
 
 //ELIMINAR ESTA FUNCION LUEGO
 

@@ -21,6 +21,7 @@ const EXPENSES_STATE = {
   filterDate: null,
   orderBy: "date",
   orderDir: "desc",
+  chipFiltered: null, // "concept" | "date" | null
   expenseToEdit: null,
 };
 
@@ -92,6 +93,12 @@ async function setupExpensesControls() {
   // Configurar el control de ordenamiento
   setupOrderBy(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
   
+
+  
+  // cargar el control de chips filter
+  await loadModuleControl(COTROL_CHIPS_FILTER);
+  // Configurar el control de chips filter
+  setupChipsFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
 }
 
 
