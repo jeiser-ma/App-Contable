@@ -43,7 +43,7 @@ async function onExpensesPageLoaded() {
 
   
   // Configurar controles del módulo (buscador, ordenamiento, fecha, botón agregar)
-  setupExpensesControls(); 
+  await setupExpensesControls(); 
 
   // Configurar botón de confirmar del modal
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_EXPENSE);
@@ -79,6 +79,13 @@ async function setupExpensesControls() {
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
   setupDateFilter(EXPENSES_STATE, renderExpenses);
+  
+  
+  // Cargar el control de contador de elementos
+  await loadModuleControl(CONTROL_LIST_COUNTER);
+  // No es necesario configurarle comportamiento, 
+  // se actualizará automáticamente al renderizar la lista
+  
   
   
 }
@@ -464,7 +471,7 @@ function renderExpenses() {
   const filtered = filterExpenses(allExpenses);
   const sorted = sortExpenses(filtered);
 
-  updateListCounter(sorted.length, allExpenses.length);
+  updateListCounter(sorted.length, allExpenses.length, PAGE_EXPENSES);
   renderExpensesList(sorted);
 }
 

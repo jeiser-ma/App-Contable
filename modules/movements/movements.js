@@ -432,7 +432,7 @@ function renderMovements() {
   const filtered = filterMovements(allMovements);
   const sorted = sortMovements(filtered);
 
-  updateListCounter(sorted.length, allMovements.length);
+  updateListCounter(sorted.length, allMovements.length, PAGE_MOVEMENTS);
   renderMovementsList(sorted);
 }
 

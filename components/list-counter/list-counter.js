@@ -1,13 +1,25 @@
 
 /**
  * Configura y muestra los controles del módulo
- * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
+ * @param {number} current - Cantidad actual
+ * @param {number} total - Cantidad total
+ * @param {string} label - Etiqueta del contador
  * @returns {void}
  */
-function setupListCounter(moduleName) {
-
+function updateListCounter(current, total, moduleName) {
+  const counter = document.getElementById(ID_CONTROL_LIST_COUNTER);
+  if (counter) {
+    let label = moduleName ? PAGES_CONFIG[moduleName].title : "elementos";
+    counter.textContent = `${current} de ${total} ${label}`;
+  }
 }
 
+
+
+
+// ===============================
+// ELIMINAR
+// ===============================
 
 /**
  * Actualiza el contador del módulo desde los datos
@@ -18,7 +30,7 @@ function updateModuleCounterFromData() {
     const config = MODULES_CONFIG[currentModule];
     if (!config) return;
     
-    const counter = document.getElementById("moduleCounter");
+    const counter = document.getElementById(ID_CONTROL_LIST_COUNTER);
     if (!counter) return;
   
     // Obtener datos según el módulo
@@ -44,7 +56,7 @@ function updateModuleCounterFromData() {
  * @param {number} total - Cantidad total
  * @returns {void}
  */
-function updateListCounter(current, total) {
+function updateListCounte111(current, total) {
   if (!currentModule) return;
   const config = MODULES_CONFIG[currentModule];
   if (!config) return;

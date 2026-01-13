@@ -295,7 +295,7 @@ const ID_CONTROL_DATE_FILTER = "control-date-filter";
 const ID_CONTAINER_ORDER_BY = "container-orderBy";
 const ID_CONTAINER_ORDER_DIR = "container-orderDir";
 
-const ID_LIST_COUNTER  = "list-counter";
+const ID_CONTROL_LIST_COUNTER  = "control-list-counter";
 const ID_BTN_CLEAR_FILTERS = "btn-clear-filters";
 
 

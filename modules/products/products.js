@@ -486,7 +486,7 @@ function renderProducts() {
   const sorted = sortProducts(filtered);
   console.log(`Productos ordenados: ${sorted.length}`);
 
-  updateListCounter(sorted.length, allProducts.length);
+  updateListCounter(sorted.length, allProducts.length, PAGE_PRODUCTS);
   renderProductsList(sorted);
   console.log("renderProducts() completado");
 }
