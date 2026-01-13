@@ -86,7 +86,11 @@ async function setupExpensesControls() {
   // No es necesario configurarle comportamiento, 
   // se actualizará automáticamente al renderizar la lista
   
-  
+
+  // cargar el control de ordenamiento
+  await loadModuleControl(CONTROL_ORDER_BY);
+  // Configurar el control de ordenamiento
+  setupOrderBy(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
   
 }
 

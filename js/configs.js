@@ -72,7 +72,11 @@ const PAGES_CONFIG = {
     title: "Gastos",
     icon: "bi-cash-coin",
     navId: null,
-    isModule: true // Módulo
+    isModule: true, // Módulo
+    sortOptions: [
+      { value: "concept", label: "Concepto" },
+      { value: "date", label: "Fecha" },
+    ]
   },
   [PAGE_INVENTORY]: {
     title: "Inventario",
@@ -292,8 +296,11 @@ const ID_CONTAINER_SEARCH_INPUT = "container-searchInput";
 const ID_CONTROL_BTN_ADD = "control-btn-add";
 
 const ID_CONTROL_DATE_FILTER = "control-date-filter";
-const ID_CONTAINER_ORDER_BY = "container-orderBy";
-const ID_CONTAINER_ORDER_DIR = "container-orderDir";
+
+const ID_CONTROL_ORDER_BY_CONTAINER = "control-order-by-container";
+const ID_CONTROL_ORDER_BY = "control-order-by";
+const ID_CONTROL_ORDER_DIR = "control-order-dir";
+const ID_CONTROL_ORDER_DIR_ICON = "control-order-dir-icon";
 
 const ID_CONTROL_LIST_COUNTER  = "control-list-counter";
 const ID_BTN_CLEAR_FILTERS = "btn-clear-filters";
