@@ -69,6 +69,13 @@ async function setupExpensesControls() {
   // Mostrar los controles del módulo
   showModuleControls();
 
+  
+  // Cargar el control de búsqueda
+  await loadModuleControl(CONTROL_SEARCH_INPUT);
+  // Configurar el control de búsqueda
+  setupSearchInput(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+
+
 
   // Cargar el control de botón de agregar
   await loadModuleControl(CONTROL_BTN_ADD);

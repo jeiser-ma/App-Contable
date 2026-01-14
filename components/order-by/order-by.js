@@ -72,7 +72,7 @@ function setupOrderBy(moduleName, moduleState, renderFn) {
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
  * @returns {void}
  */
-function setupOrderBy111(moduleName) {
+/*function setupOrderBy111(moduleName) {
   // 2. Configurar ordenamiento
   const sortContainer = document.getElementById(
     ID_CONTAINER_ORDER_BY_CONTAINER
@@ -138,4 +138,4 @@ function setupOrderBy111(moduleName) {
   } else {
     if (sortContainer) sortContainer.classList.add("d-none");
   }
-}
+}*/

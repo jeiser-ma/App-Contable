@@ -308,7 +308,12 @@ const ID_CONTAINER_CHIPS_FILTER = "container-chipsFilter";
 const ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS = "container-listCounter-btnClearFilters";
 
 // ids de los componentes específicos
-const ID_CONTAINER_SEARCH_INPUT = "container-searchInput"; // contenedor del search input
+// ids de los componentes de los search input
+const ID_CONTROL_SEARCH_INPUT_CONTAINER = "control-search-input-container"; // contenedor del search input
+const ID_CONTROL_SEARCH_INPUT = "control-search-input"; // input del search input
+const ID_CONTROL_CLEAR_SEARCH = "control-clear-search"; // botón de limpiar el search input
+
+// ids de los componentes de los btn add
 const ID_CONTROL_BTN_ADD = "control-btn-add"; // botón de agregar
 
 // ids de los componentes de la date filter
