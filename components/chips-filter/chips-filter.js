@@ -25,8 +25,8 @@ async function setupChipsFilter(moduleName, moduleState, renderFn) {
 
   // Si no hay chips configurados, salir
   if (!chipList || chipList.length === 0) {
-    console.error(
-      `No se encontró la lista de chips configurados para el módulo: ${moduleName}`
+    console.warn(
+      `No hay chips configurados para el módulo: ${moduleName}`
     );
     return;
   }

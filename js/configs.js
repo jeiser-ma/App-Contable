@@ -68,7 +68,7 @@ const PAGES_CONFIG = {
     navId: null,
     isModule: true, // Módulo
     sortOptions: [
-      { value: "name", label: "Producto" },
+      //{ value: "name", label: "Producto" },
       { value: "date", label: "Fecha" },
       { value: "quantity", label: "Cantidad" },
     ],

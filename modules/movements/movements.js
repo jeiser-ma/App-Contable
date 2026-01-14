@@ -376,8 +376,8 @@ function filterMovements(movements) {
  */
 function sortMovements(movements) {
   return [...movements].sort((a, b) => {
-    let v1 = a[MOVEMENTS_STATE.orderBy];
-    let v2 = b[MOVEMENTS_STATE.orderBy];
+      v1 = a[MOVEMENTS_STATE.orderBy];
+      v2 = b[MOVEMENTS_STATE.orderBy];
 
     // Para fechas, comparar directamente
     if (MOVEMENTS_STATE.orderBy === "date") {
@@ -387,7 +387,7 @@ function sortMovements(movements) {
     }
 
     // Para productos, obtener el nombre del producto
-    if (MOVEMENTS_STATE.orderBy === "name") {
+    /*if (MOVEMENTS_STATE.orderBy === "name") {
       const products = getData("products");
       const product1 = products.find((p) => p.id === a.productId);
       const product2 = products.find((p) => p.id === b.productId);
@@ -395,8 +395,10 @@ function sortMovements(movements) {
       //const comparison = product1.name.localeCompare(product2.name);
       //return MOVEMENTS_STATE.orderDir === "asc" ? comparison : -comparison;
       v1 = product1.name;
+      console.log("v1: ", v1);
       v2 = product2.name;
-    }
+      console.log("v2: ", v2);
+    } */
 
     // Normalizar strings para comparación
     if (typeof v1 === "string") {

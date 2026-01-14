@@ -87,7 +87,7 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
           moduleState.chipFiltered = null;
 
         } else {
-          console.error(`Chips not found for module: ${moduleName}`);
+          console.warn(`No hay chips configurados para el módulo: ${moduleName}`);
         }
 
 
