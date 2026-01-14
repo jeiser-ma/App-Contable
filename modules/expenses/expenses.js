@@ -22,7 +22,7 @@ const EXPENSES_STATE = {
   orderBy: "date",
   orderDir: "desc",
   chipFiltered: null, // "concept" | "date" | null
-  expenseToEdit: null,
+  elementToEdit: null,
 };
 
 // Exponer el estado globalmente para module-controls.js
@@ -120,7 +120,7 @@ async function setupExpensesControls() {
  * @returns {void}
  */
 function openAddExpenseModal() {
-  EXPENSES_STATE.expenseToEdit = null;
+  EXPENSES_STATE.elementToEdit = null;
 
   initModalModule(MODAL_EXPENSES);
 
@@ -220,9 +220,9 @@ function saveExpenseFromModal() {
 
   const expenses = getData("expenses") || [];
 
-  if (EXPENSES_STATE.expenseToEdit) {
+  if (EXPENSES_STATE.elementToEdit) {
     // Editar
-    const idx = expenses.findIndex((e) => e.id === EXPENSES_STATE.expenseToEdit);
+    const idx = expenses.findIndex((e) => e.id === EXPENSES_STATE.elementToEdit);
     if (idx === -1) return;
 
     expenses[idx] = {
@@ -260,7 +260,7 @@ function openEditExpenseModal(id) {
   const expense = expenses.find((e) => e.id === id);
   if (!expense) return;
 
-  EXPENSES_STATE.expenseToEdit = id;
+  EXPENSES_STATE.elementToEdit = id;
 
   initModalModule(MODAL_EXPENSES);
 

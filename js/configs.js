@@ -66,7 +66,28 @@ const PAGES_CONFIG = {
     title: "Movimientos",
     icon: "bi-arrow-repeat",
     navId: null,
-    isModule: true // Módulo
+    isModule: true, // Módulo
+    sortOptions: [
+      { value: "name", label: "Producto" },
+      { value: "date", label: "Fecha" },
+      { value: "quantity", label: "Cantidad" },
+    ],
+    chips: [
+      {
+        id: "chip-filter-in",
+        label: "Entradas",
+        icon: "bi-arrow-right",
+        color: "btn-outline-success",
+        value: "in",
+      },
+      {
+        id: "chip-filter-out",
+        label: "Salidas",
+        icon: "bi-arrow-left",
+        color: "btn-outline-danger",
+        value: "out",
+      },
+    ]
   },
   [PAGE_EXPENSES]: {
     title: "Gastos",
@@ -74,11 +95,13 @@ const PAGES_CONFIG = {
     navId: null,
     isModule: true, // Módulo
     sortOptions: [
+      { value: "name", label: "Producto" },
       { value: "concept", label: "Concepto" },
       { value: "date", label: "Fecha" },
+      { value: "amount", label: "Monto" }
     ],
     chips: [
-      {
+      /*{
         id: "chip-filter-salaries",
         label: "Sueldos",
         icon: "bi-cash-coin",
@@ -91,7 +114,7 @@ const PAGES_CONFIG = {
         icon: "bi-currency-dollar",
         color: "btn-outline-danger",
         value: "dollars",
-      },
+      },*/
     ]
   },
   [PAGE_INVENTORY]: {

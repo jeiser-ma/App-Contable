@@ -29,20 +29,26 @@ const ID_MOVEMENT_TYPE_OUT = "movementTypeOut";
 
 // Estado de la pantalla de movimientos (unificado)
 const MOVEMENTS_STATE = {
+  // Texto de búsqueda (para el input de búsqueda)
   searchText: "",
-  filterType: null, // "in" | "out" | null (todos)
+  // Fecha de filtrado (para el input de fecha)
   filterDate: null,
+  // Campo por el que se ordena (date | quantity)
   orderBy: "date",
+  // Dirección de ordenamiento (asc | desc)
   orderDir: "desc",
+  // Tipo de movimiento filtrado (para los chips de filtro)
+  chipFiltered: null, // "in" | "out" | null (todos)
+  // ID del movimiento que se va a editar
+  elementToEdit: null,
+  // ID del movimiento que se va a eliminar
+  elementToDelete: null,
+  // Tipo de movimiento actual (para el modal)
+  currentType: null, // "in" | "out" | null
 };
 
 // Exponer el estado globalmente para module-controls.js
 window.MOVEMENTS_STATE = MOVEMENTS_STATE;
-
-// Tipo de movimiento actual (para el modal)
-let movementType = null; // "in" | "out"
-let movementToEdit = null; // ID del movimiento que se está editando
-let movementToDelete = null; // ID del movimiento que se va a eliminar
 
 // ===============================
 // Hook que llama el router
@@ -65,7 +71,7 @@ async function onMovementsPageLoaded() {
   await initModalModule(MODAL_MOVEMENTS);
 
   // Configurar controles del módulo
-  setupModuleControls(PAGE_MOVEMENTS);
+  await setupMovementsControls();
 
   // Configurar botón de confirmar del modal
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
@@ -73,7 +79,56 @@ async function onMovementsPageLoaded() {
     btnConfirm.onclick = saveMovementFromModal;
   }
 
-  // Nota: renderMovements() se llama automáticamente al final de setupModuleControls()
+  // Renderizar la lista de movimientos
+  renderMovements();
+}
+
+/**
+ * Configura los controles del módulo de movimientos
+ * @param {string} pageName - Nombre de la página
+ * @returns {void}
+ */
+async function setupMovementsControls() {
+  // Limpiar el contenido de los controles del módulo
+  clearModuleControlsContent();
+
+  // Mostrar los controles del módulo
+  showModuleControls();
+
+  // Cargar el control de búsqueda
+  await loadModuleControl(CONTROL_SEARCH_INPUT);
+  // Configurar el control de búsqueda
+  setupSearchInput(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+
+  // Cargar el control de botón de agregar
+  await loadModuleControl(CONTROL_BTN_ADD);
+  // Configurar el botón de agregar
+  setupBtnAdd(openAddMovementModal);
+
+  // Cargar el control de filtro de fecha
+  await loadModuleControl(CONTROL_DATE_FILTER);
+  // Configurar el filtro de fecha
+  setupDateFilter(MOVEMENTS_STATE, renderMovements);
+
+  // cargar el control de ordenamiento
+  await loadModuleControl(CONTROL_ORDER_BY);
+  // Configurar el control de ordenamiento
+  setupOrderBy(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+
+  // cargar el control de chips filter
+  await loadModuleControl(COTROL_CHIPS_FILTER);
+  // Configurar el control de chips filter
+  setupChipsFilter(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+
+  // Cargar el control de contador de elementos
+  await loadModuleControl(CONTROL_LIST_COUNTER);
+  // No es necesario configurarle comportamiento,
+  // se actualizará automáticamente al renderizar la lista
+
+  // cargar el control de limpiar filtros
+  await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
+  // Configurar el control de limpiar filtros
+  setupBtnClearFilters(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
 }
 
 /**
@@ -81,14 +136,9 @@ async function onMovementsPageLoaded() {
  * @param {string} type - Tipo de movimiento ("in" | "out")
  * @returns {void}
  */
-/**
- * Abre el formulario para nuevo movimiento
- * El tipo de movimiento se selecciona en el modal
- * @returns {void}
- */
 function openAddMovementModal() {
-  movementToEdit = null;
-  movementType = "in"; // Por defecto entrada
+  MOVEMENTS_STATE.elementToEdit = null;
+  MOVEMENTS_STATE.currentType = "in"; // Por defecto entrada
 
   // Asegurar que el modal esté inicializado
   initModalModule(MODAL_MOVEMENTS);
@@ -124,7 +174,7 @@ function openAddMovementModal() {
   if (typeIn) {
     typeIn.onchange = () => {
       if (typeIn.checked) {
-        movementType = "in";
+        MOVEMENTS_STATE.currentType = "in";
         updateMovementTypeUI();
       }
     };
@@ -133,7 +183,7 @@ function openAddMovementModal() {
   if (typeOut) {
     typeOut.onchange = () => {
       if (typeOut.checked) {
-        movementType = "out";
+        MOVEMENTS_STATE.currentType = "out";
         updateMovementTypeUI();
       }
     };
@@ -160,14 +210,14 @@ function updateMovementTypeUI() {
 
   if (!title || !icon || !btnConfirm) return;
 
-  if (movementType === "in") {
-    title.textContent = movementToEdit
+  if (MOVEMENTS_STATE.currentType === "in") {
+    title.textContent = MOVEMENTS_STATE.elementToEdit
       ? "Editar entrada de producto"
       : "Entrada de producto";
     icon.className = "bi bi-arrow-right text-success";
     btnConfirm.className = "btn btn-success rounded-pill btn-sm";
   } else {
-    title.textContent = movementToEdit
+    title.textContent = MOVEMENTS_STATE.elementToEdit
       ? "Editar salida de producto"
       : "Salida de producto";
     icon.className = "bi bi-arrow-left text-danger";
@@ -202,7 +252,7 @@ function resetMovementForm() {
   });
 
   // Limpiar estado de edición
-  movementToEdit = null;
+  MOVEMENTS_STATE.elementToEdit = null;
 }
 
 /**
@@ -245,11 +295,11 @@ function initMovementFilters() {
 
   if (filterIn) {
     filterIn.onclick = () => {
-      if (MOVEMENTS_STATE.filterType === "in") {
-        MOVEMENTS_STATE.filterType = null;
+      if (MOVEMENTS_STATE.chipFiltered === "in") {
+        MOVEMENTS_STATE.chipFiltered = null;
         filterIn.classList.remove("active");
       } else {
-        MOVEMENTS_STATE.filterType = "in";
+        MOVEMENTS_STATE.chipFiltered = "in";
         filterIn.classList.add("active");
         if (filterOut) filterOut.classList.remove("active");
       }
@@ -260,11 +310,11 @@ function initMovementFilters() {
 
   if (filterOut) {
     filterOut.onclick = () => {
-      if (MOVEMENTS_STATE.filterType === "out") {
-        MOVEMENTS_STATE.filterType = null;
+      if (MOVEMENTS_STATE.chipFiltered === "out") {
+        MOVEMENTS_STATE.chipFiltered = null;
         filterOut.classList.remove("active");
       } else {
-        MOVEMENTS_STATE.filterType = "out";
+        MOVEMENTS_STATE.chipFiltered = "out";
         filterOut.classList.add("active");
         if (filterIn) filterIn.classList.remove("active");
       }
@@ -305,9 +355,9 @@ function filterMovements(movements) {
   }
 
   // Filtro por tipo (in/out)
-  if (MOVEMENTS_STATE.filterType) {
+  if (MOVEMENTS_STATE.chipFiltered) {
     filtered = filtered.filter(
-      (m) => m.type === MOVEMENTS_STATE.filterType.toUpperCase()
+      (m) => m.type === MOVEMENTS_STATE.chipFiltered.toUpperCase()
     );
   }
 
@@ -336,6 +386,18 @@ function sortMovements(movements) {
       return 0;
     }
 
+    // Para productos, obtener el nombre del producto
+    if (MOVEMENTS_STATE.orderBy === "name") {
+      const products = getData("products");
+      const product1 = products.find((p) => p.id === a.productId);
+      const product2 = products.find((p) => p.id === b.productId);
+      if (!product1 || !product2) return 0;
+      //const comparison = product1.name.localeCompare(product2.name);
+      //return MOVEMENTS_STATE.orderDir === "asc" ? comparison : -comparison;
+      v1 = product1.name;
+      v2 = product2.name;
+    }
+
     // Normalizar strings para comparación
     if (typeof v1 === "string") {
       v1 = v1.toLowerCase();
@@ -358,15 +420,19 @@ function sortMovements(movements) {
  * @returns {void}
  */
 function renderMovementsList(movements) {
+  // Obtener los elementos del DOM
   const movementsList = document.getElementById(ID_MOVEMENTS_LIST);
   const movementTemplate = document.getElementById(ID_MOVEMENT_CARD_TEMPLATE);
+  // Obtener los productos
   const products = getData("products");
 
   if (!movementsList || !movementTemplate) return;
 
-  movementsList.innerHTML = "";
+  // Limpiar la lista de movimientos
+  movementsList.replaceChildren();
 
   if (movements.length === 0) {
+    // Mostrar mensaje si no hay movimientos
     movementsList.innerHTML = `
       <div class="text-center text-muted py-4">
         <i class="bi bi-search"></i>
@@ -376,10 +442,16 @@ function renderMovementsList(movements) {
     return;
   }
 
+  // Recorrer la lista de movimientos
   movements.forEach((m) => {
+    // Obtener el producto
     const product = products.find((p) => p.id === m.productId);
-    if (!product) return; // Si no existe el producto, no mostrar el movimiento
+    if (!product) {
+      console.error("No se encontró el producto: ", m.productId);
+      return; // Si no existe el producto, no mostrar el movimiento
+    }
 
+    // Clonar el template del movimiento
     const node = movementTemplate.content.cloneNode(true);
     const card = node.querySelector(".card");
     const iconDiv = node.querySelector(".movement-icon");
@@ -430,12 +502,14 @@ function renderMovements() {
 
   // Primero filtrar, luego ordenar
   const filtered = filterMovements(allMovements);
+  console.log("filtrados: ", filtered);
+
   const sorted = sortMovements(filtered);
+  console.log("ordenados: ", sorted);
 
   updateListCounter(sorted.length, allMovements.length, PAGE_MOVEMENTS);
   renderMovementsList(sorted);
 }
-
 
 // ===============================
 // Guardado
@@ -461,9 +535,9 @@ function saveMovementFromModal() {
 
   // Obtener tipo de movimiento del selector
   if (typeIn && typeIn.checked) {
-    movementType = "in";
+    MOVEMENTS_STATE.currentType = "in";
   } else if (typeOut && typeOut.checked) {
-    movementType = "out";
+    MOVEMENTS_STATE.currentType = "out";
   } else {
     console.error("No se ha seleccionado el tipo de movimiento");
     return;
@@ -501,13 +575,15 @@ function saveMovementFromModal() {
   }
 
   // Validar stock para salidas (solo si es nuevo movimiento o si cambió la cantidad/producto)
-  if (movementType === "out") {
+  if (MOVEMENTS_STATE.currentType === "out") {
     let availableStock = product.quantity;
 
     // Si estamos editando, considerar el stock que se revertirá
-    if (movementToEdit) {
+    if (MOVEMENTS_STATE.elementToEdit) {
       const movements = getData("movements") || [];
-      const existingMovement = movements.find((m) => m.id === movementToEdit);
+      const existingMovement = movements.find(
+        (m) => m.id === MOVEMENTS_STATE.elementToEdit
+      );
       if (existingMovement && existingMovement.productId === product.id) {
         // Si es el mismo producto, el stock disponible incluye la cantidad que se revertirá
         if (existingMovement.type === "IN") {
@@ -541,9 +617,11 @@ function saveMovementFromModal() {
   // Guardar movimiento
   const movements = getData("movements") || [];
 
-  if (movementToEdit) {
+  if (MOVEMENTS_STATE.elementToEdit) {
     // EDITAR: Buscar el movimiento existente para revertir su efecto en el stock
-    const existingMovement = movements.find((m) => m.id === movementToEdit);
+    const existingMovement = movements.find(
+      (m) => m.id === MOVEMENTS_STATE.elementToEdit
+    );
     if (existingMovement) {
       // Revertir el efecto del movimiento anterior en el producto anterior
       const oldProductId = existingMovement.productId;
@@ -564,7 +642,7 @@ function saveMovementFromModal() {
       // Aplicar el nuevo efecto en el producto (puede ser el mismo o diferente)
       const finalProducts = updatedProducts.map((p) => {
         if (p.id === product.id) {
-          if (movementType === "in") {
+          if (MOVEMENTS_STATE.currentType === "in") {
             return { ...p, quantity: p.quantity + quantity };
           } else {
             return { ...p, quantity: p.quantity - quantity };
@@ -577,11 +655,11 @@ function saveMovementFromModal() {
 
     // Actualizar el movimiento
     const updatedMovements = movements.map((m) =>
-      m.id === movementToEdit
+      m.id === MOVEMENTS_STATE.elementToEdit
         ? {
             ...m,
             productId: product.id,
-            type: movementType.toUpperCase(),
+            type: MOVEMENTS_STATE.currentType.toUpperCase(),
             quantity: quantity,
             date: date,
             note: note || "",
@@ -590,13 +668,13 @@ function saveMovementFromModal() {
     );
     setData("movements", updatedMovements);
 
-    movementToEdit = null;
+    MOVEMENTS_STATE.elementToEdit = null;
   } else {
     // NUEVO: Crear nuevo movimiento
     const newMovement = {
       id: crypto.randomUUID(),
       productId: product.id,
-      type: movementType.toUpperCase(),
+      type: MOVEMENTS_STATE.currentType.toUpperCase(),
       quantity: quantity,
       date: date,
       note: note || "",
@@ -609,7 +687,7 @@ function saveMovementFromModal() {
     // Actualizar stock del producto
     const updatedProducts = products.map((p) => {
       if (p.id === product.id) {
-        if (movementType === "in") {
+        if (MOVEMENTS_STATE.currentType === "in") {
           return { ...p, quantity: p.quantity + quantity };
         } else {
           return { ...p, quantity: p.quantity - quantity };
@@ -622,7 +700,7 @@ function saveMovementFromModal() {
 
   // Cerrar modal y actualizar vista
   hideModalModules();
-  movementType = null;
+  MOVEMENTS_STATE.currentType = null;
   renderMovements();
 }
 
@@ -710,8 +788,8 @@ function openEditMovementModal(id) {
   const product = products.find((p) => p.id === movement.productId);
   if (!product) return;
 
-  movementToEdit = id;
-  movementType = movement.type.toLowerCase();
+  MOVEMENTS_STATE.elementToEdit = id;
+  MOVEMENTS_STATE.currentType = movement.type.toLowerCase();
 
   // Abrir modal con los datos del movimiento
   initModalModule(MODAL_MOVEMENTS);
@@ -753,7 +831,7 @@ function openEditMovementModal(id) {
   if (typeIn) {
     typeIn.onchange = () => {
       if (typeIn.checked) {
-        movementType = "in";
+        MOVEMENTS_STATE.currentType = "in";
         updateMovementTypeUI();
       }
     };
@@ -762,7 +840,7 @@ function openEditMovementModal(id) {
   if (typeOut) {
     typeOut.onchange = () => {
       if (typeOut.checked) {
-        movementType = "out";
+        MOVEMENTS_STATE.currentType = "out";
         updateMovementTypeUI();
       }
     };
@@ -797,7 +875,7 @@ function openEditMovementModal(id) {
  * @returns {void}
  */
 function openDeleteMovementModal(id) {
-  movementToDelete = id;
+  MOVEMENTS_STATE.elementToDelete = id;
 
   const movements = getData("movements") || [];
   const movement = movements.find((m) => m.id === id);
@@ -821,10 +899,12 @@ function openDeleteMovementModal(id) {
  * @returns {void}
  */
 function confirmDeleteMovement() {
-  if (!movementToDelete) return;
+  if (!MOVEMENTS_STATE.elementToDelete) return;
 
   const movements = getData("movements") || [];
-  const movement = movements.find((m) => m.id === movementToDelete);
+  const movement = movements.find(
+    (m) => m.id === MOVEMENTS_STATE.elementToDelete
+  );
   if (!movement) return;
 
   const products = getData("products");
@@ -849,10 +929,12 @@ function confirmDeleteMovement() {
   setData("products", updatedProducts);
 
   // Eliminar el movimiento
-  const updatedMovements = movements.filter((m) => m.id !== movementToDelete);
+  const updatedMovements = movements.filter(
+    (m) => m.id !== MOVEMENTS_STATE.elementToDelete
+  );
   setData("movements", updatedMovements);
 
-  movementToDelete = null;
+  MOVEMENTS_STATE.elementToDelete = null;
   DELETE_STATE.type = null;
   DELETE_STATE.id = null;
 
