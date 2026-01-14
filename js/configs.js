@@ -336,7 +336,7 @@ const CLASS_CONTROL_CHIPS_FILTER_LABEL = "chip-filter-label"; // label del chip
 const ID_CONTROL_LIST_COUNTER = "control-list-counter"; // contador de elementos
 
 // ids de los componentes de los btn clear filters
-ID_CONTROL_BTN_CLEAR_FILTERS = "control-btn-clear-filters"; // botón de limpiar filtros
+const ID_CONTROL_BTN_CLEAR_FILTERS = "control-btn-clear-filters"; // botón de limpiar filtros
 
 /**
  * @description: Configuración de los componentes de los módulos (modules controls)
