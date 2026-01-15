@@ -60,7 +60,34 @@ const PAGES_CONFIG = {
     title: "Productos",
     icon: "bi-box",
     navId: null,
-    isModule: true // Módulo
+    isModule: true, // Módulo
+    sortOptions: [
+      { value: "name", label: "Nombre" },
+      { value: "price", label: "Precio" },
+      { value: "quantity", label: "Cantidad" }
+    ],
+    chips: [
+      {
+        //id: "filterLowStock",
+        id: "filter-low-stock",
+        label: "Stock bajo",
+        icon: "bi-box",
+        color: "btn-outline-warning",
+        //filterKey: "filterStockStatus",
+        //filterValue: "low",
+        value: "low",
+      },
+      {
+        //id: "filterCriticalStock",
+        id: "filter-critical-stock",
+        label: "Stock crítico",
+        icon: "bi-box",
+        color: "btn-outline-danger",
+        //filterKey: "filterStockStatus",
+        //filterValue: "critical",
+        value: "critical",
+      },
+    ]
   },
   [PAGE_MOVEMENTS]: {
     title: "Movimientos",

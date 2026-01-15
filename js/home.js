@@ -180,15 +180,27 @@ function setupClickableCards() {
  * @param {string} filterType - Tipo de filtro ("low" o "critical")
  * @returns {void}
  */
-function navigateToProductsWithFilter(filterType) {
+async function navigateToProductsWithFilter(filterType) {
   if (typeof loadPage === "function") {
-    loadPage("products");
+    await loadPage(PAGE_PRODUCTS);
+
+    // Activar el chip correspondiente
+    const chipId = PAGES_CONFIG[PAGE_PRODUCTS].chips.find(chip => chip.filterValue === filterType).id;
+    activateChip(chipId, window.PRODUCTS_STATE);
+
+    // Actualizar el estado del módulo con el filtro aplicado
+    window.PRODUCTS_STATE.chipFiltered = filterType;
+
+    // Renderizar productos con el filtro aplicado
+    if (typeof renderProducts === "function") {
+      renderProducts();
+    }
     
     // Esperar a que se cargue la página y luego aplicar el filtro
-    setTimeout(() => {
+    /*setTimeout(() => {
       if (typeof setupModuleControls === "function") {
         // Asegurar que los controles estén configurados
-        setupModuleControls("products");
+        setupModuleControls(PAGE_PRODUCTS);
         
         // Aplicar el filtro
         const filterValue = filterType === "low" ? "low" : "critical";
@@ -196,7 +208,8 @@ function navigateToProductsWithFilter(filterType) {
           window.PRODUCTS_STATE.filterStockStatus = filterValue;
           
           // Activar el chip correspondiente
-          const chipId = filterType === "low" ? "filterLowStock" : "filterCriticalStock";
+          //const chipId = filterType === "low" ? "filterLowStock" : "filterCriticalStock";
+          const chipId = PAGES_CONFIG[PAGE_PRODUCTS].chips.find(chip => chip.filterValue === filterType).id;
           const chip = document.getElementById(chipId);
           if (chip) {
             chip.classList.add("active");
@@ -214,7 +227,7 @@ function navigateToProductsWithFilter(filterType) {
           }
         }
       }
-    }, 300);
+    }, 300);*/
   }
 }
 

@@ -161,7 +161,7 @@ function clearModuleControlsContent() {
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
  * @returns {void}
  */
-function setupModuleControls(moduleName) {
+async function setupModuleControls(moduleName) {
   const config = MODULES_CONFIG[moduleName];
   if (!config) {
     console.error(`Configuración no encontrada para el módulo: ${moduleName}`);

@@ -12,22 +12,21 @@ async function setupChipsFilter(moduleName, moduleState, renderFn) {
   const container = document.getElementById(ID_CONTAINER_CHIPS_FILTER);
   console.log("container obtenido correctamente: ", container.id);
   if (!container) {
-    console.error(`No se encontró el contenedor de chips con id: ${ID_CONTAINER_CHIPS_FILTER}`);
+    console.error(
+      `No se encontró el contenedor de chips con id: ${ID_CONTAINER_CHIPS_FILTER}`
+    );
     return;
   }
   // Limpiar el contenedor de chips
   container.replaceChildren();
-  
-  
+
   // Obtener la lista de chips configurados para el módulo
   const chipList = PAGES_CONFIG[moduleName].chips;
   console.log("chipList obtenida correctamente: ", chipList.length + " chips");
 
   // Si no hay chips configurados, salir
   if (!chipList || chipList.length === 0) {
-    console.warn(
-      `No hay chips configurados para el módulo: ${moduleName}`
-    );
+    console.warn(`No hay chips configurados para el módulo: ${moduleName}`);
     return;
   }
 
@@ -42,7 +41,7 @@ async function setupChipsFilter(moduleName, moduleState, renderFn) {
       console.error(`No se pudo crear el chip con id: ${chipConfig.id}`);
       return;
     }
-    
+
     // Configurar el handler del chip
     await setupChipHandler(chip, moduleName, moduleState, renderFn);
 
@@ -77,32 +76,60 @@ async function setupChipHandler(chip, moduleName, moduleState, renderFn) {
         chip.classList.remove("active");
       } else {
         // Activar el filtro
-        console.log(`Activating filter: ${chip.value}`);
-        moduleState.chipFiltered = chip.value;
-        chip.classList.add("active");
+        activateChip(chip.id, moduleState);
 
         // Desactivar otros chips del mismo grupo
         console.log("chip list: ", PAGES_CONFIG[moduleName].chips);
-        PAGES_CONFIG[moduleName].chips.forEach((otherChip) => {
-          console.log("otherChip: ", otherChip.id);
-          console.log("chip: ", chip.id);
-          console.log("otherChip value: ", otherChip.value);
-          console.log("chip value: ", chip.value);
-          
-          if (otherChip.id !== chip.id && otherChip.value !== chip.value) {
-            console.log("otherChip to deactivate: ", otherChip.id);
-            const otherElement = document.getElementById(otherChip.id);
-            if (otherElement) otherElement.classList.remove("active");
-          }
-        });
+        deactivateOtherChips(chip.id, moduleName);
       }
 
       // Llamar a la función de render del módulo para actualizar la lista
       renderFn();
     }
   };
-
 }
+
+
+
+/**
+ * Activa el chip que se pasa como parámetro
+ * @param {string} chipID - ID del chip activo
+ * @param {object} moduleState - Estado del módulo
+ * @returns {void}
+ */
+async function activateChip(chipID, moduleState) {
+  console.log(`Activating filter: ${chipID}`);
+  
+  const chip = document.getElementById(chipID);
+  if (chip) {
+    // Establecer el valor del filtro en el estado del módulo
+    moduleState.chipFiltered = chip.value; 
+    // Agregar clase active al botón del chip
+    chip.classList.add("active");
+  }
+}
+
+
+/**
+ * Desactiva todos los chips excepto el que se pasa como parámetro
+ * @param {string} activeChipID - ID del chip activo
+ * @param {string} moduleName - Nombre del módulo
+ * @returns {void}
+ */
+async function deactivateOtherChips(activeChipID, moduleName) {
+  console.log("disableOtherChips called with activeChipID: ", activeChipID);
+  PAGES_CONFIG[moduleName].chips.forEach((otherChip) => {
+
+    if (otherChip.id !== activeChipID) {
+      console.log("otherChip to deactivate: ", otherChip.id);
+
+      const otherElement = document.getElementById(otherChip.id);
+      if (otherElement) otherElement.classList.remove("active");
+    }
+  });
+}
+
+
 
 /**
  * Obtiene el template del chip y clona su contenido (el botón) como elemento DOM
@@ -110,9 +137,13 @@ async function setupChipHandler(chip, moduleName, moduleState, renderFn) {
  */
 async function getChipTemplate() {
   // Obtener el elemento <template> del DOM
-  const templateElement = document.getElementById(ID_CONTROL_CHIPS_FILTER_TEMPLATE);
+  const templateElement = document.getElementById(
+    ID_CONTROL_CHIPS_FILTER_TEMPLATE
+  );
   if (!templateElement) {
-    console.error(`No se encontró el template con id: ${ID_CONTROL_CHIPS_FILTER_TEMPLATE}`);
+    console.error(
+      `No se encontró el template con id: ${ID_CONTROL_CHIPS_FILTER_TEMPLATE}`
+    );
     return null;
   }
 
@@ -121,9 +152,13 @@ async function getChipTemplate() {
   const clonedContent = templateElement.content.cloneNode(true);
 
   // Obtener el botón del contenido clonado usando querySelector
-  const button = clonedContent.querySelector(`.${CLASS_CONTROL_CHIPS_FILTER_BUTTON}`);
+  const button = clonedContent.querySelector(
+    `.${CLASS_CONTROL_CHIPS_FILTER_BUTTON}`
+  );
   if (!button) {
-    console.error(`No se encontró el botón con la clase: .${CLASS_CONTROL_CHIPS_FILTER_BUTTON}`);
+    console.error(
+      `No se encontró el botón con la clase: .${CLASS_CONTROL_CHIPS_FILTER_BUTTON}`
+    );
     return null;
   }
 
@@ -153,7 +188,9 @@ async function createChipFromTemplate(chipTemplate, chipConfig) {
   chipTemplate.value = chipConfig.value;
 
   // Obtener el label usando querySelector con la clase (ya está dentro del botón clonado)
-  const labelElem = chipTemplate.querySelector(`.${CLASS_CONTROL_CHIPS_FILTER_LABEL}`);
+  const labelElem = chipTemplate.querySelector(
+    `.${CLASS_CONTROL_CHIPS_FILTER_LABEL}`
+  );
   if (!labelElem) {
     console.error(
       `No se encontró el label con clase .${CLASS_CONTROL_CHIPS_FILTER_LABEL} en el template`
@@ -164,7 +201,9 @@ async function createChipFromTemplate(chipTemplate, chipConfig) {
   labelElem.textContent = chipConfig.label;
 
   // Obtener el icono usando querySelector con la clase (ya está dentro del botón clonado)
-  const iconElem = chipTemplate.querySelector(`.${CLASS_CONTROL_CHIPS_FILTER_ICON}`);
+  const iconElem = chipTemplate.querySelector(
+    `.${CLASS_CONTROL_CHIPS_FILTER_ICON}`
+  );
   if (!iconElem) {
     console.error(
       `No se encontró el icono con clase .${CLASS_CONTROL_CHIPS_FILTER_ICON} en el template`
@@ -177,9 +216,6 @@ async function createChipFromTemplate(chipTemplate, chipConfig) {
   // Devolver el botón clonado con las configuraciones aplicadas
   return chipTemplate;
 }
-
-
-
 
 // ELIMINAR ESTA FUNCION LUEGO
 /**

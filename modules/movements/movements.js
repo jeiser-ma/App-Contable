@@ -131,6 +131,7 @@ async function setupMovementsControls() {
   setupBtnClearFilters(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
 }
 
+
 /**
  * Abre el formulario para entrada (type=in) o salida (type=out)
  * @param {string} type - Tipo de movimiento ("in" | "out")
@@ -346,11 +347,11 @@ function filterMovements(movements) {
 
   // Filtro por texto de búsqueda (busca en nombre del producto)
   if (MOVEMENTS_STATE.searchText) {
-    const products = getData("products");
+    const products = getData(PAGE_PRODUCTS);
     filtered = filtered.filter((m) => {
       const product = products.find((p) => p.id === m.productId);
       if (!product) return false;
-      return product.name.toLowerCase().includes(MOVEMENTS_STATE.searchText);
+      return product.name.toLowerCase().includes(MOVEMENTS_STATE.searchText.toLowerCase());
     });
   }
 
@@ -500,7 +501,7 @@ function renderMovementsList(movements) {
  * @returns {void}
  */
 function renderMovements() {
-  const allMovements = getData("movements") || [];
+  const allMovements = getData(PAGE_MOVEMENTS) || [];
 
   // Primero filtrar, luego ordenar
   const filtered = filterMovements(allMovements);

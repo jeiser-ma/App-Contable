@@ -401,11 +401,11 @@ function confirmDeleteInventory() {
 // ===============================
 
 /**
- * Filtra productos según el texto de búsqueda
+ * Filtra productos de inventario según el texto de búsqueda
  * @param {Array} products - Lista de productos a filtrar
  * @returns {Array} Lista de productos filtrados
  */
-function filterProductsByName(products) {
+function filterInventoryProductsByName(products) { 
   if (!INVENTORY_STATE.searchText) return products;
 
   return products.filter((p) =>
@@ -604,7 +604,7 @@ function renderInventory() {
   const allInventory = getData(PAGE_INVENTORY) || [];
 
   // Filtrar productos por búsqueda
-  const filteredProducts = filterProductsByName(allProducts);
+  const filteredProducts = filterInventoryProductsByName(allProducts);
 
   // Obtener inventarios del día seleccionado
   const dayInventory = allInventory.filter((inv) => inv.date === date && inv.status === "CONFIRMED");

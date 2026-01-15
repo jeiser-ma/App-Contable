@@ -8,7 +8,7 @@ const BTN_ID_ADD_PRODUCT = "btnAddProduct";
 const BTN_ID_SAVE_PRODUCT = "btnSaveProduct";
 const BTN_ID_CLEAR_SEARCH = "btnClearSearch";
 const BTN_ID_ORDER_DIR = "orderDir";
-const BTN_ID_CLEAR_FILTERS_PRODUCTS = "btnClearFiltersProducts";  
+const BTN_ID_CLEAR_FILTERS_PRODUCTS = "btnClearFiltersProducts";
 
 // IDs de otros elementos
 const ID_ORDER_BY = "orderBy";
@@ -31,12 +31,32 @@ let productModal;
 
 // Estado de la pantalla de productos (unificado)
 const PRODUCTS_STATE = {
+  // Texto de búsqueda (para el input de búsqueda)
+  searchText: "",
+  // Fecha de filtrado (para el input de fecha)
+  filterDate: null,
+  // Campo por el que se ordena (name | price | quantity)
+  orderBy: "name",
+  // Dirección de ordenamiento (asc | desc)
+  orderDir: "asc",
+  // Tipo de producto filtrado (para los chips de filtro)
+  chipFiltered: null, // "low" | "critical" | null (todos)
+  // ID del producto que se va a editar
+  elementToEdit: null,
+  // ID del producto que se va a eliminar
+  elementToDelete: null,
+  // No tiene tipo de producto actual (siempre es producto)
+  currentType: null,
+};
+
+// Estado de la pantalla de productos (unificado)
+/*const PRODUCTS_STATE1 = {
   searchText: "",
   productToDelete: null,
   orderBy: "name",
   orderDir: "asc",
   filterStockStatus: null, // "low" | "critical" | null
-};
+};*/
 
 // Exponer el estado globalmente para module-controls.js
 window.PRODUCTS_STATE = PRODUCTS_STATE;
@@ -54,17 +74,68 @@ async function onProductsPageLoaded() {
   // Cargar modal de productos
   console.log("Loading product-modal");
   await loadModal(MODAL_PRODUCTS, PAGE_PRODUCTS);
-  
+
   // Inicializar el modal después de cargarlo
   initModalModule(MODAL_PRODUCTS);
 
   // Configurar controles del módulo
-  setupModuleControls(PAGE_PRODUCTS);
+  //await setupModuleControls(PAGE_PRODUCTS);
+
+  // Configurar controles del módulo
+  await setupProductsControls();
 
   // Configurar botón de guardar del modal
   document.getElementById(BTN_ID_SAVE_PRODUCT).onclick = saveProductFromModal;
-  
-  // Nota: renderProducts() se llama automáticamente al final de setupModuleControls()
+
+  // Renderizar la lista de productos
+  renderProducts();
+}
+
+/**
+ * Configura los controles del módulo de productos
+ * @returns {void}
+ */
+async function setupProductsControls() {
+  // Limpiar el contenido de los controles del módulo
+  clearModuleControlsContent();
+
+  // Mostrar los controles del módulo
+  showModuleControls();
+
+  // Cargar el control de búsqueda
+  await loadModuleControl(CONTROL_SEARCH_INPUT);
+  // Configurar el control de búsqueda
+  setupSearchInput(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+
+  // Cargar el control de botón de agregar
+  await loadModuleControl(CONTROL_BTN_ADD);
+  // Configurar el botón de agregar
+  setupBtnAdd(openAddProductModal);
+
+  // No tiene filtro de fecha
+  //await loadModuleControl(CONTROL_DATE_FILTER);
+  // Configurar el filtro de fecha
+  //setupDateFilter(PRODUCTS_STATE, renderProducts);
+
+  // cargar el control de ordenamiento
+  await loadModuleControl(CONTROL_ORDER_BY);
+  // Configurar el control de ordenamiento
+  setupOrderBy(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+
+  // cargar el control de chips filter
+  await loadModuleControl(COTROL_CHIPS_FILTER);
+  // Configurar el control de chips filter
+  setupChipsFilter(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+
+  // Cargar el control de contador de elementos
+  await loadModuleControl(CONTROL_LIST_COUNTER);
+  // No es necesario configurarle comportamiento,
+  // se actualizará automáticamente al renderizar la lista
+
+  // cargar el control de limpiar filtros
+  await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
+  // Configurar el control de limpiar filtros
+  setupBtnClearFilters(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
 }
 
 /**
@@ -78,10 +149,10 @@ function openAddProductModal() {
   clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
   clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
   document.getElementById(ID_PRODUCT_ID).value = "";
-  
+
   // Cargar unidades de medida en el select
   loadUnitsIntoSelect();
-  
+
   toggleModalModules();
 }
 
@@ -103,16 +174,18 @@ function openEditProductModal(id) {
   document.getElementById(ID_INPUT_NAME).value = product.name;
   document.getElementById(ID_INPUT_PRICE).value = product.price;
   document.getElementById(ID_INPUT_QUANTITY).value = product.quantity;
-  document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value = product.lowStockThreshold || "";
-  document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value = product.criticalStockThreshold || "";
-  
+  document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value =
+    product.lowStockThreshold || "";
+  document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value =
+    product.criticalStockThreshold || "";
+
   // Cargar unidades de medida en el select y seleccionar la del producto
   loadUnitsIntoSelect();
   const umSelect = document.getElementById(ID_INPUT_UM);
   if (umSelect && product.um) {
     umSelect.value = product.um;
   }
-  
+
   toggleModalModules();
 }
 
@@ -123,7 +196,7 @@ function openEditProductModal(id) {
 function loadUnitsIntoSelect() {
   const select = document.getElementById(ID_INPUT_UM);
   if (!select) return;
-  
+
   // Limpiar opciones existentes (excepto la primera)
   const firstOption = select.querySelector('option[value=""]');
   select.innerHTML = "";
@@ -137,12 +210,12 @@ function loadUnitsIntoSelect() {
     defaultOption.selected = true;
     select.appendChild(defaultOption);
   }
-  
+
   // Obtener unidades de medida
   const units = getUnits();
-  
+
   // Agregar opciones
-  units.forEach(unit => {
+  units.forEach((unit) => {
     const option = document.createElement("option");
     option.value = unit;
     option.textContent = unit;
@@ -214,7 +287,9 @@ function initProductSearch() {
  * @returns {void}
  */
 function initClearFilters() {
-  const btnClearFilters = document.getElementById(BTN_ID_CLEAR_FILTERS_PRODUCTS);
+  const btnClearFilters = document.getElementById(
+    BTN_ID_CLEAR_FILTERS_PRODUCTS
+  );
   if (!btnClearFilters) return;
 
   btnClearFilters.onclick = () => {
@@ -251,12 +326,16 @@ function initClearFilters() {
  * @returns {void}
  */
 function updateClearFiltersButton() {
-  const btnClearFilters = document.getElementById(BTN_ID_CLEAR_FILTERS_PRODUCTS);
+  const btnClearFilters = document.getElementById(
+    BTN_ID_CLEAR_FILTERS_PRODUCTS
+  );
   if (!btnClearFilters) return;
 
-  const hasFilters = PRODUCTS_STATE.searchText || 
-                     (PRODUCTS_STATE.orderBy !== "name" || PRODUCTS_STATE.orderDir !== "asc");
-  
+  const hasFilters =
+    PRODUCTS_STATE.searchText ||
+    PRODUCTS_STATE.orderBy !== "name" ||
+    PRODUCTS_STATE.orderDir !== "asc";
+
   if (hasFilters) {
     btnClearFilters.classList.remove("d-none");
   } else {
@@ -273,84 +352,39 @@ function updateClearFiltersButton() {
  * @param {Array} products - Lista de productos a filtrar
  * @returns {Array} Lista de productos filtrados
  */
-function filterProductsByName(products) {
-  console.log("=== filterProductsByName INICIADO ===");
-  console.log("Parámetro products:", products);
-  
-  if (!products || !Array.isArray(products)) {
-    console.log("ERROR: products no es un array válido");
-    return [];
-  }
-  
-  // Asegurarse de usar el estado actualizado desde window
-  const state = window.PRODUCTS_STATE || PRODUCTS_STATE;
-  console.log("Estado obtenido:", state);
-  
-  if (!state) {
-    console.error("PRODUCTS_STATE no está disponible");
-    return products;
-  }
-  
-  console.log("filterProductsByName - Estado recibido:", {
-    searchText: state.searchText,
-    filterStockStatus: state.filterStockStatus,
-    searchTextType: typeof state.searchText,
-    searchTextLength: state.searchText ? state.searchText.length : 0
-  });
+function filterProducts(products) {
   
   let filtered = [...products];
-  console.log(`filterProductsByName - Productos iniciales: ${filtered.length}`);
-
-  // Filtro por texto de búsqueda
-  const searchText = state.searchText ? String(state.searchText).trim() : "";
-  console.log(`filterProductsByName - searchText procesado: "${searchText}" (length: ${searchText.length})`);
-  
-  if (searchText && searchText.length > 0) {
-    console.log(`Filtrando por búsqueda: "${searchText}"`);
-    const beforeCount = filtered.length;
+  // Filtrar por texto de búsqueda (busca en nombre del producto)
+  if (PRODUCTS_STATE.searchText) {
     filtered = filtered.filter((p) => {
       if (!p || !p.name) return false;
-      const matches = p.name.toLowerCase().includes(searchText.toLowerCase());
-      return matches;
+      return p.name
+        .toLowerCase()
+        .includes(PRODUCTS_STATE.searchText.toLowerCase());
     });
-    console.log(`Productos después de búsqueda: ${filtered.length} (antes: ${beforeCount})`);
-  } else {
-    console.log("No hay texto de búsqueda, saltando filtro de búsqueda");
   }
 
-  // Filtro por estado de stock
-  const stockStatus = state.filterStockStatus;
-  console.log(`filterProductsByName - stockStatus: "${stockStatus}" (type: ${typeof stockStatus})`);
-  
-  if (stockStatus === "critical") {
-    console.log("Filtrando por stock crítico");
-    const beforeCount = filtered.length;
-    filtered = filtered.filter((p) => {
-      if (!p) return false;
-      const threshold = p.criticalStockThreshold || 0;
-      const matches = p.quantity !== undefined && p.quantity <= threshold;
-      return matches;
-    });
-    console.log(`Productos después de filtro crítico: ${filtered.length} (antes: ${beforeCount})`);
-  } else if (stockStatus === "low") {
-    console.log("Filtrando por stock bajo");
-    const beforeCount = filtered.length;
+  // Filtro por chips de estado de stock
+  const stockStatus = PRODUCTS_STATE.chipFiltered ? PRODUCTS_STATE.chipFiltered.toLowerCase() : null;
+
+  if (stockStatus) {
     filtered = filtered.filter((p) => {
       if (!p) return false;
       const lowThreshold = p.lowStockThreshold || 0;
       const criticalThreshold = p.criticalStockThreshold || 0;
-      const matches = p.quantity !== undefined && 
-             p.quantity <= lowThreshold && 
-             p.quantity > criticalThreshold;
-      return matches;
+      if (stockStatus === "critical") {
+        return p.quantity !== undefined && p.quantity <= criticalThreshold;
+      } else if (stockStatus === "low") {
+        return p.quantity !== undefined && p.quantity > criticalThreshold && p.quantity <= lowThreshold;
+      } else {
+        return false;
+      }
     });
-    console.log(`Productos después de filtro bajo: ${filtered.length} (antes: ${beforeCount})`);
-  } else {
-    console.log(`No hay filtro de stock activo (stockStatus: ${stockStatus})`);
   }
 
-  console.log(`filterProductsByName - Productos finales: ${filtered.length}`);
   return filtered;
+
 }
 
 /**
@@ -360,12 +394,12 @@ function filterProductsByName(products) {
  */
 function sortProducts(products) {
   // Asegurarse de usar el estado actualizado desde window
-  const state = window.PRODUCTS_STATE || PRODUCTS_STATE;
-  if (!state) return products;
-  
+  //const state = window.PRODUCTS_STATE || PRODUCTS_STATE;
+  //if (!state) return products;
+
   return [...products].sort((a, b) => {
-    let v1 = a[state.orderBy];
-    let v2 = b[state.orderBy];
+    let v1 = a[PRODUCTS_STATE.orderBy];
+    let v2 = b[PRODUCTS_STATE.orderBy];
 
     // Normalizar strings para comparación
     if (typeof v1 === "string") {
@@ -373,8 +407,8 @@ function sortProducts(products) {
       v2 = v2.toLowerCase();
     }
 
-    if (v1 < v2) return state.orderDir === "asc" ? -1 : 1;
-    if (v1 > v2) return state.orderDir === "asc" ? 1 : -1;
+    if (v1 < v2) return PRODUCTS_STATE.orderDir === "asc" ? -1 : 1;
+    if (v1 > v2) return PRODUCTS_STATE.orderDir === "asc" ? 1 : -1;
     return 0;
   });
 }
@@ -410,13 +444,13 @@ function renderProductsList(products) {
     const node = prodTemplate.content.cloneNode(true);
 
     node.querySelector(".product-name").textContent = p.name;
-    
+
     // Determinar color y icono según el stock
     const criticalThreshold = p.criticalStockThreshold || 0;
     const lowThreshold = p.lowStockThreshold || 0;
     let quantityColor = "";
     let quantityIcon = "bi-boxes";
-    
+
     if (p.quantity <= criticalThreshold) {
       quantityColor = "text-danger";
       quantityIcon = "bi-exclamation-triangle-fill";
@@ -424,7 +458,7 @@ function renderProductsList(products) {
       quantityColor = "text-warning";
       quantityIcon = "bi-exclamation-triangle-fill";
     }
-    
+
     const metaEl = node.querySelector(".product-meta");
     if (metaEl) {
       metaEl.innerHTML = `<i class="bi ${quantityIcon} ${quantityColor}"></i> <span class="${quantityColor}">${p.quantity}</span> 
@@ -446,51 +480,15 @@ function renderProductsList(products) {
  * @returns {void}
  */
 function renderProducts() {
-  console.log("renderProducts() llamado");
-  const allProducts = getData("products") || [];
-  console.log(`Total de productos: ${allProducts.length}`);
-
-  // Verificar que PRODUCTS_STATE esté disponible
-  const state = window.PRODUCTS_STATE || PRODUCTS_STATE;
-  if (!state) {
-    console.error("PRODUCTS_STATE no está disponible");
-    return;
-  }
-  
-  console.log("Estado actual:", {
-    searchText: state.searchText,
-    filterStockStatus: state.filterStockStatus,
-    orderBy: state.orderBy,
-    orderDir: state.orderDir
-  });
+  const allProducts = getData(PAGE_PRODUCTS) || [];
 
   // Primero filtrar, luego ordenar
-  console.log("Llamando a filterProductsByName()...");
-  console.log("Tipo de filterProductsByName:", typeof filterProductsByName);
-  console.log("filterProductsByName es función?", typeof filterProductsByName === "function");
-  console.log("filterProductsByName.toString():", filterProductsByName.toString().substring(0, 200));
-  
-  let filtered;
-  try {
-    console.log("ANTES de llamar filterProductsByName");
-    filtered = filterProductsByName(allProducts);
-    console.log("DESPUÉS de llamar filterProductsByName");
-    console.log(`Productos filtrados: ${filtered.length}`);
-  } catch (error) {
-    console.error("ERROR en filterProductsByName:", error);
-    console.error("Stack trace:", error.stack);
-    return;
-  }
-  
-  console.log("Llamando a sortProducts()...");
+  const filtered = filterProducts(allProducts);
   const sorted = sortProducts(filtered);
-  console.log(`Productos ordenados: ${sorted.length}`);
 
   updateListCounter(sorted.length, allProducts.length, PAGE_PRODUCTS);
   renderProductsList(sorted);
-  console.log("renderProducts() completado");
 }
-
 
 /**
  * Guarda el producto desde el modal
@@ -502,8 +500,12 @@ function saveProductFromModal() {
   const price = Number(document.getElementById(ID_INPUT_PRICE).value);
   const um = document.getElementById(ID_INPUT_UM).value.trim();
   const quantity = Number(document.getElementById(ID_INPUT_QUANTITY).value);
-  const lowStockThreshold = Number(document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value);
-  const criticalStockThreshold = Number(document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value);
+  const lowStockThreshold = Number(
+    document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value
+  );
+  const criticalStockThreshold = Number(
+    document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value
+  );
 
   let products = getData("products");
 
@@ -529,12 +531,18 @@ function saveProductFromModal() {
 
   // Umbrales obligatorios
   if (!lowStockThreshold || lowStockThreshold < 0) {
-    setInputError(ID_INPUT_LOW_STOCK_THRESHOLD, "El umbral de stock bajo es obligatorio");
+    setInputError(
+      ID_INPUT_LOW_STOCK_THRESHOLD,
+      "El umbral de stock bajo es obligatorio"
+    );
     return;
   }
 
   if (!criticalStockThreshold || criticalStockThreshold < 0) {
-    setInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD, "El umbral de stock crítico es obligatorio");
+    setInputError(
+      ID_INPUT_CRITICAL_STOCK_THRESHOLD,
+      "El umbral de stock crítico es obligatorio"
+    );
     return;
   }
 
@@ -542,7 +550,17 @@ function saveProductFromModal() {
   if (id) {
     // EDITAR
     products = products.map((p) =>
-      p.id === id ? { ...p, name, price, um, quantity, lowStockThreshold, criticalStockThreshold } : p
+      p.id === id
+        ? {
+            ...p,
+            name,
+            price,
+            um,
+            quantity,
+            lowStockThreshold,
+            criticalStockThreshold,
+          }
+        : p
     );
   } else {
     // ALTA
@@ -607,7 +625,7 @@ function clearInputError(inputId) {
  * @returns {void}
  */
 function openDeleteProductModal(id) {
-  PRODUCTS_STATE.productToDelete = id;
+  PRODUCTS_STATE.elementToDelete = id;
 
   const product = getData("products").find((p) => p.id === id);
   if (!product) return;
@@ -621,10 +639,10 @@ function openDeleteProductModal(id) {
  * @returns {void}
  */
 function confirmDeleteProduct() {
-  if (!PRODUCTS_STATE.productToDelete) return;
+  if (!PRODUCTS_STATE.elementToDelete) return;
 
   const products = getData("products");
-  const deleted = products.find((p) => p.id === PRODUCTS_STATE.productToDelete);
+  const deleted = products.find((p) => p.id === PRODUCTS_STATE.elementToDelete);
 
   // Guardamos estado undo
   UNDO_STATE.data = deleted;
@@ -632,11 +650,11 @@ function confirmDeleteProduct() {
 
   // Eliminamos
   const updated = products.filter(
-    (p) => p.id !== PRODUCTS_STATE.productToDelete
+    (p) => p.id !== PRODUCTS_STATE.elementToDelete
   );
   setData("products", updated);
 
-  PRODUCTS_STATE.productToDelete = null;
+  PRODUCTS_STATE.elementToDelete = null;
   DELETE_STATE.type = null;
   DELETE_STATE.id = null;
 
