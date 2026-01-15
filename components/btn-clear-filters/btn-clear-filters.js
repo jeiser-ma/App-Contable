@@ -67,9 +67,8 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
         if (dateFilter) {
           console.log(`Date filter found for module: ${moduleName}`);
           // Limpiar filtro de fecha
-          // Establecer fecha de hoy por defecto
-          const today = new Date().toISOString().split("T")[0];
-          dateFilter.value = today;
+          //const today = new Date().toISOString().split("T")[0];
+          dateFilter.value = "";
 
           // Actualizar estado del moduleState para el filtro de fecha
           moduleState.filterDate = null;
