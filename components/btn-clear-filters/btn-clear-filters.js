@@ -67,11 +67,16 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
         if (dateFilter) {
           console.log(`Date filter found for module: ${moduleName}`);
           // Limpiar filtro de fecha
-          //const today = new Date().toISOString().split("T")[0];
-          dateFilter.value = "";
-
-          // Actualizar estado del moduleState para el filtro de fecha
-          moduleState.filterDate = null;
+          let dateValue = "";
+          let filterValue = null;
+          if (moduleName === PAGE_INVENTORY) {
+            dateValue = new Date().toISOString().split("T")[0];
+            filterValue = dateValue;
+          } 
+          // Establecer valor del campo del filtro de fecha
+          dateFilter.value = dateValue;
+          // Establecer valor del estado del moduleState para el filtro de fecha
+          moduleState.filterDate = filterValue;
         } else {
           console.error(`Date filter not found for module: ${moduleName}`);
         }

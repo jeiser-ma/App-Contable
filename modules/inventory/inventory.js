@@ -600,8 +600,8 @@ function renderCompletedInventoryList(inventoryCounts) {
  */
 function renderInventory() {
   const date = INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
-  const allProducts = getData("products") || [];
-  const allInventory = getData("inventory") || [];
+  const allProducts = getData(PAGE_PRODUCTS) || [];
+  const allInventory = getData(PAGE_INVENTORY) || [];
 
   // Filtrar productos por búsqueda
   const filteredProducts = filterProductsByName(allProducts);
