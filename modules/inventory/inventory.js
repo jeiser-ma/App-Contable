@@ -20,15 +20,27 @@ const ID_LOCATION_STORE_INPUT = "locationStoreInput";
 
 // Estado de la pantalla de inventario (unificado)
 const INVENTORY_STATE = {
+  // Texto de búsqueda (para el input de búsqueda)
   searchText: "",
-  filterDate: null, // Por defecto será la fecha de hoy
+  // no tiene fecha de filtrado
+  filterDate: null,
+  // no tiene campo por el que se ordena
+  orderBy: null,
+  // no tiene dirección de ordenamiento
+  orderDir: null,
+  // Tipo de inventario filtrado (para los chips de filtro)
+  chipFiltered: null, // "pending" | "partial" | "completed" | null (todos)
+  // ID del inventario que se va a editar
+  elementToEdit: null,
+  // ID del inventario que se va a eliminar
+  elementToDelete: null,
+  // No tiene tipo de inventario actual
+  currentType: null, 
 };
 
 // Exponer el estado globalmente para module-controls.js
 window.INVENTORY_STATE = INVENTORY_STATE;
 
-// Producto actual para el modal
-let currentProductId = null;
 
 // ===============================
 // Hook que llama el router
@@ -54,9 +66,10 @@ async function onInventoryPageLoaded() {
   initModalModule(MODAL_INVENTORY);
 
   // Configurar controles del módulo
-  setupModuleControls(PAGE_INVENTORY);
+  //setupModuleControls(PAGE_INVENTORY);
 
-  // El filtro de fecha ya se configura en setupModuleControls con la fecha de hoy
+    // Configurar controles del módulo
+    await setupInventoryControls();
 
   // Configurar botón de confirmar del modal
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_INVENTORY);
@@ -64,8 +77,59 @@ async function onInventoryPageLoaded() {
     btnConfirm.onclick = saveInventoryFromModal;
   }
 
-  // Nota: renderInventory() se llama automáticamente al final de setupModuleControls()
+  // Renderizar la lista de inventario
+  renderInventory();
 }
+
+
+/**
+ * Configura los controles del módulo de inventario
+ * @returns {void}
+ */
+async function setupInventoryControls() {
+  // Limpiar el contenido de los controles del módulo
+  clearModuleControlsContent();
+
+  // Mostrar los controles del módulo
+  showModuleControls();
+
+  // Cargar el control de búsqueda
+  await loadModuleControl(CONTROL_SEARCH_INPUT);
+  // Configurar el control de búsqueda
+  setupSearchInput(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+
+  // El inventario no tiene botón de agregar
+  //await loadModuleControl(CONTROL_BTN_ADD);
+  // Configurar el botón de agregar
+  //setupBtnAdd(openAddInventoryModal);
+
+  // Cargar el control de filtro de fecha
+  // El filtro de fecha ya se configura en setupDateFilter con la fecha de hoy
+  await loadModuleControl(CONTROL_DATE_FILTER);
+  // Configurar el filtro de fecha
+  setupDateFilter(INVENTORY_STATE, renderInventory);
+
+  // el inventario no tiene campo de ordenamiento
+  //await loadModuleControl(CONTROL_ORDER_BY);
+  // Configurar el control de ordenamiento
+  //setupOrderBy(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+
+  // el inventario no tiene campo de chips filter
+  //await loadModuleControl(COTROL_CHIPS_FILTER);
+  // Configurar el control de chips filter
+  //setupChipsFilter(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+
+  // el inventario no tiene control de contador de elementos
+  //await loadModuleControl(CONTROL_LIST_COUNTER);
+  // No es necesario configurarle comportamiento,
+  // se actualizará automáticamente al renderizar la lista
+
+  // cargar el control de limpiar filtros
+  await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
+  // Configurar el control de limpiar filtros
+  setupBtnClearFilters(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+}
+
 
 /**
  * Abre el modal para realizar inventario de un producto
@@ -73,7 +137,7 @@ async function onInventoryPageLoaded() {
  * @returns {void}
  */
 function openAddInventoryModal(productId) {
-  currentProductId = productId;
+  INVENTORY_STATE.elementToEdit = productId;
 
   const products = getData("products") || [];
   const product = products.find((p) => p.id === productId);
@@ -139,8 +203,8 @@ function saveInventoryFromModal() {
   const warehouseInput = document.getElementById(ID_LOCATION_WAREHOUSE_INPUT);
   const storeInput = document.getElementById(ID_LOCATION_STORE_INPUT);
 
-  if (!warehouseInput || !storeInput || !currentProductId) {
-    console.error("No se encontraron los campos del formulario");
+  if (!warehouseInput || !storeInput || !INVENTORY_STATE.elementToEdit) {
+    console.error("No se encontraron los campos del formulario o el producto actual");
     return;
   }
 
@@ -202,7 +266,7 @@ function saveInventoryFromModal() {
   
   // Verificar si ya existe un inventario para este producto en esta fecha
   const existingIndex = inventory.findIndex(
-    (inv) => inv.productId === currentProductId && inv.date === date
+    (inv) => inv.productId === INVENTORY_STATE.elementToEdit && inv.date === date
   );
 
   // Si existe inventario previo, mantener los valores que no se están actualizando
@@ -240,7 +304,7 @@ function saveInventoryFromModal() {
 
   // Validar que la suma no supere el stock total del producto
   const products = getData("products") || [];
-  const product = products.find((p) => p.id === currentProductId);
+  const product = products.find((p) => p.id === INVENTORY_STATE.elementToEdit);
   if (product) {
     const productStock = product.quantity || 0;
     const totalWarehouse = finalWarehouseQuantity !== null ? finalWarehouseQuantity : 0;
@@ -257,7 +321,7 @@ function saveInventoryFromModal() {
 
   const inventoryData = {
     id: existingIndex >= 0 ? inventory[existingIndex].id : crypto.randomUUID(),
-    productId: currentProductId,
+    productId: INVENTORY_STATE.elementToEdit,
     warehouseQuantity: finalWarehouseQuantity,
     storeQuantity: finalStoreQuantity,
     date: date,
@@ -277,7 +341,7 @@ function saveInventoryFromModal() {
 
   // Cerrar modal y actualizar vista
   hideModalModules();
-  currentProductId = null;
+  INVENTORY_STATE.elementToEdit = null;
   renderInventory();
 }
 

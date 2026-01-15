@@ -83,9 +83,9 @@ async function onMovementsPageLoaded() {
   renderMovements();
 }
 
+
 /**
  * Configura los controles del módulo de movimientos
- * @param {string} pageName - Nombre de la página
  * @returns {void}
  */
 async function setupMovementsControls() {

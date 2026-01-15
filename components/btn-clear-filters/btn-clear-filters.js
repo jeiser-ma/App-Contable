@@ -17,7 +17,6 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
   const btnClearFilters = document.getElementById(ID_CONTROL_BTN_CLEAR_FILTERS);
   if (btnClearFilters) {
     if (renderFn && typeof renderFn === "function") {
-
       // Configurar el listener del btn clear filters
       btnClearFilters.onclick = () => {
         console.log(`Clear filters clicked`);
@@ -26,14 +25,16 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
         const searchInput = document.getElementById(ID_CONTROL_SEARCH_INPUT);
         const btnClearSearch = document.getElementById(ID_CONTROL_CLEAR_SEARCH);
         if (searchInput && btnClearSearch) {
-          console.log(`Search input and btn clear search found for module: ${moduleName}`);
+          console.log(
+            `Search input and btn clear search found for module: ${moduleName}`
+          );
           // Limpiar buscador
           searchInput.value = "";
-          
+
           // Ocultar botón de limpiar buscador
           btnClearSearch.classList.add("d-none");
 
-          // Actualizar estado del moduleState para el buscador 
+          // Actualizar estado del moduleState para el buscador
           moduleState.searchText = "";
         }
 
@@ -42,10 +43,12 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
         const orderDir = document.getElementById(ID_CONTROL_ORDER_DIR);
         const orderDirIcon = document.getElementById(ID_CONTROL_ORDER_DIR_ICON);
         if (orderBy && orderDir && orderDirIcon) {
-          console.log(`Order by, order dir and order dir icon found for module: ${moduleName}`);
+          console.log(
+            `Order by, order dir and order dir icon found for module: ${moduleName}`
+          );
           // Limpiar ordenamiento
           orderBy.value = "";
-          
+
           // Actualizar icono del ordenamiento
           orderDirIcon.classList.add("bi-sort-alpha-down");
           orderDirIcon.classList.remove("bi-sort-alpha-up");
@@ -54,15 +57,19 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
           moduleState.orderBy = config.sortOptions[0]?.value || "";
           moduleState.orderDir = "desc";
         } else {
-          console.error(`Order by, order dir or order dir icon not found for module: ${moduleName}`);
+          console.error(
+            `Order by, order dir or order dir icon not found for module: ${moduleName}`
+          );
         }
-        
+
         // Limpiar filtro de fecha (si existe)
         const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
         if (dateFilter) {
           console.log(`Date filter found for module: ${moduleName}`);
           // Limpiar filtro de fecha
-          dateFilter.value = "";
+          // Establecer fecha de hoy por defecto
+          const today = new Date().toISOString().split("T")[0];
+          dateFilter.value = today;
 
           // Actualizar estado del moduleState para el filtro de fecha
           moduleState.filterDate = null;
@@ -71,7 +78,9 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
         }
 
         // Limpiar chips (si existen)
-        const chips = document.querySelectorAll(`.${CLASS_CONTROL_CHIPS_FILTER_BUTTON}`);
+        const chips = document.querySelectorAll(
+          `.${CLASS_CONTROL_CHIPS_FILTER_BUTTON}`
+        );
         console.log(`Chips encontrados: ${moduleName}`, chips);
         if (chips && chips.length > 0) {
           console.log(`Chips found for module: ${moduleName}`);
@@ -85,11 +94,11 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
 
           // Actualizar estado de los chips filtrados
           moduleState.chipFiltered = null;
-
         } else {
-          console.warn(`No hay chips configurados para el módulo: ${moduleName}`);
+          console.warn(
+            `No hay chips configurados para el módulo: ${moduleName}`
+          );
         }
-
 
         // Llamar a la función de renderizado
         renderFn();
@@ -101,9 +110,6 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
     console.error(`Btn clear filters not found for module: ${moduleName}`);
   }
 }
-
-
-
 
 //eliminar
 

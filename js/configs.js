@@ -114,14 +114,31 @@ const PAGES_CONFIG = {
         icon: "bi-currency-dollar",
         color: "btn-outline-danger",
         value: "dollars",
-      },*/
+      }*/
     ]
   },
   [PAGE_INVENTORY]: {
     title: "Inventario",
     icon: "bi-clipboard-data",
     navId: null,
-    isModule: true // Módulo
+    isModule: true, // Módulo
+    sortOptions: [],
+    chips: [
+      {
+        id: "chip-filter-store",
+        label: "Tienda",
+        icon: "bi-shop-window",
+        color: "btn-outline-success",
+        value: "storeQuantity",
+      },
+      {
+        id: "chip-filter-warehouse",
+        label: "Almacén",
+        icon: "bi-houses",
+        color: "btn-outline-primary",
+        value: "warehouseQuantity",
+      }
+    ]
   },
   [PAGE_ACCOUNTING]: {
     title: "Contabilidad",
