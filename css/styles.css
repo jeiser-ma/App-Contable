@@ -11,26 +11,26 @@
 
 /* Cards flotantes para botón Adicionar */
 .floating-cards {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 1050;
+  /*position: absolute;*/
+  /*bottom: 100%;*/
+  /*left: 50%;*/
+  /*transform: translateX(-50%);*/
+  /*margin-bottom: 10px;*/
+  /*display: flex;*/
+  /*flex-direction: column;*/
+  /*gap: 8px;*/
+  /*z-index: 1050;*/
   animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(20px);
+    transform: translateX(0%) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateX(0%) translateY(0);
   }
 }
 
