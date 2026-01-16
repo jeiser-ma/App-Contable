@@ -195,39 +195,6 @@ async function navigateToProductsWithFilter(filterType) {
     if (typeof renderProducts === "function") {
       renderProducts();
     }
-    
-    // Esperar a que se cargue la página y luego aplicar el filtro
-    /*setTimeout(() => {
-      if (typeof setupModuleControls === "function") {
-        // Asegurar que los controles estén configurados
-        setupModuleControls(PAGE_PRODUCTS);
-        
-        // Aplicar el filtro
-        const filterValue = filterType === "low" ? "low" : "critical";
-        if (window.PRODUCTS_STATE) {
-          window.PRODUCTS_STATE.filterStockStatus = filterValue;
-          
-          // Activar el chip correspondiente
-          //const chipId = filterType === "low" ? "filterLowStock" : "filterCriticalStock";
-          const chipId = PAGES_CONFIG[PAGE_PRODUCTS].chips.find(chip => chip.filterValue === filterType).id;
-          const chip = document.getElementById(chipId);
-          if (chip) {
-            chip.classList.add("active");
-            // Desactivar el otro chip si está activo
-            const otherChipId = filterType === "low" ? "filterCriticalStock" : "filterLowStock";
-            const otherChip = document.getElementById(otherChipId);
-            if (otherChip) {
-              otherChip.classList.remove("active");
-            }
-          }
-          
-          // Renderizar productos con el filtro aplicado
-          if (typeof renderProducts === "function") {
-            renderProducts();
-          }
-        }
-      }
-    }, 300);*/
   }
 }
 
