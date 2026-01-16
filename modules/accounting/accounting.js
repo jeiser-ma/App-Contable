@@ -249,13 +249,16 @@ function renderAccountingProducts() {
       <div class="card-body py-2 px-3">
         <div class="fw-semibold mb-2">${product.name}</div>
         <div class="d-flex flex-wrap gap-2 small text-muted">
-          <span><i class="bi bi-box text-primary"></i> ${ap.yesterdayStock}</span>
-          <span><i class="bi bi-arrow-right-circle text-success"></i> +${ap.yesterdayEntries}</span>
-          <span><i class="bi bi-arrow-left-circle text-danger"></i> -${ap.yesterdayExits}</span>
-          <span><i class="bi bi-box text-success"></i> ${ap.todayInventory !== null ? ap.todayInventory : '--'}</span>
-          <span>VENTAS ${ap.sales !== null && ap.sales !== undefined ? ap.sales : '--'}</span>
-          <span>PU $${ap.unitPrice.toFixed(2)}</span>
-          <span>IMP $${ap.amount.toFixed(2)}</span>
+          <span><i class="bi bi-box-fill text-primary"></i> ${ap.yesterdayStock}</span>
+          <span><i class="bi bi-arrow-right-circle-fill text-success"></i> +${ap.yesterdayEntries}</span>
+          <span><i class="bi bi-arrow-left-circle-fill text-danger"></i> -${ap.yesterdayExits}</span>
+          <span><i class="bi bi-box-fill text-success"></i> ${ap.todayInventory !== null ? ap.todayInventory : '--'}</span>
+          <span><i class="bi bi-cart-check-fill text-success"></i>  ${ap.sales !== null && ap.sales !== undefined ? ap.sales : '--'}</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 pt-2 small text-muted fw-semibold">
+          <!-- <span>VENTAS ${ap.sales !== null && ap.sales !== undefined ? ap.sales : '--'}</span> -->
+          <span> <i class="bi bi-coin text-primary"></i> PU $${ap.unitPrice.toFixed(2)}</span>
+          <span> <i class="bi bi-cash text-primary"></i> IMP $${ap.amount.toFixed(2)}</span>
         </div>
       </div>
     `;

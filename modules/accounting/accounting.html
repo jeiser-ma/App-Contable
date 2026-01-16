@@ -1,4 +1,4 @@
-<div class="d-flex flex-column gap-2 px-2 pb-5 mt-5 mb-5">
+<div class="d-flex flex-column gap-2">
   
   <!-- Filtro de fecha -->
   <div class="d-inline-flex align-items-center gap-2 pt-3">
@@ -14,8 +14,9 @@
   <div id="alertMissingInventory" class="alert alert-warning d-none">
     <i class="bi bi-exclamation-triangle"></i>
     <strong>Faltan productos por hacerle el inventario</strong>
-    <button class="btn btn-sm btn-warning rounded-pill" onclick="goToInventory()">
+    <button class="btn btn-chip btn-warning rounded-pill" onclick="goToInventory()">
       Ir al Inventario
+      <i class="bi bi-chevron-right small"></i>
     </button>
   </div>
 
@@ -23,8 +24,9 @@
   <div id="alertNoExpenses" class="alert alert-danger d-none">
     <i class="bi bi-info-circle"></i>
     <strong>No hay gastos registrados para el día de ayer</strong>
-    <button class="btn btn-sm btn-danger rounded-pill" onclick="goToExpenses()">
+    <button class="btn btn-chip btn-danger rounded-pill" onclick="goToExpenses()">
       Ir a Gastos
+      <i class="bi bi-chevron-right small"></i>
     </button>
   </div>
 
@@ -38,6 +40,25 @@
     <div class="card-body">
       <div id="accountingProductsList" class="d-grid gap-2">
         <!-- Productos se llenan dinámicamente -->
+         <!-- TEMPLATE: Card de producto -->
+         <template id="accountingProductCardTemplate">
+          <div class="card shadow-sm">
+            <div class="card-body py-2 px-3">
+              <div class="fw-semibold mb-2" id="accounting-product-name">product name</div>
+              <div class="d-flex flex-wrap gap-2 small text-muted">
+                <span><i class="bi bi-box text-primary"></i> yesterday Stock</span>
+                <span><i class="bi bi-arrow-right-circle text-success"></i> yesterday Entries</span>
+                <span><i class="bi bi-arrow-left-circle text-danger"></i> yesterday Exits</span>
+                <span><i class="bi bi-box text-success"></i>today Inventory</span>
+              </div>
+              <div class="d-flex flex-wrap gap-2 small text-muted">
+                <span>VENTAS </span>
+                <span>PU </span>
+                <span>IMP</span>
+              </div>
+            </div>
+          </div>
+         </template>
       </div>
       <div class="mt-3">
         <button class="btn btn-primary w-100 rounded-pill" id="btnTotalAmount">
@@ -157,7 +178,7 @@
   </div>
 
   <!-- Botón Cerrar Contabilidad -->
-  <div class="mb-5">
+  <div class="">
     <button class="btn btn-primary w-100 rounded-pill" id="btnCloseAccounting" disabled>
       <i class="bi bi-lock"></i> Cerrar Contabilidad
     </button>
