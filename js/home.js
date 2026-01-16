@@ -185,7 +185,7 @@ async function navigateToProductsWithFilter(filterType) {
     await loadPage(PAGE_PRODUCTS);
 
     // Activar el chip correspondiente
-    const chipId = PAGES_CONFIG[PAGE_PRODUCTS].chips.find(chip => chip.filterValue === filterType).id;
+    const chipId = PAGES_CONFIG[PAGE_PRODUCTS].chips.find(chip => chip.value === filterType).id;
     activateChip(chipId, window.PRODUCTS_STATE);
 
     // Actualizar el estado del módulo con el filtro aplicado
