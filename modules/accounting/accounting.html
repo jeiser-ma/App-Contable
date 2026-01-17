@@ -20,10 +20,7 @@
       <div id="alertMissingInventory" class="alert alert-warning d-none">
         <i class="bi bi-exclamation-triangle"></i>
         <strong>Faltan productos por hacerle el inventario</strong>
-        <button
-          class="btn btn-chip btn-warning rounded-pill"
-          onclick="goToInventory()"
-        >
+        <button class="btn btn-chip btn-warning rounded-pill" onclick="goToInventory()">
           Ir al Inventario
           <i class="bi bi-chevron-right small"></i>
         </button>
@@ -35,29 +32,42 @@
         <template id="accountingProductCardTemplate">
           <div class="card shadow-sm">
             <div class="card-body py-2 px-3">
-              <div class="fw-semibold mb-2" id="accounting-product-name">
+              <div class="fw-semibold mb-2 accounting-product-name">
                 product name
               </div>
               <div class="d-flex flex-wrap gap-2 small text-muted">
-                <span
-                  ><i class="bi bi-box text-primary"></i> yesterday Stock</span
-                >
-                <span
-                  ><i class="bi bi-arrow-right-circle text-success"></i>
-                  yesterday Entries</span
-                >
-                <span
-                  ><i class="bi bi-arrow-left-circle text-danger"></i> yesterday
-                  Exits</span
-                >
-                <span
-                  ><i class="bi bi-box text-success"></i>today Inventory</span
-                >
+                <div>
+                  <i class="bi bi-box-fill text-primary"></i>
+                  <span class="accounting-product-yesterday-stock">--</span>
+                </div>
+                <div>
+                  <i class="bi bi-arrow-right-circle-fill text-success"></i>
+                  <span class="accounting-product-yesterday-entries">--</span>
+                </div>
+                <div>
+                  <i class="bi bi-arrow-left-circle-fill text-danger"></i>
+                  <span class="accounting-product-yesterday-exits">--</span>
+                </div>
+                <div>
+                  <i class="bi bi-box-fill text-success"></i>
+                  <span class="accounting-product-today-inventory">--</span>
+                </div>
+                <div>
+                  <i class="bi bi-cart-check-fill text-success"></i>
+                  <span class="accounting-product-sales">--</span>
+                </div>
               </div>
-              <div class="d-flex flex-wrap gap-2 small text-muted">
-                <span>VENTAS </span>
-                <span>PU </span>
-                <span>IMP</span>
+              <div class="d-flex flex-wrap gap-2 pt-2 small text-muted fw-semibold">
+                <div>
+                  <i class="bi bi-coin text-primary"></i>
+                  PU
+                  <span class="accounting-product-unit-price"> $0.00</span>
+                </div>
+                <div>
+                  <i class="bi bi-cash text-primary"></i>
+                  IMP
+                  <span class="accounting-product-total-amount"> $0.00</span>
+                </div>
               </div>
             </div>
           </div>
@@ -81,10 +91,7 @@
       <div id="alertNoExpenses" class="alert alert-warning d-none">
         <i class="bi bi-exclamation-triangle"></i>
         <strong>No hay gastos registrados para el día de ayer</strong>
-        <button
-          class="btn btn-chip btn-warning rounded-pill"
-          onclick="goToExpenses()"
-        >
+        <button class="btn btn-chip btn-warning rounded-pill" onclick="goToExpenses()">
           Ir a Gastos
           <i class="bi bi-chevron-right small"></i>
         </button>
@@ -109,35 +116,25 @@
     </div>
     <div class="card-body">
       <!-- Ventas en Efectivo -->
-      <div
-        class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded"
-      >
+      <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
         <div class="d-flex align-items-center gap-2">
           <i class="bi bi-cash text-success fs-5"></i>
           <span class="fw-semibold">Efectivo</span>
           <span class="text-success" id="cashSalesAmount">$0.00</span>
         </div>
-        <button
-          class="btn btn-success btn-sm rounded-pill"
-          id="btnAddCashSales"
-        >
+        <button class="btn btn-success btn-sm rounded-pill" id="btnAddCashSales">
           <i class="bi bi-plus"></i> Agregar
         </button>
       </div>
 
       <!-- Ventas por Transferencia -->
-      <div
-        class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded"
-      >
+      <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
         <div class="d-flex align-items-center gap-2">
           <i class="bi bi-credit-card text-success fs-5"></i>
           <span class="fw-semibold">Transf.</span>
           <span class="text-success" id="transferSalesAmount">$0.00</span>
         </div>
-        <button
-          class="btn btn-success btn-sm rounded-pill"
-          id="btnAddTransferSales"
-        >
+        <button class="btn btn-success btn-sm rounded-pill" id="btnAddTransferSales">
           <i class="bi bi-plus"></i> Agregar
         </button>
       </div>
@@ -158,15 +155,11 @@
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <span><i class="bi bi-calculator text-primary"></i> Importe Total</span>
-        <span class="text-primary fw-semibold" id="closingTotalAmount"
-          >$0.00</span
-        >
+        <span class="text-primary fw-semibold" id="closingTotalAmount">$0.00</span>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-2">
         <span><i class="bi bi-calculator text-success"></i> Total Ventas</span>
-        <span class="text-success fw-semibold" id="closingTotalSales"
-          >$0.00</span
-        >
+        <span class="text-success fw-semibold" id="closingTotalSales">$0.00</span>
       </div>
       <div class="d-flex justify-content-between align-items-center">
         <span><i class="bi bi-dash-circle text-danger"></i> Diferencia</span>
@@ -202,11 +195,7 @@
 
   <!-- Botón Cerrar Contabilidad -->
   <div class="">
-    <button
-      class="btn btn-primary w-100 rounded-pill"
-      id="btnCloseAccounting"
-      disabled
-    >
+    <button class="btn btn-primary w-100 rounded-pill" id="btnCloseAccounting" disabled>
       <i class="bi bi-lock"></i> Cerrar Contabilidad
     </button>
   </div>

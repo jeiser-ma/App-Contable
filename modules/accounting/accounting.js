@@ -24,6 +24,19 @@ const ID_REAL_SALARY = "realSalary";
 const ID_ALERT_MISSING_INVENTORY = "alertMissingInventory";
 const ID_ALERT_NO_EXPENSES = "alertNoExpenses";
 
+// ids de template de productos
+const ID_ACCOUNTING_PRODUCT_CARD_TEMPLATE = "accountingProductCardTemplate";
+const CLASS_ACCOUNTING_PRODUCT_NAME = "accounting-product-name";
+const CLASS_ACCOUNTING_PRODUCT_YESTERDAY_STOCK = "accounting-product-yesterday-stock";
+const CLASS_ACCOUNTING_PRODUCT_YESTERDAY_ENTRIES = "accounting-product-yesterday-entries";
+const CLASS_ACCOUNTING_PRODUCT_YESTERDAY_EXITS = "accounting-product-yesterday-exits";
+const CLASS_ACCOUNTING_PRODUCT_TODAY_INVENTORY = "accounting-product-today-inventory";
+const CLASS_ACCOUNTING_PRODUCT_EXITS = "accounting-product-exits";
+const CLASS_ACCOUNTING_PRODUCT_INVENTORY = "accounting-product-inventory";
+const CLASS_ACCOUNTING_PRODUCT_SALES = "accounting-product-sales";
+const CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE = "accounting-product-unit-price";
+const CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT = "accounting-product-total-amount";
+
 //#endregion
 
 
@@ -77,8 +90,8 @@ async function onAccountingPageLoaded() {
   document.getElementById(ID_BTN_ADD_TRANSFER_SALES).onclick = () => openTransferSalesModal();
   document.getElementById(ID_BTN_CLOSE_ACCOUNTING).onclick = () => confirmCloseAccounting();
 
-  // Cargar contabilidad
-  loadAccounting();
+  // Renderizar la contabilidad
+  await renderAccounting();
 }
 
 
@@ -108,7 +121,7 @@ async function setupAccountingControls() {
   // El filtro de fecha ya se configura en setupDateFilter con la fecha de hoy
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  setupDateFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, loadAccounting);
+  setupDateFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
 
   // la contabilidad no tiene campo de ordenamiento
   //await loadModuleControl(CONTROL_ORDER_BY);
@@ -118,7 +131,7 @@ async function setupAccountingControls() {
   // cargar el control de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  await setupChipsFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, loadAccounting);
+  await setupChipsFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
 
   // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
   //activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "today").id, ACCOUNTING_STATE);
@@ -133,7 +146,7 @@ async function setupAccountingControls() {
   // cargar el control de limpiar filtros
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
-  setupBtnClearFilters(PAGE_ACCOUNTING, ACCOUNTING_STATE, loadAccounting);
+  setupBtnClearFilters(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
 }
 
 
@@ -142,36 +155,11 @@ async function setupAccountingControls() {
  * Carga la contabilidad del día seleccionado
  * @returns {void}
  */
-function loadAccounting() {
+async function loadAccounting() {
   const allAccounting = getData(PAGE_ACCOUNTING) || [];
 
-  // Filtrar la contabilidad por chips
-  // if (ACCOUNTING_STATE.chipFiltered) {
-  //   console.log("ACCOUNTING_STATE.chipFiltered: " + ACCOUNTING_STATE.chipFiltered);
-
-  //   ACCOUNTING_STATE.filterDate = ACCOUNTING_STATE.chipFiltered === "today" ? getToday() : getYesterday(getToday());
-  //   console.log("ACCOUNTING_STATE.filterDate: " + ACCOUNTING_STATE.filterDate);
-
-  //   // actualizar el campo de fecha en el DOM segun la fecha de los chips
-  //   const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
-  //   if (dateFilter) {
-  //     dateFilter.value = ACCOUNTING_STATE.filterDate;
-  //   }
-  // }
 
   // // Filtrar la contabilidad por fecha
-  // if (ACCOUNTING_STATE.filterDate) {
-  //   // Si la fecha es hoy, activar el chip de hoy
-  //   if (ACCOUNTING_STATE.filterDate === getToday()) {
-  //     activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "today").id, ACCOUNTING_STATE);
-  //     // Si la fecha es ayer, activar el chip de ayer
-  //   } else if (ACCOUNTING_STATE.filterDate === getYesterday(getToday())) {
-  //     activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "yesterday").id, ACCOUNTING_STATE);
-  //   }
-  //   // Obtener la contabilidad del día
-  //   currentAccounting = allAccounting.find(a => a.date === ACCOUNTING_STATE.filterDate);
-  // }
-
   currentAccounting = allAccounting.find(a => a.date === ACCOUNTING_STATE.filterDate);
 
   if (!currentAccounting) {
@@ -180,8 +168,53 @@ function loadAccounting() {
     saveAccounting();
   }
 
-  renderAccounting();
+  //renderAccounting();
 }
+
+
+/**
+ * Renderiza la contabilidad
+ * @returns {void}
+ */
+async function renderAccounting() {
+  // Cargar la contabilidad si no existe
+  if (!currentAccounting) {
+    await loadAccounting();
+  }
+
+  // Validar inventario
+  const missingInventory = validateInventory();
+  const alertMissing = document.getElementById(ID_ALERT_MISSING_INVENTORY);
+  if (alertMissing) {
+    alertMissing.classList.toggle("d-none", !missingInventory);
+  }
+
+  // Validar gastos
+  const noExpenses = currentAccounting.totalExpenses === 0;
+  const alertNoExpenses = document.getElementById(ID_ALERT_NO_EXPENSES);
+  if (alertNoExpenses) {
+    alertNoExpenses.classList.toggle("d-none", !noExpenses);
+  }
+
+  // Renderizar productos
+  renderAccountingProducts();
+
+  // Renderizar gastos
+  renderAccountingExpenses();
+
+  // Actualizar totales
+  updateTotals();
+
+  // Actualizar cierre de caja
+  updateClosing();
+
+  // Actualizar cálculo de salario
+  updateSalary();
+
+  // Habilitar/deshabilitar botón de cerrar
+  updateCloseButton();
+}
+
 
 /**
  * Crea una nueva contabilidad para una fecha
@@ -277,45 +310,7 @@ function getYesterday(date) {
   return d.toISOString().split("T")[0];
 }
 
-/**
- * Renderiza la contabilidad
- * @returns {void}
- */
-function renderAccounting() {
-  if (!currentAccounting) return;
 
-  // Validar inventario
-  const missingInventory = validateInventory();
-  const alertMissing = document.getElementById(ID_ALERT_MISSING_INVENTORY);
-  if (alertMissing) {
-    alertMissing.classList.toggle("d-none", !missingInventory);
-  }
-
-  // Validar gastos
-  const noExpenses = currentAccounting.totalExpenses === 0;
-  const alertNoExpenses = document.getElementById(ID_ALERT_NO_EXPENSES);
-  if (alertNoExpenses) {
-    alertNoExpenses.classList.toggle("d-none", !noExpenses);
-  }
-
-  // Renderizar productos
-  renderAccountingProducts();
-
-  // Renderizar gastos
-  renderAccountingExpenses();
-
-  // Actualizar totales
-  updateTotals();
-
-  // Actualizar cierre de caja
-  updateClosing();
-
-  // Actualizar cálculo de salario
-  updateSalary();
-
-  // Habilitar/deshabilitar botón de cerrar
-  updateCloseButton();
-}
 
 /**
  * Valida que todos los productos tengan inventario
@@ -334,46 +329,67 @@ function validateInventory() {
  * Renderiza la lista de productos de contabilidad
  * @returns {void}
  */
-function renderAccountingProducts() {
+async function renderAccountingProducts() {
+  // Obtener el elemento <template> del DOM de la tarjeta de producto
+  const template = document.getElementById(ID_ACCOUNTING_PRODUCT_CARD_TEMPLATE);
+
   // Obtener la lista de productos del DOM
   const list = document.getElementById(ID_ACCOUNTING_PRODUCTS_LIST);
-  if (!list || !currentAccounting) return;
+
+  // Validar que existan la lista de productos, el template y la contabilidad
+  if (!list || !template || !currentAccounting) return;
 
   // Obtener los productos
-  const products = getData(PAGE_PRODUCTS) || [];
-  // Obtener el template de la tarjeta de producto
-  //const template = document.getElementById(ID_ACCOUNTING_PRODUCT_CARD_TEMPLATE);
-  //if (!template) return;
+  const productsAll = getData(PAGE_PRODUCTS) || [];
 
   // Limpiar la lista
   list.replaceChildren();
 
   // Recorrer los productos
-  currentAccounting.products.forEach(ap => {
-    const product = products.find(p => p.id === ap.productId);
+  currentAccounting.products.forEach(async accountingProd => {
+    const product = productsAll.find(p => p.id === accountingProd.productId);
     if (!product) return;
 
-    const card = document.createElement("div");
-    card.className = "card shadow-sm";
-    card.innerHTML = `
-      <div class="card-body py-2 px-3">
-        <div class="fw-semibold mb-2">${product.name}</div>
-        <div class="d-flex flex-wrap gap-2 small text-muted">
-          <span><i class="bi bi-box-fill text-primary"></i> ${ap.yesterdayStock}</span>
-          <span><i class="bi bi-arrow-right-circle-fill text-success"></i> +${ap.yesterdayEntries}</span>
-          <span><i class="bi bi-arrow-left-circle-fill text-danger"></i> -${ap.yesterdayExits}</span>
-          <span><i class="bi bi-box-fill text-success"></i> ${ap.todayInventory !== null ? ap.todayInventory : '--'}</span>
-          <span><i class="bi bi-cart-check-fill text-success"></i>  ${ap.sales !== null && ap.sales !== undefined ? ap.sales : '--'}</span>
-          </div>
-          <div class="d-flex flex-wrap gap-2 pt-2 small text-muted fw-semibold">
-          <!-- <span>VENTAS ${ap.sales !== null && ap.sales !== undefined ? ap.sales : '--'}</span> -->
-          <span> <i class="bi bi-coin text-primary"></i> PU $${ap.unitPrice.toFixed(2)}</span>
-          <span> <i class="bi bi-cash text-primary"></i> IMP $${ap.amount.toFixed(2)}</span>
-        </div>
-      </div>
-    `;
-    list.appendChild(card);
+    // crear una copia del template
+    const clonedTemplate = template.content.cloneNode(true);
+
+    // crear la tarjeta de producto
+    const newProductCard = await createProductCardFromTemplate(clonedTemplate, product.name, accountingProd);
+
+    if (!newProductCard) {
+      console.error(`No se pudo crear el new product card con id: ${product.name}`);
+      return;
+    }
+
+    list.appendChild(newProductCard);
+    console.log("new product card creado correctamente: ", product.name);
   });
+}
+
+/**
+ * Crea una nueva tarjeta de producto desde el template
+ * @param {HTMLElement} clonedTemplate - Template de la tarjeta de producto
+ * @param {Object} product - Producto a crear la tarjeta
+ * @returns {HTMLElement} Tarjeta de producto creada
+ */
+async function createProductCardFromTemplate(clonedTemplate, productName, product) {
+  // const productCard = clonedTemplate.querySelector("."+CLASS_ACCOUNTING_PRODUCT_CARD);
+  // if (!productCard) {
+  //   console.error("no se encontró el product card en el template");
+  //   return null;
+  // }
+
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_NAME).textContent = productName;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_STOCK).textContent = product.yesterdayStock;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_ENTRIES).textContent = product.yesterdayEntries;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_EXITS).textContent = product.yesterdayExits;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TODAY_INVENTORY).textContent = !product.todayInventory ? 0 : product.todayInventory;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_SALES).textContent = product.sales;
+
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE).textContent = product.unitPrice.toFixed(2);
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT).textContent = product.amount.toFixed(2);
+  return clonedTemplate;
+
 }
 
 /**

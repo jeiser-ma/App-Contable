@@ -43,7 +43,7 @@ function setupDateFilter(moduleName, moduleState, renderFn) {
  */
 function linkDateAndChipsFilters(moduleName, moduleState, controlName) {
 
-  console.error("linkDateAndChipsFilters>>>>>: " + controlName + " " + moduleName);
+  console.warn("linkDateAndChipsFilters>>>>>: " + controlName + " " + moduleName);
   // Validar que sea un modulo con chips de fecha
   if (moduleName === PAGE_ACCOUNTING) {
     
