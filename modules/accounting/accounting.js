@@ -37,6 +37,11 @@ const CLASS_ACCOUNTING_PRODUCT_SALES = "accounting-product-sales";
 const CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE = "accounting-product-unit-price";
 const CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT = "accounting-product-total-amount";
 
+// ids de template de gastos
+const ID_ACCOUNTING_EXPENSE_CARD_TEMPLATE = "accountingExpenseCardTemplate";
+const CLASS_ACCOUNTING_EXPENSE_CONCEPT = "accounting-expense-concept";
+const CLASS_ACCOUNTING_EXPENSE_AMOUNT = "accounting-expense-amount";
+
 //#endregion
 
 
@@ -369,16 +374,11 @@ async function renderAccountingProducts() {
 /**
  * Crea una nueva tarjeta de producto desde el template
  * @param {HTMLElement} clonedTemplate - Template de la tarjeta de producto
+ * @param {string} productName - Nombre del producto
  * @param {Object} product - Producto a crear la tarjeta
  * @returns {HTMLElement} Tarjeta de producto creada
  */
 async function createProductCardFromTemplate(clonedTemplate, productName, product) {
-  // const productCard = clonedTemplate.querySelector("."+CLASS_ACCOUNTING_PRODUCT_CARD);
-  // if (!productCard) {
-  //   console.error("no se encontró el product card en el template");
-  //   return null;
-  // }
-
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_NAME).textContent = productName;
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_STOCK).textContent = product.yesterdayStock;
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_ENTRIES).textContent = product.yesterdayEntries;
@@ -392,13 +392,20 @@ async function createProductCardFromTemplate(clonedTemplate, productName, produc
 
 }
 
+
 /**
  * Renderiza la lista de gastos
  * @returns {void}
  */
 function renderAccountingExpenses() {
+  // Obtener el elemento <template> del DOM de la tarjeta de gasto
+  const template = document.getElementById(ID_ACCOUNTING_EXPENSE_CARD_TEMPLATE);
+
+  // Obtener la lista de gastos del DOM
   const list = document.getElementById(ID_ACCOUNTING_EXPENSES_LIST);
-  if (!list) return;
+
+  // Validar que existan la lista de productos, el template y la contabilidad
+  if (!list || !template) return;
 
   const yesterday = getYesterday(ACCOUNTING_STATE.filterDate);
   const expenses = getData(PAGE_EXPENSES) || [];
@@ -411,23 +418,53 @@ function renderAccountingExpenses() {
     return;
   }*/
 
-  yesterdayExpenses.forEach(expense => {
-    const card = document.createElement("div");
-    card.className = "card shadow-sm";
-    card.innerHTML = `
-      <div class="card-body py-2 px-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-cash-coin text-danger"></i>
-            <span class="fw-semibold">${expense.concept}</span>
-          </div>
-          <span class="text-danger fw-semibold">-$${expense.amount.toFixed(2)}</span>
-        </div>
-      </div>
-    `;
-    list.appendChild(card);
+  yesterdayExpenses.forEach(async expense => {
+
+    // crear una copia del template
+    const clonedTemplate = template.content.cloneNode(true);
+
+    // crear la tarjeta de gasto
+    const newExpenseCard = await createExpenseCardFromTemplate(clonedTemplate, expense);
+
+    if (!newExpenseCard) {
+      console.error(`No se pudo crear el new expense card con id: ${expense.concept}`);
+      return;
+    }
+
+    // const card = document.createElement("div");
+    // card.className = "card shadow-sm";
+    // card.innerHTML = `
+    //   <div class="card-body py-2 px-3">
+    //     <div class="d-flex justify-content-between align-items-center">
+    //       <div class="d-flex align-items-center gap-2">
+    //         <i class="bi bi-cash-coin text-danger"></i>
+    //         <span class="fw-semibold">${expense.concept}</span>
+    //       </div>
+    //       <span class="text-danger fw-semibold">-$${expense.amount.toFixed(2)}</span>
+    //     </div>
+    //   </div>
+    // `;
+
+    list.appendChild(newExpenseCard);
+    console.log("new expense card creado correctamente: ", expense.concept);
   });
 }
+
+
+
+/**
+ * Crea una nueva tarjeta de gasto desde el template
+ * @param {HTMLElement} clonedTemplate - Template de la tarjeta de producto
+ * @param {Object} expense - Gasto a crear la tarjeta
+ * @returns {HTMLElement} Tarjeta de gasto creada
+ */
+async function createExpenseCardFromTemplate(clonedTemplate, expense) {
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_CONCEPT).textContent = expense.concept;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_AMOUNT).textContent = "-$ "+expense.amount.toFixed(2);
+  return clonedTemplate;
+}
+
+
 
 /**
  * Actualiza los totales
