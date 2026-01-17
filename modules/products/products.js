@@ -123,7 +123,7 @@ async function setupProductsControls() {
   setupOrderBy(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
 
   // cargar el control de chips filter
-  await loadModuleControl(COTROL_CHIPS_FILTER);
+  await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
   setupChipsFilter(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
 

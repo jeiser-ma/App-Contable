@@ -207,11 +207,44 @@ async function setupModuleControls(moduleName) {
 }
 
 /**
- * Obtiene el estado del módulo actual
+ * Obtiene el objeto de estado completo de un módulo dado su nombre
+ * @param {string} moduleName - Nombre del módulo ("expenses", "inventory", "accounting", "products", "movements")
+ * @returns {Object|null} - Objeto de estado del módulo o null si no se encuentra
+ * @example
+ * const expensesState = getModuleState("expenses"); // Retorna EXPENSES_STATE
+ * const inventoryState = getModuleState("inventory"); // Retorna INVENTORY_STATE
+ */
+function getModuleState(moduleName) {
+  // Mapeo de nombres de módulos a nombres de estados
+  const stateNameMap = {
+    "expenses": "EXPENSES_STATE",
+    "inventory": "INVENTORY_STATE",
+    "accounting": "ACCOUNTING_STATE",
+    "products": "PRODUCTS_STATE",
+    "movements": "MOVEMENTS_STATE",
+  };
+
+  const stateName = stateNameMap[moduleName];
+  if (!stateName) {
+    console.warn(`getModuleState: Módulo "${moduleName}" no encontrado`);
+    return null;
+  }
+
+  const state = window[stateName];
+  if (!state) {
+    console.warn(`getModuleState: Estado "${stateName}" no encontrado en window`);
+    return null;
+  }
+
+  return state;
+}
+
+/**
+ * Obtiene un valor específico del estado del módulo actual
  * @param {string} key - Clave del estado
  * @returns {any}
  */
-function getModuleState(key) {
+function getCurrentModuleStateValue(key) {
   if (!currentModule) return null;
   const config = MODULES_CONFIG[currentModule];
   if (!config) return null;

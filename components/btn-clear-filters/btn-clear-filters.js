@@ -29,6 +29,8 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
         // Limpiar chips (si existen)
         await clearChipsFilter(moduleName, moduleState);
 
+        linkDateAndChipsFilters(moduleName, moduleState, CONTROL_DATE_FILTER);
+
         // Llamar a la función de renderizado
         renderFn();
       };

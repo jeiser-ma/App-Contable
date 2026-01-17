@@ -113,7 +113,7 @@ async function setupInventoryControls() {
   //setupOrderBy(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
 
   // el inventario no tiene campo de chips filter
-  //await loadModuleControl(COTROL_CHIPS_FILTER);
+  //await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
   //setupChipsFilter(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
 
@@ -368,7 +368,7 @@ function saveInventoryFromModal() {
     inventory.push(inventoryData);
   }
 
-  setData("inventory", inventory);
+  setData(PAGE_INVENTORY, inventory);
 
   // Cerrar modal y actualizar vista
   hideModalModules();

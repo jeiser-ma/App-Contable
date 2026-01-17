@@ -116,7 +116,7 @@ async function setupMovementsControls() {
   setupOrderBy(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
 
   // cargar el control de chips filter
-  await loadModuleControl(COTROL_CHIPS_FILTER);
+  await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
   setupChipsFilter(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
 

@@ -95,7 +95,7 @@ async function setupExpensesControls() {
   
   
   // cargar el control de chips filter
-  await loadModuleControl(COTROL_CHIPS_FILTER);
+  await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
   setupChipsFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
 
@@ -218,7 +218,7 @@ function saveExpenseFromModal() {
     return;
   }
 
-  const expenses = getData("expenses") || [];
+  const expenses = getData(PAGE_EXPENSES) || [];
 
   if (EXPENSES_STATE.elementToEdit) {
     // Editar
@@ -245,7 +245,7 @@ function saveExpenseFromModal() {
     expenses.push(newExpense);
   }
 
-  setData("expenses", expenses);
+  setData(PAGE_EXPENSES, expenses);
   hideModalModules();
   renderExpenses();
 }
@@ -256,7 +256,7 @@ function saveExpenseFromModal() {
  * @returns {void}
  */
 function openEditExpenseModal(id) {
-  const expenses = getData("expenses") || [];
+  const expenses = getData(PAGE_EXPENSES) || [];
   const expense = expenses.find((e) => e.id === id);
   if (!expense) return;
 
@@ -334,7 +334,7 @@ function loadExpenseConceptsIntoSelect() {
  * @returns {void}
  */
 function openDeleteExpenseModal(id) {
-  const expenses = getData("expenses") || [];
+  const expenses = getData(PAGE_EXPENSES) || [];
   const expense = expenses.find((e) => e.id === id);
   if (!expense) return;
 
@@ -351,7 +351,7 @@ function openDeleteExpenseModal(id) {
 function confirmDeleteExpense() {
   if (!DELETE_STATE.id) return;
 
-  const expenses = getData("expenses") || [];
+  const expenses = getData(PAGE_EXPENSES) || [];
   const deleted = expenses.find((e) => e.id === DELETE_STATE.id);
   if (!deleted) return;
 
@@ -360,7 +360,7 @@ function confirmDeleteExpense() {
   UNDO_STATE.type = "expenses";
 
   const updated = expenses.filter((e) => e.id !== DELETE_STATE.id);
-  setData("expenses", updated);
+  setData(PAGE_EXPENSES, updated);
 
   DELETE_STATE.type = null;
   DELETE_STATE.id = null;
@@ -489,7 +489,7 @@ function renderExpensesList(expenses) {
  * @returns {void}
  */
 function renderExpenses() {
-  const allExpenses = getData("expenses") || [];
+  const allExpenses = getData(PAGE_EXPENSES) || [];
 
   const filtered = filterExpenses(allExpenses);
   const sorted = sortExpenses(filtered);

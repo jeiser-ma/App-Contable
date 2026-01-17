@@ -377,7 +377,7 @@ const CONTROL_BTN_ADD = "btn-add";
 const CONTROL_DATE_FILTER = "date-filter";
 const CONTROL_ORDER_BY = "order-by";
 //fila 3
-const COTROL_CHIPS_FILTER = "chips-filter";
+const CONTROL_CHIPS_FILTER = "chips-filter";
 //fila 4
 const CONTROL_LIST_COUNTER = "list-counter";
 const CONTROL_BTN_CLEAR_FILTERS = "btn-clear-filters";
@@ -445,9 +445,9 @@ const MODULES_CONTROLS_CONFIG = {
     containerId: ID_CONTAINER_DATE_FILTER_ORDER_BY,
     componentName: CONTROL_ORDER_BY
   },
-  [COTROL_CHIPS_FILTER]: {
+  [CONTROL_CHIPS_FILTER]: {
     containerId: ID_CONTAINER_CHIPS_FILTER,
-    componentName: COTROL_CHIPS_FILTER
+    componentName: CONTROL_CHIPS_FILTER
   },
   [CONTROL_LIST_COUNTER]: {
     containerId: ID_CONTAINER_LIST_COUNTER_BTN_CLEAR_FILTERS,

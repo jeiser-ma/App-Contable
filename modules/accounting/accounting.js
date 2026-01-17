@@ -59,24 +59,23 @@ let currentAccounting = null;
 async function onAccountingPageLoaded() {
   console.log("onAccountingPageLoaded execution");
 
-  // Establecer fecha por defecto (hoy)
-  //const today = new Date().toISOString().split("T")[0];
-  ACCOUNTING_STATE.filterDate = getToday();
+  // Cargar modales de agregar ventas
+  // Cargar modal de ventas en efectivo
+  await loadModal(MODAL_CASH_SALES, PAGE_ACCOUNTING);
+  // Inicializar el modal de ventas en efectivo después de cargarlo
+  initModalModule(MODAL_CASH_SALES);
+  // Cargar modal de ventas en transferencia
+  await loadModal(MODAL_TRANSFER_SALES, PAGE_ACCOUNTING);
+  // Inicializar el modal después de cargarlo  
+  initModalModule(MODAL_TRANSFER_SALES);
 
   // Configurar controles del módulo
   await setupAccountingControls();
 
-  // Cargar modales de ventas
-  await loadModal(MODAL_CASH_SALES, PAGE_ACCOUNTING);
-  await loadModal(MODAL_TRANSFER_SALES, PAGE_ACCOUNTING);
-  initModalModule(MODAL_CASH_SALES);
-  initModalModule(MODAL_TRANSFER_SALES);
-
-
-  // Configurar botones
+  // Configurar eventos de botones
   document.getElementById(ID_BTN_ADD_CASH_SALES).onclick = () => openCashSalesModal();
   document.getElementById(ID_BTN_ADD_TRANSFER_SALES).onclick = () => openTransferSalesModal();
-  document.getElementById(ID_BTN_CLOSE_ACCOUNTING).onclick = confirmCloseAccounting;
+  document.getElementById(ID_BTN_CLOSE_ACCOUNTING).onclick = () => confirmCloseAccounting();
 
   // Cargar contabilidad
   loadAccounting();
@@ -117,9 +116,14 @@ async function setupAccountingControls() {
   //setupOrderBy(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
 
   // cargar el control de chips filter
-  await loadModuleControl(COTROL_CHIPS_FILTER);
+  await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  setupChipsFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, loadAccounting);
+  await setupChipsFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, loadAccounting);
+
+  // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
+  //activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "today").id, ACCOUNTING_STATE);
+  linkDateAndChipsFilters(PAGE_ACCOUNTING, ACCOUNTING_STATE, CONTROL_DATE_FILTER);
+
 
   // la contabilidad no tiene control de contador de elementos
   //await loadModuleControl(CONTROL_LIST_COUNTER);
@@ -139,34 +143,36 @@ async function setupAccountingControls() {
  * @returns {void}
  */
 function loadAccounting() {
-  const allAccounting = getData("accounting") || [];
+  const allAccounting = getData(PAGE_ACCOUNTING) || [];
 
   // Filtrar la contabilidad por chips
-  if (ACCOUNTING_STATE.chipFiltered) {
-    console.log("ACCOUNTING_STATE.chipFiltered: " + ACCOUNTING_STATE.chipFiltered);
+  // if (ACCOUNTING_STATE.chipFiltered) {
+  //   console.log("ACCOUNTING_STATE.chipFiltered: " + ACCOUNTING_STATE.chipFiltered);
 
-    ACCOUNTING_STATE.filterDate = ACCOUNTING_STATE.chipFiltered === "today" ? getToday() : getYesterday(getToday());
-    console.log("ACCOUNTING_STATE.filterDate: " + ACCOUNTING_STATE.filterDate);
+  //   ACCOUNTING_STATE.filterDate = ACCOUNTING_STATE.chipFiltered === "today" ? getToday() : getYesterday(getToday());
+  //   console.log("ACCOUNTING_STATE.filterDate: " + ACCOUNTING_STATE.filterDate);
 
-    // actualizar el campo de fecha en el DOM segun la fecha de los chips
-    const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
-    if (dateFilter) {
-      dateFilter.value = ACCOUNTING_STATE.filterDate;
-    }
-  }
+  //   // actualizar el campo de fecha en el DOM segun la fecha de los chips
+  //   const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
+  //   if (dateFilter) {
+  //     dateFilter.value = ACCOUNTING_STATE.filterDate;
+  //   }
+  // }
 
-  // Filtrar la contabilidad por fecha
-  if (ACCOUNTING_STATE.filterDate) {
-    // Si la fecha es hoy, activar el chip de hoy
-    if (ACCOUNTING_STATE.filterDate === getToday()) {
-      activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "today").id, ACCOUNTING_STATE);
-    // Si la fecha es ayer, activar el chip de ayer
-    }else if (ACCOUNTING_STATE.filterDate === getYesterday(getToday())) {
-      activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "yesterday").id, ACCOUNTING_STATE);
-    }
-    // Obtener la contabilidad del día
-    currentAccounting = allAccounting.find(a => a.date === ACCOUNTING_STATE.filterDate);
-  }
+  // // Filtrar la contabilidad por fecha
+  // if (ACCOUNTING_STATE.filterDate) {
+  //   // Si la fecha es hoy, activar el chip de hoy
+  //   if (ACCOUNTING_STATE.filterDate === getToday()) {
+  //     activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "today").id, ACCOUNTING_STATE);
+  //     // Si la fecha es ayer, activar el chip de ayer
+  //   } else if (ACCOUNTING_STATE.filterDate === getYesterday(getToday())) {
+  //     activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "yesterday").id, ACCOUNTING_STATE);
+  //   }
+  //   // Obtener la contabilidad del día
+  //   currentAccounting = allAccounting.find(a => a.date === ACCOUNTING_STATE.filterDate);
+  // }
+
+  currentAccounting = allAccounting.find(a => a.date === ACCOUNTING_STATE.filterDate);
 
   if (!currentAccounting) {
     // Crear nueva contabilidad para el día
