@@ -171,7 +171,24 @@ const PAGES_CONFIG = {
     title: "Contabilidad",
     icon: "bi-calculator",
     navId: "navAccounting",
-    isModule: true // Módulo
+    isModule: true, // Módulo
+    sortOptions: [],
+    chips: [
+      {
+        id: "chip-filter-yesterday",
+        label: "Ayer",
+        icon: "bi-calendar-event",
+        color: "btn-outline-primary",
+        value: "yesterday",
+      },
+      {
+        id: "chip-filter-today",
+        label: "Hoy",
+        icon: "bi-calendar-event-fill",
+        color: "btn-outline-success",
+        value: "today",
+      }
+    ]
   },
   [PAGE_SETTINGS]: {
     title: "Ajustes",

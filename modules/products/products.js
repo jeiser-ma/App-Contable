@@ -115,7 +115,7 @@ async function setupProductsControls() {
   // No tiene filtro de fecha
   //await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  //setupDateFilter(PRODUCTS_STATE, renderProducts);
+  //setupDateFilter(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
 
   // cargar el control de ordenamiento
   await loadModuleControl(CONTROL_ORDER_BY);

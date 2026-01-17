@@ -108,7 +108,7 @@ async function setupMovementsControls() {
   // Cargar el control de filtro de fecha
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  setupDateFilter(MOVEMENTS_STATE, renderMovements);
+  setupDateFilter(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
 
   // cargar el control de ordenamiento
   await loadModuleControl(CONTROL_ORDER_BY);

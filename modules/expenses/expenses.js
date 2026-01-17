@@ -85,7 +85,7 @@ async function setupExpensesControls() {
   // Cargar el control de filtro de fecha
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  setupDateFilter(EXPENSES_STATE, renderExpenses);
+  setupDateFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
    
 
   // cargar el control de ordenamiento
