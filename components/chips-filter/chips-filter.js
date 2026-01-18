@@ -61,7 +61,7 @@ async function setupChipsFilter(moduleName, moduleState, renderFn) {
  */
 async function setupChipHandler(chip, moduleName, moduleState, renderFn) {
   // Configurar el handler del chip (onclick)
-  chip.onclick = () => {
+  chip.onclick = async () => {
     if (renderFn && typeof renderFn === "function") {
       console.log(`Chip clicked: ${chip.id}, value: ${chip.value}`);
 
@@ -85,7 +85,7 @@ async function setupChipHandler(chip, moduleName, moduleState, renderFn) {
       }
 
       // Enlazar el filtro de fecha con los chips de filtro (hoy | ayer)
-      linkDateAndChipsFilters(moduleName, moduleState, CONTROL_CHIPS_FILTER);
+      await linkDateAndChipsFilters(moduleName, moduleState, CONTROL_CHIPS_FILTER);
 
       // Llamar a la función de render del módulo para actualizar la lista
       renderFn();

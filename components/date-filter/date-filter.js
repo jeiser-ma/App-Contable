@@ -20,11 +20,11 @@ function setupDateFilter(moduleName, moduleState, renderFn) {
     renderFn();
 
     // Configurar el listener de cambio de fecha
-    dateFilter.onchange = () => {
+    dateFilter.onchange = async () => {
       if (renderFn && typeof renderFn === "function") {
         moduleState.filterDate = dateFilter.value || null;
         console.log(`Date filter changed: ${moduleState.filterDate}`);
-        linkDateAndChipsFilters(moduleName, moduleState, CONTROL_DATE_FILTER);
+        await linkDateAndChipsFilters(moduleName, moduleState, CONTROL_DATE_FILTER);
         // if (moduleName === PAGE_ACCOUNTING) {
         //   clearChipsFilter(moduleName, moduleState);
         // }
@@ -41,9 +41,9 @@ function setupDateFilter(moduleName, moduleState, renderFn) {
  * @param {string} controlName - Nombre del control que se activo
  * @returns {void}
  */
-function linkDateAndChipsFilters(moduleName, moduleState, controlName) {
+async function linkDateAndChipsFilters(moduleName, moduleState, controlName) {
 
-  console.warn("linkDateAndChipsFilters>>>>>: " + controlName + " " + moduleName);
+  console.warn("linkDateAndChipsFilters>>>>>: " + controlName + " ---> " + moduleName);
   // Validar que sea un modulo con chips de fecha
   if (moduleName === PAGE_ACCOUNTING) {
     

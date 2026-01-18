@@ -140,7 +140,7 @@ async function setupAccountingControls() {
 
   // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
   //activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "today").id, ACCOUNTING_STATE);
-  linkDateAndChipsFilters(PAGE_ACCOUNTING, ACCOUNTING_STATE, CONTROL_DATE_FILTER);
+  await linkDateAndChipsFilters(PAGE_ACCOUNTING, ACCOUNTING_STATE, CONTROL_DATE_FILTER);
 
 
   // la contabilidad no tiene control de contador de elementos
@@ -182,10 +182,14 @@ async function loadAccounting() {
  * @returns {void}
  */
 async function renderAccounting() {
+  console.warn("renderAccounting execution, ACCOUNTING_STATE.filterDate>>>>>: " + ACCOUNTING_STATE.filterDate);
+
   // Cargar la contabilidad si no existe
-  if (!currentAccounting) {
+  //if (!currentAccounting) {
     await loadAccounting();
-  }
+    console.warn("accounting loaded, date>>>>>: " + currentAccounting.date);
+ // }
+
 
   // Validar inventario
   const missingInventory = validateInventory();
@@ -431,20 +435,6 @@ function renderAccountingExpenses() {
       return;
     }
 
-    // const card = document.createElement("div");
-    // card.className = "card shadow-sm";
-    // card.innerHTML = `
-    //   <div class="card-body py-2 px-3">
-    //     <div class="d-flex justify-content-between align-items-center">
-    //       <div class="d-flex align-items-center gap-2">
-    //         <i class="bi bi-cash-coin text-danger"></i>
-    //         <span class="fw-semibold">${expense.concept}</span>
-    //       </div>
-    //       <span class="text-danger fw-semibold">-$${expense.amount.toFixed(2)}</span>
-    //     </div>
-    //   </div>
-    // `;
-
     list.appendChild(newExpenseCard);
     console.log("new expense card creado correctamente: ", expense.concept);
   });
@@ -477,20 +467,20 @@ function updateTotals() {
   currentAccounting.totalAmount = currentAccounting.products.reduce((sum, p) => sum + p.amount, 0);
   const btnTotalAmount = document.getElementById(ID_BTN_TOTAL_AMOUNT);
   if (btnTotalAmount) {
-    btnTotalAmount.innerHTML = `<i class="bi bi-cash-stack"></i> Importe Total: $${currentAccounting.totalAmount.toFixed(2)}`;
+    btnTotalAmount.innerHTML = `Importe Total: $${currentAccounting.totalAmount.toFixed(2)}`;
   }
 
   // Total de gastos
   const btnTotalExpenses = document.getElementById(ID_BTN_TOTAL_EXPENSES);
   if (btnTotalExpenses) {
-    btnTotalExpenses.innerHTML = `<i class="bi bi-cash-stack"></i> Total Gastos: $${currentAccounting.totalExpenses.toFixed(2)}`;
+    btnTotalExpenses.innerHTML = `Total Gastos: $${currentAccounting.totalExpenses.toFixed(2)}`;
   }
 
   // Total de ventas (incluye ventas en efectivo + transferencia + gastos)
   currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses;
   const btnTotalSales = document.getElementById(ID_BTN_TOTAL_SALES);
   if (btnTotalSales) {
-    btnTotalSales.innerHTML = `<i class="bi bi-cash-stack"></i> Total Ventas: $${currentAccounting.totalSales.toFixed(2)}`;
+    btnTotalSales.innerHTML = `Total Ventas: $${currentAccounting.totalSales.toFixed(2)}`;
   }
 
   // Actualizar montos de ventas
