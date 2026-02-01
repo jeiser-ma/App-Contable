@@ -549,6 +549,7 @@ function saveProductFromModal() {
   // Si hay un id de producto es una edición si no, es un alta de producto
   if (id) {
     // EDITAR
+    // el producto se actualiza sin modificar la cantidad
     products = products.map((p) =>
       p.id === id
         ? {
@@ -563,6 +564,7 @@ function saveProductFromModal() {
     );
   } else {
     // ALTA
+    // el producto se inicializa con cantidad 0
     products.push({
       id: crypto.randomUUID(),
       name,
