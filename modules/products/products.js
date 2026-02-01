@@ -173,7 +173,7 @@ function openEditProductModal(id) {
   document.getElementById(ID_PRODUCT_ID).value = product.id;
   document.getElementById(ID_INPUT_NAME).value = product.name;
   document.getElementById(ID_INPUT_PRICE).value = product.price;
-  document.getElementById(ID_INPUT_QUANTITY).value = product.quantity;
+  //document.getElementById(ID_INPUT_QUANTITY).value = product.quantity;
   document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value =
     product.lowStockThreshold || "";
   document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value =
@@ -499,7 +499,7 @@ function saveProductFromModal() {
   const name = document.getElementById(ID_INPUT_NAME).value.trim();
   const price = Number(document.getElementById(ID_INPUT_PRICE).value);
   const um = document.getElementById(ID_INPUT_UM).value.trim();
-  const quantity = Number(document.getElementById(ID_INPUT_QUANTITY).value);
+  //const quantity = Number(document.getElementById(ID_INPUT_QUANTITY).value);
   const lowStockThreshold = Number(
     document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value
   );
@@ -556,7 +556,6 @@ function saveProductFromModal() {
             name,
             price,
             um,
-            quantity,
             lowStockThreshold,
             criticalStockThreshold,
           }
@@ -569,7 +568,7 @@ function saveProductFromModal() {
       name,
       price,
       um,
-      quantity,
+      quantity:0,
       lowStockThreshold,
       criticalStockThreshold,
     });
