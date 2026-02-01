@@ -3,27 +3,10 @@
 // ===============================
 
 //#region Constants
-const ID_ACCOUNTING_DATE_FILTER = "accountingDateFilter";
+// ids de listas de productos
 const ID_ACCOUNTING_PRODUCTS_LIST = "accountingProductsList";
-const ID_ACCOUNTING_EXPENSES_LIST = "accountingExpensesList";
-const ID_BTN_TOTAL_AMOUNT = "btnTotalAmount";
-const ID_BTN_TOTAL_EXPENSES = "btnTotalExpenses";
-const ID_BTN_TOTAL_SALES = "btnTotalSales";
-const ID_BTN_CLOSE_ACCOUNTING = "btnCloseAccounting";
-const ID_CASH_SALES_AMOUNT = "cashSalesAmount";
-const ID_TRANSFER_SALES_AMOUNT = "transferSalesAmount";
-const ID_BTN_ADD_CASH_SALES = "btnAddCashSales";
-const ID_BTN_ADD_TRANSFER_SALES = "btnAddTransferSales";
-const ID_CLOSING_TOTAL_AMOUNT = "closingTotalAmount";
-const ID_CLOSING_TOTAL_SALES = "closingTotalSales";
-const ID_CLOSING_DIFFERENCE = "closingDifference";
-const ID_SALARY_PERCENTAGE = "salaryPercentage";
-const ID_NOMINAL_SALARY = "nominalSalary";
-const ID_SALARY_DIFFERENCE = "salaryDifference";
-const ID_REAL_SALARY = "realSalary";
+// ids de alerta de inventario faltante
 const ID_ALERT_MISSING_INVENTORY = "alertMissingInventory";
-const ID_ALERT_NO_EXPENSES = "alertNoExpenses";
-
 // ids de template de productos
 const ID_ACCOUNTING_PRODUCT_CARD_TEMPLATE = "accountingProductCardTemplate";
 const CLASS_ACCOUNTING_PRODUCT_NAME = "accounting-product-name";
@@ -37,10 +20,52 @@ const CLASS_ACCOUNTING_PRODUCT_SALES = "accounting-product-sales";
 const CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE = "accounting-product-unit-price";
 const CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT = "accounting-product-total-amount";
 
+// ids de listas de gastos
+const ID_ACCOUNTING_EXPENSES_LIST = "accountingExpensesList";
+// ids de alerta de gastos faltantes
+const ID_ALERT_NO_EXPENSES = "alertNoExpenses";
 // ids de template de gastos
 const ID_ACCOUNTING_EXPENSE_CARD_TEMPLATE = "accountingExpenseCardTemplate";
 const CLASS_ACCOUNTING_EXPENSE_CONCEPT = "accounting-expense-concept";
 const CLASS_ACCOUNTING_EXPENSE_AMOUNT = "accounting-expense-amount";
+
+// ids de campos de la sección de ventas
+const ID_CASH_SALES_AMOUNT = "cashSalesAmount";
+const ID_TRANSFER_SALES_AMOUNT = "transferSalesAmount";
+// ids de inputs de ventas en efectivo y transferencia
+const ID_INPUT_CASH_SALES = "cashSalesInput";
+const ID_INPUT_TRANSFER_SALES = "transferSalesInput";
+// ids de los campos de mensajes de validación de ventas en efectivo y transferencia
+const ID_INVALID_FEEDBACK_CASH_SALES = "cashSalesInput-invalid-feedback";
+const ID_INVALID_FEEDBACK_TRANSFER_SALES = "transferSalesInput-invalid-feedback";
+// ids de botones de agregar ventas en efectivo y transferencia
+const ID_BTN_ADD_CASH_SALES = "btnAddCashSales";
+const ID_BTN_ADD_TRANSFER_SALES = "btnAddTransferSales";
+// ids de botones de guardar ventas en efectivo y transferencia
+const ID_BTN_SAVE_CASH_SALES = "btnSaveCashSales";
+const ID_BTN_SAVE_TRANSFER_SALES = "btnSaveTransferSales";
+
+
+// ids de botones de totales
+const ID_BTN_TOTAL_AMOUNT = "btnTotalAmount";
+const ID_BTN_TOTAL_EXPENSES = "btnTotalExpenses";
+const ID_BTN_TOTAL_SALES = "btnTotalSales";
+
+
+// ids de campos de la sección de cierre de caja
+const ID_CLOSING_TOTAL_AMOUNT = "closingTotalAmount";
+const ID_CLOSING_TOTAL_SALES = "closingTotalSales";
+const ID_CLOSING_DIFFERENCE = "closingDifference";
+
+// ids de campos de la sección de salarios
+const ID_SALARY_PERCENTAGE = "salaryPercentage";
+const ID_NOMINAL_SALARY = "nominalSalary";
+const ID_SALARY_DIFFERENCE = "salaryDifference";
+const ID_REAL_SALARY = "realSalary";
+
+
+// id de botón de cierre de caja
+const ID_BTN_CLOSE_ACCOUNTING = "btnCloseAccounting";
 
 //#endregion
 
@@ -186,16 +211,16 @@ async function renderAccounting() {
 
   // Cargar la contabilidad si no existe
   //if (!currentAccounting) {
-    await loadAccounting();
-    console.warn("accounting loaded, date>>>>>: " + currentAccounting.date);
- // }
+  await loadAccounting();
+  console.warn("accounting loaded, date>>>>>: " + currentAccounting.date);
+  // }
 
 
   // Validar inventario
   const missingInventory = validateInventory();
-  const alertMissing = document.getElementById(ID_ALERT_MISSING_INVENTORY);
-  if (alertMissing) {
-    alertMissing.classList.toggle("d-none", !missingInventory);
+  const alertMissingInventory = document.getElementById(ID_ALERT_MISSING_INVENTORY);
+  if (alertMissingInventory) {
+    alertMissingInventory.classList.toggle("d-none", !missingInventory);
   }
 
   // Validar gastos
@@ -215,10 +240,10 @@ async function renderAccounting() {
   updateTotals();
 
   // Actualizar cierre de caja
-  updateClosing();
+  updateClosingSection();
 
   // Actualizar cálculo de salario
-  updateSalary();
+  updateSalarySection();
 
   // Habilitar/deshabilitar botón de cerrar
   updateCloseButton();
@@ -308,16 +333,6 @@ function createNewAccounting(date) {
   };
 }
 
-/**
- * Obtiene la fecha de ayer en formato YYYY-MM-DD
- * @param {string} date - Fecha en formato YYYY-MM-DD
- * @returns {string} Fecha de ayer
- */
-function getYesterday(date) {
-  const d = new Date(date + "T00:00:00");
-  d.setDate(d.getDate() - 1);
-  return d.toISOString().split("T")[0];
-}
 
 
 
@@ -450,7 +465,7 @@ function renderAccountingExpenses() {
  */
 async function createExpenseCardFromTemplate(clonedTemplate, expense) {
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_CONCEPT).textContent = expense.concept;
-  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_AMOUNT).textContent = "-$ "+expense.amount.toFixed(2);
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_AMOUNT).textContent = "-$ " + expense.amount.toFixed(2);
   return clonedTemplate;
 }
 
@@ -499,7 +514,7 @@ function updateTotals() {
  * Actualiza la sección de cierre de caja
  * @returns {void}
  */
-function updateClosing() {
+function updateClosingSection() {
   if (!currentAccounting) return;
 
   const totalAmount = document.getElementById(ID_CLOSING_TOTAL_AMOUNT);
@@ -534,7 +549,7 @@ function updateClosing() {
  * Actualiza la sección de cálculo de salario
  * @returns {void}
  */
-function updateSalary() {
+function updateSalarySection() {
   if (!currentAccounting) return;
 
   const percentage = document.getElementById(ID_SALARY_PERCENTAGE);
@@ -586,15 +601,49 @@ function updateCloseButton() {
 }
 
 /**
+ * Muestra un error en un campo de entrada
+ * @param {string} inputId - ID del campo de entrada
+ * @param {string} feedbackId - ID del campo de mensaje de error
+ * @param {string} message - Mensaje de error a mostrar
+ * @returns {void}
+ */
+function showInputError(inputId, feedbackId, message) {
+  const input = document.getElementById(inputId);
+  const feedback = document.getElementById(feedbackId);
+  if (!input || !feedback) return;
+
+  input.classList.add("is-invalid");
+  feedback.textContent = message;
+
+}
+
+/**
+ * Limpia el error de un campo de entrada
+ * @param {string} inputId - ID del campo de entrada
+ * @param {string} feedbackId - ID del campo de mensaje de error
+ * @returns {void}
+ */
+function clearInputError(inputId, feedbackId) {
+  const input = document.getElementById(inputId);
+  const feedback = document.getElementById(feedbackId);
+  if (!input || !feedback) return;
+
+  input.classList.remove("is-invalid");
+  feedback.textContent = "";
+
+}
+
+/**
  * Abre el modal de ventas en efectivo
  * @returns {void}
  */
 function openCashSalesModal() {
   initModalModule(MODAL_CASH_SALES);
-  const input = document.getElementById("cashSalesInput");
+  const input = document.getElementById(ID_INPUT_CASH_SALES);
   if (!input || !currentAccounting) return;
 
-  input.value = currentAccounting.cashSales || 0;
+  clearInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES);
+  input.value = currentAccounting.cashSales || "";
   showModalModules();
 }
 
@@ -604,10 +653,11 @@ function openCashSalesModal() {
  */
 function openTransferSalesModal() {
   initModalModule(MODAL_TRANSFER_SALES);
-  const input = document.getElementById("transferSalesInput");
+  const input = document.getElementById(ID_INPUT_TRANSFER_SALES);
   if (!input || !currentAccounting) return;
 
-  input.value = currentAccounting.transferSales || 0;
+  clearInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES);
+  input.value = currentAccounting.transferSales || "";
   showModalModules();
 }
 
@@ -616,12 +666,29 @@ function openTransferSalesModal() {
  * @returns {void}
  */
 function saveCashSales() {
-  const input = document.getElementById("cashSalesInput");
+  const input = document.getElementById(ID_INPUT_CASH_SALES);
   if (!input || !currentAccounting) return;
 
-  const amount = parseFloat(input.value) || 0;
+  // Limpiar errores previos
+  clearInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES);
+
+  // Validar campo vacío
+  if (input.value === "" || input.value.trim() === "") {
+    showInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES, "La cantidad ingresada no es un número válido");
+    return;
+  }
+
+  const amount = parseFloat(input.value);
+
+  // Validar que sea un número válido
+  if (isNaN(amount)) {
+    showInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES, "La cantidad ingresada no es un número válido");
+    return;
+  }
+
+  // Validar que no sea negativo
   if (amount < 0) {
-    showSnackbar("La cantidad no puede ser negativa");
+    showInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES, "La cantidad no puede ser negativa");
     return;
   }
 
@@ -636,12 +703,29 @@ function saveCashSales() {
  * @returns {void}
  */
 function saveTransferSales() {
-  const input = document.getElementById("transferSalesInput");
+  const input = document.getElementById(ID_INPUT_TRANSFER_SALES);
   if (!input || !currentAccounting) return;
 
-  const amount = parseFloat(input.value) || 0;
+  // Limpiar errores previos
+  clearInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES);
+
+  // Validar campo vacío
+  if (input.value === "" || input.value.trim() === "") {
+    showInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES, "Ingresá una cantidad");
+    return;
+  }
+
+  const amount = parseFloat(input.value);
+
+  // Validar que sea un número válido
+  if (isNaN(amount)) {
+    showInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES, "La cantidad ingresada no es un número válido");
+    return;
+  }
+
+  // Validar que no sea negativo
   if (amount < 0) {
-    showSnackbar("La cantidad no puede ser negativa");
+    showInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES, "La cantidad no puede ser negativa");
     return;
   }
 
@@ -658,16 +742,8 @@ function saveTransferSales() {
 function saveAccounting() {
   if (!currentAccounting) return;
 
-  const allAccounting = getData(PAGE_ACCOUNTING) || [];
-  const index = allAccounting.findIndex(a => a.id === currentAccounting.id);
+  setDataById(PAGE_ACCOUNTING, currentAccounting);
 
-  if (index >= 0) {
-    allAccounting[index] = currentAccounting;
-  } else {
-    allAccounting.push(currentAccounting);
-  }
-
-  setData(PAGE_ACCOUNTING, allAccounting);
 }
 
 /**
@@ -719,7 +795,7 @@ function closeAccounting() {
  */
 function goToInventory() {
   if (typeof loadPage === "function") {
-    loadPage("inventory");
+    loadPage(PAGE_INVENTORY);
   }
 }
 
@@ -729,7 +805,47 @@ function goToInventory() {
  */
 function goToExpenses() {
   if (typeof loadPage === "function") {
-    loadPage("expenses");
+    loadPage(PAGE_EXPENSES);
   }
 }
 
+// UTILIDADES
+/**
+ * Obtiene la fecha de ayer en formato YYYY-MM-DD
+ * @param {string} date - Fecha en formato YYYY-MM-DD
+ * @returns {string} Fecha de ayer
+ */
+function getYesterday(date) {
+  const d = new Date(date + "T00:00:00");
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split("T")[0];
+}
+
+
+/**
+ * Obtiene la última contabilidad registrada con estado cerrada
+ * @returns {Object|null} Última contabilidad cerrada o null si no existe
+ */
+function getLastAccounting() {
+  const allAccounting = getData(PAGE_ACCOUNTING) || [];
+  
+  // Filtrar solo las contabilidades cerradas
+  const closedAccountings = allAccounting.filter(a => a.closed === true);
+  
+  // Si no hay contabilidades cerradas, retornar null
+  if (closedAccountings.length === 0) {
+    return null;
+  }
+  
+  // Encontrar la contabilidad con la fecha más reciente
+  let lastAccounting = closedAccountings[0];
+  closedAccountings.forEach(accounting => {
+    const accountingDate = new Date(accounting.date + "T00:00:00");
+    const lastAccountingDate = new Date(lastAccounting.date + "T00:00:00");
+    if (accountingDate > lastAccountingDate) {
+      lastAccounting = accounting;
+    }
+  });
+  
+  return lastAccounting;
+}
