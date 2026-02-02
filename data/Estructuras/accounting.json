@@ -13,6 +13,14 @@
       "amount": 0
     }
   ],
+  "expenses": [
+    {
+      "id": "uuid",
+      "concept": "Pago del guardia",
+      "date": "2025-12-23",
+      "amount": 1500.5
+    }
+  ],
   "cashSales": 0,
   "transferSales": 0,
   "totalSales": 0,

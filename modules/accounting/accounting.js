@@ -182,27 +182,6 @@ async function setupAccountingControls() {
 
 
 /**
- * Carga la contabilidad del día seleccionado
- * @returns {void}
- */
-async function loadAccounting() {
-  const allAccounting = getData(PAGE_ACCOUNTING) || [];
-
-
-  // // Filtrar la contabilidad por fecha
-  currentAccounting = allAccounting.find(a => a.date === ACCOUNTING_STATE.filterDate);
-
-  if (!currentAccounting) {
-    // Crear nueva contabilidad para el día
-    currentAccounting = createNewAccounting(ACCOUNTING_STATE.filterDate);
-    saveAccounting();
-  }
-
-  //renderAccounting();
-}
-
-
-/**
  * Renderiza la contabilidad
  * @returns {void}
  */
@@ -230,23 +209,57 @@ async function renderAccounting() {
     alertNoExpenses.classList.toggle("d-none", !noExpenses);
   }
 
-  // Renderizar productos
+  // Renderizar lista de productos
   renderAccountingProducts();
 
-  // Renderizar gastos
+  // Renderizar lista de gastos
   renderAccountingExpenses();
 
-  // Actualizar totales
-  updateTotals();
+  // Renderizar sección de ventas
+  renderSalesSection();
 
-  // Actualizar cierre de caja
-  updateClosingSection();
+  // Renderizar totales
+  renderTotals();
 
-  // Actualizar cálculo de salario
-  updateSalarySection();
+  // Renderizar sección de cierre de caja
+  renderClosingSection();
+
+  // Renderizar sección de cálculo de salario
+  renderSalarySection();
 
   // Habilitar/deshabilitar botón de cerrar
-  updateCloseButton();
+  renderCloseButton();
+}
+
+
+
+// =======================================================
+// Funciones de carga y creación de contabilidad
+// =======================================================
+
+/**
+ * Carga la contabilidad del día seleccionado
+ * @returns {void}
+ */
+async function loadAccounting() {
+  const allAccounting = getData(PAGE_ACCOUNTING) || [];
+
+
+  // // Filtrar la contabilidad por fecha
+  currentAccounting = allAccounting.find(a => a.date === ACCOUNTING_STATE.filterDate);
+
+  if (!currentAccounting) {
+    // Crear nueva contabilidad para el día
+    currentAccounting = createNewAccounting(ACCOUNTING_STATE.filterDate);
+    // Guardar la contabilidad creada
+    saveAccounting();
+  } else if (!currentAccounting.closed) {
+    // Contabilidad abierta: actualizar products y expenses con datos actuales
+    refreshOpenAccountingData();
+    // Guardar la contabilidad actualizada
+    saveAccounting();
+  }
+
 }
 
 
@@ -256,23 +269,98 @@ async function renderAccounting() {
  * @returns {Object} Objeto de contabilidad
  */
 function createNewAccounting(date) {
+  const accountingProducts = buildAccountingProductsForDate(date);
+  const totalAmount = accountingProducts.reduce((sum, p) => sum + p.amount, 0);
+
+  const accountingExpenses = buildAccountingExpensesForDate(date);
+  const totalExpenses = accountingExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+
+  // la diferencia es el importe total menos el total de ventas 
+  // (incluye ventas en efectivo + transferencia + total de gastos)
+  // (en una contabilidad nueva,total de ventas = total de gastos)
+  const difference = totalAmount - totalExpenses;
+  const salaryPercentage = getSalaryPercentage();
+  const nominalSalary = totalAmount * salaryPercentage / 100;
+  const realSalary = nominalSalary - difference;
+
+  return {
+    id: crypto.randomUUID(),
+    date: date,
+    products: accountingProducts,
+    expenses: accountingExpenses,
+    cashSales: 0,
+    transferSales: 0,
+    totalSales: totalExpenses,
+    totalExpenses: totalExpenses,
+    totalAmount: totalAmount,
+    difference: difference,
+    salaryPercentage: salaryPercentage,
+    nominalSalary: nominalSalary,
+    realSalary: realSalary,
+    closed: false,
+    createdAt: new Date().toISOString(),
+    closedAt: null
+  };
+}
+
+
+/**
+ * Actualiza products y expenses de la contabilidad actual con datos actuales.
+ * Actualiza total de gastos, importe total, total de ventas y diferencia.
+ * Solo debe llamarse cuando la contabilidad no está cerrada.
+ * @returns {void}
+ */
+function refreshOpenAccountingData() {
+  if (!currentAccounting || currentAccounting.closed) return;
+
+  currentAccounting.products = buildAccountingProductsForDate(currentAccounting.date);
+  currentAccounting.expenses = buildAccountingExpensesForDate(currentAccounting.date);
+
+  //Actualizar total de gastos
+  currentAccounting.totalExpenses = currentAccounting.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  // Actualizar total de ventas (incluye ventas en efectivo + transferencia + gastos)
+  currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses;
+
+  // Actualizar importe total (suma de los productos de la contabilidad actual)
+  currentAccounting.totalAmount = currentAccounting.products.reduce((sum, p) => sum + p.amount, 0);
+  // Actualizar diferencia (importe total - total de ventas)
+  currentAccounting.difference = currentAccounting.totalAmount - currentAccounting.totalSales;
+
+  // Actualizar el porcentaje de salario a partir del porcentaje de salario configurado
+  currentAccounting.salaryPercentage = getSalaryPercentage();
+  // Actualizar salario nominal
+  currentAccounting.nominalSalary = (currentAccounting.totalAmount * currentAccounting.salaryPercentage) / 100;
+  // Actualizar salario real
+  currentAccounting.realSalary = currentAccounting.nominalSalary - currentAccounting.difference;
+}
+
+
+/**
+ * Construye la lista de productos de contabilidad para una fecha
+ * @param {string} date - Fecha en formato YYYY-MM-DD
+ * @returns {Array} Lista de productos de contabilidad
+ */
+function buildAccountingProductsForDate(date) {
   const yesterday = getYesterday(date);
   const products = getData(PAGE_PRODUCTS) || [];
   const movements = getData(PAGE_MOVEMENTS) || [];
   const inventory = getData(PAGE_INVENTORY) || [];
-  const expenses = getData(PAGE_EXPENSES) || [];
+  const lastAccounting = getLastAccounting();
 
-  // Obtener contabilidad de ayer
-  const allAccounting = getData(PAGE_ACCOUNTING) || [];
-  const yesterdayAccounting = allAccounting.find(a => a.date === yesterday && a.closed);
+  return products.map(product => {
+    // Inicio es la cantidad del inventario de la contabilidad anterior
+    // (de la última contabilidad cerrada)
 
-  const accountingProducts = products.map(product => {
-    // Stock de ayer (de contabilidad cerrada de ayer o stock actual del producto)
-    let yesterdayStock = product.quantity;
-    if (yesterdayAccounting) {
-      const yesterdayProduct = yesterdayAccounting.products.find(p => p.productId === product.id);
-      if (yesterdayProduct) {
-        yesterdayStock = yesterdayProduct.yesterdayStock + yesterdayProduct.yesterdayEntries - yesterdayProduct.yesterdayExits;
+    // Inicializar el inicio con el stock actual del producto
+    let inicio = product.quantity;
+
+    // Si hay contabilidad anterior, 
+    // actualizar el inicio con la cantidad del inventario de la contabilidad anterior
+    if (lastAccounting) {
+      const lastAccProduct = lastAccounting.products.find(p => p.productId === product.id);
+      if (lastAccProduct) {
+        //lastStock = lastAccProduct.yesterdayStock + lastAccProduct.yesterdayEntries - lastAccProduct.yesterdayExits;
+        inicio = lastAccProduct.todayInventory || 0;
       }
     }
 
@@ -288,49 +376,68 @@ function createNewAccounting(date) {
 
     // Inventario de hoy
     const todayInventory = inventory.find(inv => inv.date === date && inv.productId === product.id && inv.status === "CONFIRMED");
-    let todayInventoryQty = null;
+    let fin = null;
     if (todayInventory) {
-      todayInventoryQty = (todayInventory.warehouseQuantity || 0) + (todayInventory.storeQuantity || 0);
+      fin = (todayInventory.warehouseQuantity || 0) + (todayInventory.storeQuantity || 0);
     }
 
-    // Ventas = stock ayer + entradas ayer - salidas ayer - inventario hoy
-    const sales = todayInventoryQty !== null
-      ? yesterdayStock + yesterdayEntries - yesterdayExits - todayInventoryQty
-      : null; // null indica que falta inventario
+    // Ventas = inicio + entradas ayer - salidas ayer - fin (inventario de hoy)
+    const sales = fin !== null
+      ? inicio + yesterdayEntries - yesterdayExits - fin
+      : 0; // 0 indica que falta inventario de hoy
 
     return {
       productId: product.id,
-      yesterdayStock: yesterdayStock,
+      yesterdayStock: inicio,
       yesterdayEntries: yesterdayEntries,
       yesterdayExits: yesterdayExits,
-      todayInventory: todayInventoryQty,
-      sales: sales !== null ? sales : 0,
+      todayInventory: fin,
+      sales: sales,
       unitPrice: product.price || 0,
-      amount: sales !== null ? (sales * (product.price || 0)) : 0
+      amount: sales * (product.price || 0)
     };
   });
+}
 
-  // Gastos de ayer
-  const yesterdayExpenses = expenses.filter(e => e.date === yesterday);
-  const totalExpenses = yesterdayExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 
-  return {
-    id: crypto.randomUUID(),
-    date: date,
-    products: accountingProducts,
-    cashSales: 0,
-    transferSales: 0,
-    totalSales: 0,
-    totalExpenses: totalExpenses,
-    totalAmount: accountingProducts.reduce((sum, p) => sum + p.amount, 0),
-    difference: 0,
-    salaryPercentage: getSalaryPercentage(),
-    nominalSalary: 0,
-    realSalary: 0,
-    closed: false,
-    createdAt: new Date().toISOString(),
-    closedAt: null
-  };
+/**
+ * Obtiene la última contabilidad registrada con estado cerrada
+ * @returns {Object|null} Última contabilidad cerrada o null si no existe
+ */
+function getLastAccounting() {
+  const allAccounting = getData(PAGE_ACCOUNTING) || [];
+
+  // Filtrar solo las contabilidades cerradas
+  const closedAccountings = allAccounting.filter(a => a.closed === true);
+
+  // Si no hay contabilidades cerradas, retornar null
+  if (closedAccountings.length === 0) {
+    return null;
+  }
+
+  // Encontrar la contabilidad con la fecha más reciente
+  let lastAccounting = closedAccountings[0];
+  closedAccountings.forEach(accounting => {
+    const accountingDate = new Date(accounting.date + "T00:00:00");
+    const lastAccountingDate = new Date(lastAccounting.date + "T00:00:00");
+    if (accountingDate > lastAccountingDate) {
+      lastAccounting = accounting;
+    }
+  });
+
+  return lastAccounting;
+}
+
+
+/**
+ * Construye la lista de gastos de contabilidad para una fecha (gastos del día anterior)
+ * @param {string} date - Fecha en formato YYYY-MM-DD
+ * @returns {Array} Lista de gastos (snapshot)
+ */
+function buildAccountingExpensesForDate(date) {
+  const yesterday = getYesterday(date);
+  const expenses = getData(PAGE_EXPENSES) || [];
+  return expenses.filter(e => e.date === yesterday).map(e => ({ ...e }));
 }
 
 
@@ -348,6 +455,13 @@ function validateInventory() {
     return p.todayInventory === null || p.todayInventory === undefined;
   });
 }
+
+
+
+
+// =======================================================
+// Funciones de renderización de la contabilidad
+// =======================================================
 
 /**
  * Renderiza la lista de productos de contabilidad
@@ -423,21 +537,23 @@ function renderAccountingExpenses() {
   // Obtener la lista de gastos del DOM
   const list = document.getElementById(ID_ACCOUNTING_EXPENSES_LIST);
 
-  // Validar que existan la lista de productos, el template y la contabilidad
-  if (!list || !template) return;
+  // Validar que existan la lista de gastos, el template y la contabilidad
+  if (!list || !template || !currentAccounting) return;
 
-  const yesterday = getYesterday(ACCOUNTING_STATE.filterDate);
-  const expenses = getData(PAGE_EXPENSES) || [];
-  const yesterdayExpenses = expenses.filter(e => e.date === yesterday);
+  // Usar gastos guardados en la contabilidad; si no existen (contabilidades antiguas), usar gastos de ayer
+  // let expensesToShow = [];
+  // if (Array.isArray(currentAccounting.expenses) && currentAccounting.expenses.length > 0) {
+  //   expensesToShow = currentAccounting.expenses;
+  // } else {
+  //   const yesterday = getYesterday(currentAccounting.date);
+  //   const expenses = getData(PAGE_EXPENSES) || [];
+  //   expensesToShow = expenses.filter(e => e.date === yesterday);
+  // }
 
   list.replaceChildren();
 
-  /*if (yesterdayExpenses.length === 0) {
-    list.innerHTML = `<div class="text-center text-muted py-2">No hay gastos registrados para ayer </br> ${yesterday}</div>`;
-    return;
-  }*/
-
-  yesterdayExpenses.forEach(async expense => {
+  // expensesToShow.forEach(async expense => {
+  currentAccounting.expenses.forEach(async expense => {
 
     // crear una copia del template
     const clonedTemplate = template.content.cloneNode(true);
@@ -456,7 +572,6 @@ function renderAccountingExpenses() {
 }
 
 
-
 /**
  * Crea una nueva tarjeta de gasto desde el template
  * @param {HTMLElement} clonedTemplate - Template de la tarjeta de producto
@@ -470,117 +585,127 @@ async function createExpenseCardFromTemplate(clonedTemplate, expense) {
 }
 
 
-
 /**
- * Actualiza los totales
+ * Actualiza la sección de ventas
  * @returns {void}
  */
-function updateTotals() {
+function renderSalesSection() {
   if (!currentAccounting) return;
 
-  // Total de importes
-  currentAccounting.totalAmount = currentAccounting.products.reduce((sum, p) => sum + p.amount, 0);
+  // Actualizar montos de ventas en efectivo
+  const cashAmount = document.getElementById(ID_CASH_SALES_AMOUNT);
+  if (cashAmount) {
+    cashAmount.textContent = `$ ${currentAccounting.cashSales.toFixed(2)}`;
+  }
+
+  // Actualizar montos de ventas por transferencia
+  const transferAmount = document.getElementById(ID_TRANSFER_SALES_AMOUNT);
+  if (transferAmount) {
+    transferAmount.textContent = `$ ${currentAccounting.transferSales.toFixed(2)}`;
+  }
+}
+
+
+/**
+ * Renderiza los totales de la contabilidad
+ * @returns {void}
+ */
+function renderTotals() {
+  if (!currentAccounting) return;
+
+  // Importe Total 
   const btnTotalAmount = document.getElementById(ID_BTN_TOTAL_AMOUNT);
   if (btnTotalAmount) {
-    btnTotalAmount.innerHTML = `Importe Total: $${currentAccounting.totalAmount.toFixed(2)}`;
+    btnTotalAmount.innerHTML = `Importe Total: $ ${currentAccounting.totalAmount.toFixed(2)}`;
   }
 
   // Total de gastos
   const btnTotalExpenses = document.getElementById(ID_BTN_TOTAL_EXPENSES);
   if (btnTotalExpenses) {
-    btnTotalExpenses.innerHTML = `Total Gastos: $${currentAccounting.totalExpenses.toFixed(2)}`;
+    btnTotalExpenses.innerHTML = `Total Gastos: $ ${currentAccounting.totalExpenses.toFixed(2)}`;
   }
 
   // Total de ventas (incluye ventas en efectivo + transferencia + gastos)
-  currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses;
   const btnTotalSales = document.getElementById(ID_BTN_TOTAL_SALES);
   if (btnTotalSales) {
-    btnTotalSales.innerHTML = `Total Ventas: $${currentAccounting.totalSales.toFixed(2)}`;
-  }
-
-  // Actualizar montos de ventas
-  const cashAmount = document.getElementById(ID_CASH_SALES_AMOUNT);
-  if (cashAmount) {
-    cashAmount.textContent = `$${currentAccounting.cashSales.toFixed(2)}`;
-  }
-
-  const transferAmount = document.getElementById(ID_TRANSFER_SALES_AMOUNT);
-  if (transferAmount) {
-    transferAmount.textContent = `$${currentAccounting.transferSales.toFixed(2)}`;
+    btnTotalSales.innerHTML = `Total Ventas: $ ${currentAccounting.totalSales.toFixed(2)}`;
   }
 }
+
 
 /**
  * Actualiza la sección de cierre de caja
  * @returns {void}
  */
-function updateClosingSection() {
+function renderClosingSection() {
   if (!currentAccounting) return;
 
   const totalAmount = document.getElementById(ID_CLOSING_TOTAL_AMOUNT);
   const totalSales = document.getElementById(ID_CLOSING_TOTAL_SALES);
-  const difference = document.getElementById(ID_CLOSING_DIFFERENCE);
 
+  // Actualizar el campo Importe Total
   if (totalAmount) {
     totalAmount.textContent = `$${currentAccounting.totalAmount.toFixed(2)}`;
   }
 
+  // Actualizar el campo de total de ventas
   if (totalSales) {
     totalSales.textContent = `$${currentAccounting.totalSales.toFixed(2)}`;
   }
 
-  if (difference) {
-    currentAccounting.difference = currentAccounting.totalAmount - currentAccounting.totalSales;
-    difference.textContent = `$${currentAccounting.difference.toFixed(2)}`;
-
-    // Colorear según el valor
-    difference.className = "fw-semibold";
-    if (currentAccounting.difference === 0) {
-      difference.classList.add("text-success");
-    } else if (currentAccounting.difference < 0) {
-      difference.classList.add("text-danger");
-    } else {
-      difference.classList.add("text-primary");
-    }
-  }
+  // Actualizar el campo de diferencia
+  formatDifferenceField(ID_CLOSING_DIFFERENCE);
 }
 
 /**
  * Actualiza la sección de cálculo de salario
  * @returns {void}
  */
-function updateSalarySection() {
+function renderSalarySection() {
   if (!currentAccounting) return;
 
   const percentage = document.getElementById(ID_SALARY_PERCENTAGE);
   const nominal = document.getElementById(ID_NOMINAL_SALARY);
-  const salaryDiff = document.getElementById(ID_SALARY_DIFFERENCE);
   const real = document.getElementById(ID_REAL_SALARY);
 
+  // Actualizar el campo de porcentaje de salario
   if (percentage) {
-    percentage.textContent = `${currentAccounting.salaryPercentage}%`;
+    percentage.textContent = `${currentAccounting.salaryPercentage} %`;
   }
 
+  // Actualizar el campo de salario nominal
   if (nominal) {
-    currentAccounting.nominalSalary = (currentAccounting.totalAmount * currentAccounting.salaryPercentage) / 100;
-    nominal.textContent = `$${currentAccounting.nominalSalary.toFixed(2)}`;
+    nominal.textContent = `$ ${currentAccounting.nominalSalary.toFixed(2)}`;
   }
 
-  if (salaryDiff) {
-    salaryDiff.textContent = `$${currentAccounting.difference.toFixed(2)}`;
-    salaryDiff.className = "fw-semibold";
-    if (currentAccounting.difference === 0) {
-      salaryDiff.classList.add("text-success");
-    } else if (currentAccounting.difference < 0) {
-      salaryDiff.classList.add("text-danger");
-    } else {
-      salaryDiff.classList.add("text-primary");
-    }
-  }
+  // Actualizar el campo de diferencia de salario
+  formatDifferenceField(ID_SALARY_DIFFERENCE);
 
+  // Actualizar el campo de salario real
   if (real) {
-    currentAccounting.realSalary = currentAccounting.nominalSalary - currentAccounting.difference;
-    real.textContent = `$${currentAccounting.realSalary.toFixed(2)}`;
+    real.textContent = `$ ${currentAccounting.realSalary.toFixed(2)}`;
+  }
+}
+
+/**
+ * Actualiza el salario real
+ * @returns {void}
+ */
+function formatDifferenceField(fieldId) {
+  const field = document.getElementById(fieldId);
+  if (!currentAccounting || !field) return;
+
+  // Actualizar el texto del campo
+  field.textContent = `$${currentAccounting.difference.toFixed(2)}`;
+  field.className = "fw-semibold";
+
+  // Colorear según el valor
+  if (currentAccounting.difference === 0) {
+    field.classList.add("text-success");
+  } else if (currentAccounting.difference < 0) {
+    field.classList.add("text-danger");
+  } else {
+    field.classList.add("text-primary");
   }
 }
 
@@ -588,7 +713,7 @@ function updateSalarySection() {
  * Actualiza el estado del botón de cerrar contabilidad
  * @returns {void}
  */
-function updateCloseButton() {
+function renderCloseButton() {
   const btn = document.getElementById(ID_BTN_CLOSE_ACCOUNTING);
   if (!btn) return;
 
@@ -598,39 +723,6 @@ function updateCloseButton() {
     !currentAccounting.closed;
 
   btn.disabled = !canClose;
-}
-
-/**
- * Muestra un error en un campo de entrada
- * @param {string} inputId - ID del campo de entrada
- * @param {string} feedbackId - ID del campo de mensaje de error
- * @param {string} message - Mensaje de error a mostrar
- * @returns {void}
- */
-function showInputError(inputId, feedbackId, message) {
-  const input = document.getElementById(inputId);
-  const feedback = document.getElementById(feedbackId);
-  if (!input || !feedback) return;
-
-  input.classList.add("is-invalid");
-  feedback.textContent = message;
-
-}
-
-/**
- * Limpia el error de un campo de entrada
- * @param {string} inputId - ID del campo de entrada
- * @param {string} feedbackId - ID del campo de mensaje de error
- * @returns {void}
- */
-function clearInputError(inputId, feedbackId) {
-  const input = document.getElementById(inputId);
-  const feedback = document.getElementById(feedbackId);
-  if (!input || !feedback) return;
-
-  input.classList.remove("is-invalid");
-  feedback.textContent = "";
-
 }
 
 /**
@@ -666,36 +758,7 @@ function openTransferSalesModal() {
  * @returns {void}
  */
 function saveCashSales() {
-  const input = document.getElementById(ID_INPUT_CASH_SALES);
-  if (!input || !currentAccounting) return;
-
-  // Limpiar errores previos
-  clearInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES);
-
-  // Validar campo vacío
-  if (input.value === "" || input.value.trim() === "") {
-    showInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES, "La cantidad ingresada no es un número válido");
-    return;
-  }
-
-  const amount = parseFloat(input.value);
-
-  // Validar que sea un número válido
-  if (isNaN(amount)) {
-    showInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES, "La cantidad ingresada no es un número válido");
-    return;
-  }
-
-  // Validar que no sea negativo
-  if (amount < 0) {
-    showInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES, "La cantidad no puede ser negativa");
-    return;
-  }
-
-  currentAccounting.cashSales = amount;
-  saveAccounting();
-  hideModalModules();
-  renderAccounting();
+  saveSalesGeneric(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES);
 }
 
 /**
@@ -703,15 +766,25 @@ function saveCashSales() {
  * @returns {void}
  */
 function saveTransferSales() {
-  const input = document.getElementById(ID_INPUT_TRANSFER_SALES);
+  saveSalesGeneric(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES);
+}
+
+/**
+ * Función genérica para guardar las ventas por transferencia o en efectivo
+ * @param {string} inputId - ID del campo de entrada
+ * @param {string} invalidFeedbackId - ID del campo de mensaje de error
+ * @returns {void}
+ */
+function saveSalesGeneric(inputId, invalidFeedbackId) {
+  const input = document.getElementById(inputId);
   if (!input || !currentAccounting) return;
 
   // Limpiar errores previos
-  clearInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES);
+  clearInputError(inputId, invalidFeedbackId);
 
   // Validar campo vacío
   if (input.value === "" || input.value.trim() === "") {
-    showInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES, "Ingresá una cantidad");
+    showInputError(inputId, invalidFeedbackId, "Ingresá una cantidad");
     return;
   }
 
@@ -719,19 +792,31 @@ function saveTransferSales() {
 
   // Validar que sea un número válido
   if (isNaN(amount)) {
-    showInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES, "La cantidad ingresada no es un número válido");
+    showInputError(inputId, invalidFeedbackId, "La cantidad ingresada no es un número válido");
     return;
   }
 
   // Validar que no sea negativo
   if (amount < 0) {
-    showInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES, "La cantidad no puede ser negativa");
+    showInputError(inputId, invalidFeedbackId, "La cantidad no puede ser negativa");
     return;
   }
 
-  currentAccounting.transferSales = amount;
+  // Actualizar ventas en efectivo o transferencia
+  if (inputId === ID_INPUT_CASH_SALES) {
+    currentAccounting.cashSales = amount;
+  } else if (inputId === ID_INPUT_TRANSFER_SALES) {
+    currentAccounting.transferSales = amount;
+  }
+
+  // Actualizar total de ventas (incluye ventas en efectivo + transferencia + gastos)
+  currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses;
+
+  // Guardar la contabilidad
   saveAccounting();
+  // Cerrar el modal
   hideModalModules();
+  // Renderizar la contabilidad
   renderAccounting();
 }
 
@@ -753,11 +838,13 @@ function saveAccounting() {
 function confirmCloseAccounting() {
   if (!currentAccounting) return;
 
+  // Validar que no haya productos sin inventario
   if (validateInventory()) {
     showSnackbar("No se puede cerrar: faltan productos sin inventario");
     return;
   }
 
+  // Validar que haya ventas en efectivo o transferencia
   if (currentAccounting.cashSales === 0 || currentAccounting.transferSales === 0) {
     showSnackbar("No se puede cerrar: faltan ventas en efectivo o transferencia");
     return;
@@ -822,30 +909,38 @@ function getYesterday(date) {
 }
 
 
+
+
+//  PONER EN UN .JS PARA MANAGE INPUTS FEEDBACKS
 /**
- * Obtiene la última contabilidad registrada con estado cerrada
- * @returns {Object|null} Última contabilidad cerrada o null si no existe
+ * Muestra un error en un campo de entrada
+ * @param {string} inputId - ID del campo de entrada
+ * @param {string} feedbackId - ID del campo de mensaje de error
+ * @param {string} message - Mensaje de error a mostrar
+ * @returns {void}
  */
-function getLastAccounting() {
-  const allAccounting = getData(PAGE_ACCOUNTING) || [];
-  
-  // Filtrar solo las contabilidades cerradas
-  const closedAccountings = allAccounting.filter(a => a.closed === true);
-  
-  // Si no hay contabilidades cerradas, retornar null
-  if (closedAccountings.length === 0) {
-    return null;
-  }
-  
-  // Encontrar la contabilidad con la fecha más reciente
-  let lastAccounting = closedAccountings[0];
-  closedAccountings.forEach(accounting => {
-    const accountingDate = new Date(accounting.date + "T00:00:00");
-    const lastAccountingDate = new Date(lastAccounting.date + "T00:00:00");
-    if (accountingDate > lastAccountingDate) {
-      lastAccounting = accounting;
-    }
-  });
-  
-  return lastAccounting;
+function showInputError(inputId, feedbackId, message) {
+  const input = document.getElementById(inputId);
+  const feedback = document.getElementById(feedbackId);
+  if (!input || !feedback) return;
+
+  input.classList.add("is-invalid");
+  feedback.textContent = message;
+
+}
+
+/**
+ * Limpia el error de un campo de entrada
+ * @param {string} inputId - ID del campo de entrada
+ * @param {string} feedbackId - ID del campo de mensaje de error
+ * @returns {void}
+ */
+function clearInputError(inputId, feedbackId) {
+  const input = document.getElementById(inputId);
+  const feedback = document.getElementById(feedbackId);
+  if (!input || !feedback) return;
+
+  input.classList.remove("is-invalid");
+  feedback.textContent = "";
+
 }
