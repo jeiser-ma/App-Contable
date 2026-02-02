@@ -17,6 +17,7 @@ const CLASS_ACCOUNTING_PRODUCT_TODAY_INVENTORY = "accounting-product-today-inven
 const CLASS_ACCOUNTING_PRODUCT_EXITS = "accounting-product-exits";
 const CLASS_ACCOUNTING_PRODUCT_INVENTORY = "accounting-product-inventory";
 const CLASS_ACCOUNTING_PRODUCT_SALES = "accounting-product-sales";
+const CLASS_ACCOUNTING_PRODUCT_MISSING_INVENTORY_WARNING = "missing-inventory-warning";
 const CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE = "accounting-product-unit-price";
 const CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT = "accounting-product-total-amount";
 
@@ -569,8 +570,9 @@ async function createProductCardFromTemplate(clonedTemplate, productName, produc
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_STOCK).textContent = product.yesterdayStock;
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_ENTRIES).textContent = product.yesterdayEntries;
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_YESTERDAY_EXITS).textContent = product.yesterdayExits;
-  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TODAY_INVENTORY).textContent = !product.todayInventory ? 0 : product.todayInventory;
-  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_SALES).textContent = product.sales;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_MISSING_INVENTORY_WARNING).classList.toggle("d-none", product.todayInventory !== null);
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TODAY_INVENTORY).textContent = product.todayInventory === null ? "--" : product.todayInventory;
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_SALES).textContent = product.sales === null ? "--" : product.sales;
 
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE).textContent = product.unitPrice.toFixed(2);
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT).textContent = product.amount.toFixed(2);
