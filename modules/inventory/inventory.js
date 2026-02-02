@@ -179,12 +179,12 @@ function openAddInventoryModal(productId) {
   if (existingInventory) {
     warehouseInput.value =
       existingInventory.warehouseQuantity !== null &&
-      existingInventory.warehouseQuantity !== undefined
+        existingInventory.warehouseQuantity !== undefined
         ? existingInventory.warehouseQuantity
         : "";
     storeInput.value =
       existingInventory.storeQuantity !== null &&
-      existingInventory.storeQuantity !== undefined
+        existingInventory.storeQuantity !== undefined
         ? existingInventory.storeQuantity
         : "";
   } else {
@@ -200,11 +200,53 @@ function openAddInventoryModal(productId) {
 }
 
 /**
- * Guarda el conteo de inventario desde el modal
- * Valida que ambas cantidades no estén vacías y guarda el conteo
- * @returns {void}
+ * Guarda un inventario en almacenamiento (crear o actualizar por productId + date).
+ * Función genérica usada desde el modal y para inventarios de stock cero.
+ * @param {string} productId - ID del producto
+ * @param {string} date - Fecha YYYY-MM-DD
+ * @param {number|null} warehouseQuantity - Cantidad en almacén
+ * @param {number|null} storeQuantity - Cantidad en tienda
+ * @returns {Object|undefined} El inventario guardado o undefined si falla
  */
-function saveInventoryFromModal() {
+function saveInventory(productId, date, warehouseQuantity, storeQuantity) {
+  const inventory = getData(PAGE_INVENTORY) || [];
+  const existingIndex = inventory.findIndex(
+    (inv) => inv.productId === productId && inv.date === date
+  );
+
+  let finalId = crypto.randomUUID();
+  let finalCreatedAt = new Date().toISOString();
+  if (existingIndex >= 0) {
+    finalId = inventory[existingIndex].id;
+    finalCreatedAt = inventory[existingIndex].createdAt;
+  }
+
+  const inventoryData = {
+    id: finalId,
+    productId,
+    warehouseQuantity: warehouseQuantity ?? null,
+    storeQuantity: storeQuantity ?? null,
+    date,
+    status: "CONFIRMED",
+    createdAt: finalCreatedAt,
+  };
+
+  if (existingIndex >= 0) {
+    inventory[existingIndex] = inventoryData;
+  } else {
+    inventory.push(inventoryData);
+  }
+
+  setData(PAGE_INVENTORY, inventory);
+  return inventoryData;
+}
+
+/**
+ * Valida y obtiene las cantidades finales de almacén/tienda desde el modal.
+ * Resuelve vacíos usando valores existentes si es edición.
+ * @returns {{ valid: boolean, date?: string, warehouseQuantity?: number|null, storeQuantity?: number|null, productId?: string }} Resultado de validación y valores
+ */
+function getValidatedInventoryValuesFromModal() {
   const warehouseInput = document.getElementById(ID_LOCATION_WAREHOUSE_INPUT);
   const storeInput = document.getElementById(ID_LOCATION_STORE_INPUT);
 
@@ -212,11 +254,10 @@ function saveInventoryFromModal() {
     console.error(
       "No se encontraron los campos del formulario o el producto actual"
     );
-    return;
+    return { valid: false };
   }
 
-  const date =
-    INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
+  const date = INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
 
   // Limpiar errores previos
   clearInputError(ID_LOCATION_WAREHOUSE_INPUT);
@@ -232,7 +273,7 @@ function saveInventoryFromModal() {
       ID_LOCATION_WAREHOUSE_INPUT,
       "Ingresá al menos una cantidad (almacén o tienda)"
     );
-    return;
+    return { valid: false };
   }
 
   // Convertir a números (si está vacío, se manejará después)
@@ -245,12 +286,12 @@ function saveInventoryFromModal() {
       ID_LOCATION_WAREHOUSE_INPUT,
       "La cantidad no puede ser negativa"
     );
-    return;
+    return { valid: false };
   }
 
   if (storeQuantity !== null && storeQuantity < 0) {
     setInputError(ID_LOCATION_STORE_INPUT, "La cantidad no puede ser negativa");
-    return;
+    return { valid: false };
   }
 
   // Validar que no tengan comas (solo números enteros o decimales con punto)
@@ -259,7 +300,7 @@ function saveInventoryFromModal() {
       ID_LOCATION_WAREHOUSE_INPUT,
       "Usá punto (.) en lugar de coma para decimales"
     );
-    return;
+    return { valid: false };
   }
 
   if (storeValue.includes(",")) {
@@ -267,7 +308,7 @@ function saveInventoryFromModal() {
       ID_LOCATION_STORE_INPUT,
       "Usá punto (.) en lugar de coma para decimales"
     );
-    return;
+    return { valid: false };
   }
 
   // Validar que sean números válidos
@@ -276,99 +317,49 @@ function saveInventoryFromModal() {
     (isNaN(warehouseQuantity) || !isFinite(warehouseQuantity))
   ) {
     setInputError(ID_LOCATION_WAREHOUSE_INPUT, "Ingresá un número válido");
-    return;
+    return { valid: false };
   }
 
   if (storeValue !== "" && (isNaN(storeQuantity) || !isFinite(storeQuantity))) {
     setInputError(ID_LOCATION_STORE_INPUT, "Ingresá un número válido");
-    return;
+    return { valid: false };
   }
 
-  // Guardar conteo de inventario
-  const inventory = getData("inventory") || [];
-
-  // Verificar si ya existe un inventario para este producto en esta fecha
-  const existingIndex = inventory.findIndex(
-    (inv) =>
-      inv.productId === INVENTORY_STATE.elementToEdit && inv.date === date
-  );
-
-  // Si existe inventario previo, mantener los valores que no se están actualizando
-  let finalWarehouseQuantity = warehouseQuantity;
-  let finalStoreQuantity = storeQuantity;
-
-  if (existingIndex >= 0) {
-    const existing = inventory[existingIndex];
-    // Si el campo está vacío, mantener el valor existente
-    if (warehouseValue === "") {
-      finalWarehouseQuantity =
-        existing.warehouseQuantity !== null &&
-        existing.warehouseQuantity !== undefined
-          ? existing.warehouseQuantity
-          : null;
-    } else {
-      // Si tiene valor (incluso 0), usar ese valor
-      finalWarehouseQuantity = warehouseQuantity;
-    }
-    if (storeValue === "") {
-      finalStoreQuantity =
-        existing.storeQuantity !== null && existing.storeQuantity !== undefined
-          ? existing.storeQuantity
-          : null;
-    } else {
-      // Si tiene valor (incluso 0), usar ese valor
-      finalStoreQuantity = storeQuantity;
-    }
-  } else {
-    // Si es nuevo y el campo está vacío, usar null
-    if (warehouseValue === "") {
-      finalWarehouseQuantity = null;
-    }
-    if (storeValue === "") {
-      finalStoreQuantity = null;
-    }
-  }
 
   // Validar que la suma no supere el stock total del producto
-  const products = getData("products") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
   const product = products.find((p) => p.id === INVENTORY_STATE.elementToEdit);
   if (product) {
     const productStock = product.quantity || 0;
-    const totalWarehouse =
-      finalWarehouseQuantity !== null ? finalWarehouseQuantity : 0;
-    const totalStore = finalStoreQuantity !== null ? finalStoreQuantity : 0;
-    const totalInventory = totalWarehouse + totalStore;
-
+    const totalInventory =
+      (warehouseQuantity ?? 0) + (storeQuantity ?? 0);
     if (totalInventory > productStock) {
       const errorMessage = `La suma (${totalInventory}) supera el stock disponible (${productStock})`;
       setInputError(ID_LOCATION_WAREHOUSE_INPUT, errorMessage);
       setInputError(ID_LOCATION_STORE_INPUT, errorMessage);
-      return;
+      return { valid: false };
     }
   }
 
-  const inventoryData = {
-    id: existingIndex >= 0 ? inventory[existingIndex].id : crypto.randomUUID(),
+  return {
+    valid: true,
+    date,
     productId: INVENTORY_STATE.elementToEdit,
-    warehouseQuantity: finalWarehouseQuantity,
-    storeQuantity: finalStoreQuantity,
-    date: date,
-    status: "CONFIRMED",
-    createdAt:
-      existingIndex >= 0
-        ? inventory[existingIndex].createdAt
-        : new Date().toISOString(),
+    warehouseQuantity: warehouseQuantity,
+    storeQuantity: storeQuantity,
   };
+}
 
-  if (existingIndex >= 0) {
-    // Actualizar existente
-    inventory[existingIndex] = inventoryData;
-  } else {
-    // Crear nuevo
-    inventory.push(inventoryData);
-  }
+/**
+ * Guarda el conteo de inventario desde el modal.
+ * Valida entradas, resuelve valores y delega el guardado a saveInventory.
+ * @returns {void}
+ */
+function saveInventoryFromModal() {
+  const result = getValidatedInventoryValuesFromModal();
+  if (!result.valid) return;
 
-  setData(PAGE_INVENTORY, inventory);
+  saveInventory(result.productId, result.date, result.warehouseQuantity, result.storeQuantity);
 
   // Cerrar modal y actualizar vista
   hideModalModules();
@@ -677,8 +668,11 @@ function renderInventory() {
     return stock === 0 && !inventoryProductIds.has(p.id);
   });
 
-  // Crear inventarios virtuales para productos con stock cero
+  // Productos con stock cero: persistir inventario 0/0 y mostrarlos como completados
   zeroStockProducts.forEach((product) => {
+    saveInventory(product.id, date, 0, 0,);
+
+    // Crear inventario virtual para productos con stock cero
     const virtualInventory = {
       id: `zero-stock-${product.id}`, // ID especial para identificar inventarios virtuales
       productId: product.id,

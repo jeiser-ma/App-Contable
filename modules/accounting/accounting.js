@@ -250,7 +250,7 @@ async function loadAccounting() {
 
   if (!currentAccounting) {
     // Crear nueva contabilidad para el día
-    currentAccounting = createNewAccounting(ACCOUNTING_STATE.filterDate);
+    createNewAccounting(ACCOUNTING_STATE.filterDate);
     // Guardar la contabilidad creada
     saveAccounting();
   } else if (!currentAccounting.closed) {
@@ -263,27 +263,62 @@ async function loadAccounting() {
 }
 
 
+
+/**
+ * Calcula el salario nominal de la contabilidad actual
+ * Actualiza el campo nominalSalary de la contabilidad actual
+ * @returns {void}
+ */
+async function calculateNominalSalary() {
+  if (!currentAccounting) {
+    return;
+  }
+
+  currentAccounting.nominalSalary = currentAccounting.totalAmount * currentAccounting.salaryPercentage / 100;
+}
+
+/**
+ * Calcula el salario real de la contabilidad actual
+ * Actualiza el campo realSalary de la contabilidad actual
+ * @returns {void}
+ */
+async function calculateRealSalary() {
+  if (!currentAccounting) {
+    return;
+  }
+
+  currentAccounting.realSalary = currentAccounting.nominalSalary;
+  if (currentAccounting.difference < 0) {
+    // si la diferencia es negativa, el salario real es el salario nominal más la diferencia
+    // se suma porque la diferencia ya es negativa 
+    currentAccounting.realSalary = currentAccounting.nominalSalary + currentAccounting.difference;
+  };
+}
+
 /**
  * Crea una nueva contabilidad para una fecha
  * @param {string} date - Fecha en formato YYYY-MM-DD
  * @returns {Object} Objeto de contabilidad
  */
-function createNewAccounting(date) {
+async function createNewAccounting(date) {
+  // Construir la lista de productos de la contabilidad
   const accountingProducts = buildAccountingProductsForDate(date);
+  // Calcular el importe total de los productos
   const totalAmount = accountingProducts.reduce((sum, p) => sum + p.amount, 0);
-
+  // Construir la lista de gastos de la contabilidad
   const accountingExpenses = buildAccountingExpensesForDate(date);
+  // Calcular el total de gastos
   const totalExpenses = accountingExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 
-  // la diferencia es el importe total menos el total de ventas 
+  // la diferencia es el total de ventas menos el importe total 
   // (incluye ventas en efectivo + transferencia + total de gastos)
   // (en una contabilidad nueva,total de ventas = total de gastos)
-  const difference = totalAmount - totalExpenses;
+  const difference = totalExpenses - totalAmount;
+  // Obtener el porcentaje de salario configurado
   const salaryPercentage = getSalaryPercentage();
-  const nominalSalary = totalAmount * salaryPercentage / 100;
-  const realSalary = nominalSalary - difference;
 
-  return {
+  // Crear la nueva contabilidad
+  currentAccounting = {
     id: crypto.randomUUID(),
     date: date,
     products: accountingProducts,
@@ -295,12 +330,17 @@ function createNewAccounting(date) {
     totalAmount: totalAmount,
     difference: difference,
     salaryPercentage: salaryPercentage,
-    nominalSalary: nominalSalary,
-    realSalary: realSalary,
+    nominalSalary: null,
+    realSalary: null,
     closed: false,
     createdAt: new Date().toISOString(),
     closedAt: null
   };
+
+  // Calcular el salario nominal
+  await calculateNominalSalary();
+  // Calcular el salario real
+  await calculateRealSalary();
 }
 
 
@@ -310,7 +350,7 @@ function createNewAccounting(date) {
  * Solo debe llamarse cuando la contabilidad no está cerrada.
  * @returns {void}
  */
-function refreshOpenAccountingData() {
+async function refreshOpenAccountingData() {
   if (!currentAccounting || currentAccounting.closed) return;
 
   currentAccounting.products = buildAccountingProductsForDate(currentAccounting.date);
@@ -324,14 +364,14 @@ function refreshOpenAccountingData() {
   // Actualizar importe total (suma de los productos de la contabilidad actual)
   currentAccounting.totalAmount = currentAccounting.products.reduce((sum, p) => sum + p.amount, 0);
   // Actualizar diferencia (importe total - total de ventas)
-  currentAccounting.difference = currentAccounting.totalAmount - currentAccounting.totalSales;
+  currentAccounting.difference = currentAccounting.totalSales - currentAccounting.totalAmount;
 
   // Actualizar el porcentaje de salario a partir del porcentaje de salario configurado
   currentAccounting.salaryPercentage = getSalaryPercentage();
   // Actualizar salario nominal
-  currentAccounting.nominalSalary = (currentAccounting.totalAmount * currentAccounting.salaryPercentage) / 100;
+  await calculateNominalSalary();
   // Actualizar salario real
-  currentAccounting.realSalary = currentAccounting.nominalSalary - currentAccounting.difference;
+  await calculateRealSalary();
 }
 
 
@@ -384,7 +424,7 @@ function buildAccountingProductsForDate(date) {
     // Ventas = inicio + entradas ayer - salidas ayer - fin (inventario de hoy)
     const sales = fin !== null
       ? inicio + yesterdayEntries - yesterdayExits - fin
-      : 0; // 0 indica que falta inventario de hoy
+      : null; // null indica que falta inventario de hoy
 
     return {
       productId: product.id,
@@ -437,7 +477,9 @@ function getLastAccounting() {
 function buildAccountingExpensesForDate(date) {
   const yesterday = getYesterday(date);
   const expenses = getData(PAGE_EXPENSES) || [];
-  return expenses.filter(e => e.date === yesterday).map(e => ({ ...e }));
+
+  let expensesForDate = expenses.filter(e => e.date === yesterday).map(e => ({ ...e }));
+  return expensesForDate;
 }
 
 
@@ -475,7 +517,18 @@ async function renderAccountingProducts() {
   const list = document.getElementById(ID_ACCOUNTING_PRODUCTS_LIST);
 
   // Validar que existan la lista de productos, el template y la contabilidad
-  if (!list || !template || !currentAccounting) return;
+  if (!list) {
+    console.error("lista de productos no encontrada");
+    return;
+  }
+  if (!template) {
+    console.error("template de producto no encontrado");
+    return;
+  }
+  if (!currentAccounting) {
+    console.error("contabilidad no encontrada");
+    return;
+  }
 
   // Obtener los productos
   const productsAll = getData(PAGE_PRODUCTS) || [];
@@ -536,9 +589,21 @@ function renderAccountingExpenses() {
 
   // Obtener la lista de gastos del DOM
   const list = document.getElementById(ID_ACCOUNTING_EXPENSES_LIST);
+  console.error("lista de gastos antes de renderizar: ", list);
 
   // Validar que existan la lista de gastos, el template y la contabilidad
-  if (!list || !template || !currentAccounting) return;
+  if (!list) {
+    console.error("lista de gastos no encontrada");
+    return;
+  }
+  if (!template) {
+    console.error("template de gasto no encontrado");
+    return;
+  }
+  if (!currentAccounting) {
+    console.error("contabilidad no encontrada");
+    return;
+  }
 
   // Usar gastos guardados en la contabilidad; si no existen (contabilidades antiguas), usar gastos de ayer
   // let expensesToShow = [];
@@ -856,6 +921,8 @@ function confirmCloseAccounting() {
   }
 
   // Pedir confirmación
+  openConfirmDeleteModal("accounting", currentAccounting.id, "contabilidad");
+
   if (confirm("¿Estás seguro de cerrar la contabilidad? Esta acción no se puede deshacer.")) {
     closeAccounting();
   }
