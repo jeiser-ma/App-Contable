@@ -67,6 +67,8 @@ const ID_REAL_SALARY = "realSalary";
 
 // id de botón de cierre de caja
 const ID_BTN_CLOSE_ACCOUNTING = "btnCloseAccounting";
+// id de botón de reabrir contabilidad
+const ID_BTN_REOPEN_ACCOUNTING = "btnReopenAccounting";
 
 //#endregion
 
@@ -120,6 +122,7 @@ async function onAccountingPageLoaded() {
   document.getElementById(ID_BTN_ADD_CASH_SALES).onclick = () => openCashSalesModal();
   document.getElementById(ID_BTN_ADD_TRANSFER_SALES).onclick = () => openTransferSalesModal();
   document.getElementById(ID_BTN_CLOSE_ACCOUNTING).onclick = () => confirmCloseAccounting();
+  document.getElementById(ID_BTN_REOPEN_ACCOUNTING).onclick = () => confirmReopenAccounting();
 
   // Renderizar la contabilidad
   await renderAccounting();
@@ -230,6 +233,9 @@ async function renderAccounting() {
 
   // Habilitar/deshabilitar botón de cerrar
   renderCloseButton();
+
+  // Habilitar/deshabilitar botón de reabrir
+  renderReopenButton();
 }
 
 
@@ -784,12 +790,34 @@ function renderCloseButton() {
   const btn = document.getElementById(ID_BTN_CLOSE_ACCOUNTING);
   if (!btn) return;
 
-  const canClose = !validateInventory() &&
-    currentAccounting.cashSales > 0 &&
-    currentAccounting.transferSales > 0 &&
-    !currentAccounting.closed;
+  // Mostrar/ocultar botón de cerrar
+  if (currentAccounting.closed) {
+    btn.classList.add("d-none");
+    return;
+  } else {
+    // Mostrar botón de cerrar
+    btn.classList.remove("d-none");
 
-  btn.disabled = !canClose;
+    // Validar que se pueda cerrar la contabilidad
+    const canClose = !validateInventory() &&
+      currentAccounting.cashSales > 0 &&
+      currentAccounting.transferSales > 0 &&
+      !currentAccounting.closed;
+    // Deshabilitar/habilitar botón de cerrar
+    btn.disabled = !canClose;
+  }
+
+}
+
+/**
+ * Actualiza el estado del botón de cerrar contabilidad
+ * @returns {void}
+ */
+function renderReopenButton() {
+  const btn = document.getElementById(ID_BTN_REOPEN_ACCOUNTING);
+  if (!btn) return;
+
+  btn.classList.toggle("d-none", !currentAccounting.closed);
 }
 
 /**
@@ -902,6 +930,33 @@ function saveAccounting() {
  * Confirma el cierre de contabilidad
  * @returns {void}
  */
+function confirmReopenAccounting() {
+  if (!currentAccounting) return;
+  // Pedir confirmación para reabrir contabilidad
+  //openConfirmDeleteModal("accounting", currentAccounting.id, "contabilidad");
+  if (confirm("¿Estás seguro de reabrir la contabilidad? Esta acción no se puede deshacer.")) {
+    reopenAccounting();
+  }
+}
+
+/**
+ * Reabre la contabilidad
+ * @returns {void}
+ */
+function reopenAccounting() {
+  if (!currentAccounting) return;
+  currentAccounting.closed = false;
+  currentAccounting.closedAt = null;
+
+  saveAccounting();
+  renderAccounting();
+  showSnackbar("Contabilidad reabierta correctamente");
+}
+
+/**
+ * Confirma el cierre de contabilidad
+ * @returns {void}
+ */
 function confirmCloseAccounting() {
   if (!currentAccounting) return;
 
@@ -923,11 +978,30 @@ function confirmCloseAccounting() {
   }
 
   // Pedir confirmación
-  openConfirmDeleteModal("accounting", currentAccounting.id, "contabilidad");
+  //openConfirmDeleteModal("accounting", currentAccounting.id, "contabilidad");
 
   if (confirm("¿Estás seguro de cerrar la contabilidad? Esta acción no se puede deshacer.")) {
     closeAccounting();
   }
+}
+
+/**
+ * Actualiza el stock (quantity) de cada producto con el todayInventory
+ * de la contabilidad que se está cerrando.
+ * @returns {void}
+ */
+function updateProductsAccountingStock() {
+  if (!currentAccounting?.products?.length) return;
+
+  const products = getData(PAGE_PRODUCTS) || [];
+  currentAccounting.products.forEach((accProduct) => {
+    const product = products.find((p) => p.id === accProduct.productId);
+    if (product) {
+      product.quantity = accProduct.todayInventory ?? 0;
+    }
+  });
+
+  setData(PAGE_PRODUCTS, products);
 }
 
 /**
@@ -940,10 +1014,14 @@ function closeAccounting() {
   currentAccounting.closed = true;
   currentAccounting.closedAt = new Date().toISOString();
 
+  updateProductsAccountingStock();
+
   saveAccounting();
   renderAccounting();
   showSnackbar("Contabilidad cerrada correctamente");
 }
+
+
 
 /**
  * Navega al módulo de inventario
