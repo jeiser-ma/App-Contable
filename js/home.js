@@ -254,7 +254,7 @@ function updateAccountingSummary() {
   updateMetric("accountingTotalSales", formatCurrency(accounting.totalSales || 0));
   
   // Calcular diferencia
-  const difference = (accounting.totalAmount || 0) - (accounting.totalSales || 0);
+  const difference = (accounting.difference);
   updateMetric("accountingDifference", formatCurrency(difference));
   
   // Aplicar color e icono según la diferencia
@@ -271,10 +271,10 @@ function updateAccountingSummary() {
       differenceIcon.classList.add("bi-check-circle-fill", "text-success");
     } else if (difference < 0) {
       differenceElement.classList.add("text-danger");
-      differenceIcon.classList.add("bi-x-circle-fill", "text-danger");
+      differenceIcon.classList.add("bi-arrow-down-circle-fill", "text-danger");
     } else {
-      differenceElement.classList.add("text-primary");
-      differenceIcon.classList.add("bi-arrow-up-circle-fill", "text-primary");
+      differenceElement.classList.add("text-warning");
+      differenceIcon.classList.add("bi-arrow-up-circle-fill", "text-warning");
     }
   }
 }
