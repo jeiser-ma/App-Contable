@@ -389,7 +389,7 @@ function sortMovements(movements) {
 
     // Para productos, obtener el nombre del producto
     /*if (MOVEMENTS_STATE.orderBy === "name") {
-      const products = getData("products");
+      const products = getData(PAGE_PRODUCTS);
       const product1 = products.find((p) => p.id === a.productId);
       const product2 = products.find((p) => p.id === b.productId);
       if (!product1 || !product2) return 0;
@@ -427,7 +427,7 @@ function renderMovementsList(movements) {
   const movementsList = document.getElementById(ID_MOVEMENTS_LIST);
   const movementTemplate = document.getElementById(ID_MOVEMENT_CARD_TEMPLATE);
   // Obtener los productos
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
 
   if (!movementsList || !movementTemplate) return;
 
@@ -562,7 +562,7 @@ function saveMovementFromModal() {
     return;
   }
 
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
   const product = products.find(
     (p) => p.name.toLowerCase() === productName.toLowerCase()
   );
@@ -583,7 +583,7 @@ function saveMovementFromModal() {
 
     // Si estamos editando, considerar el stock que se revertirá
     if (MOVEMENTS_STATE.elementToEdit) {
-      const movements = getData("movements") || [];
+      const movements = getData(PAGE_MOVEMENTS) || [];
       const existingMovement = movements.find(
         (m) => m.id === MOVEMENTS_STATE.elementToEdit
       );
@@ -618,7 +618,7 @@ function saveMovementFromModal() {
   }
 
   // Guardar movimiento
-  const movements = getData("movements") || [];
+  const movements = getData(PAGE_MOVEMENTS) || [];
 
   if (MOVEMENTS_STATE.elementToEdit) {
     // EDITAR: Buscar el movimiento existente para revertir su efecto en el stock
@@ -653,7 +653,7 @@ function saveMovementFromModal() {
         }
         return p;
       });
-      setData("products", finalProducts);
+      setData(PAGE_PRODUCTS, finalProducts);
     }
 
     // Actualizar el movimiento
@@ -669,7 +669,7 @@ function saveMovementFromModal() {
           }
         : m
     );
-    setData("movements", updatedMovements);
+    setData(PAGE_MOVEMENTS, updatedMovements);
 
     MOVEMENTS_STATE.elementToEdit = null;
   } else {
@@ -685,7 +685,7 @@ function saveMovementFromModal() {
     };
 
     movements.push(newMovement);
-    setData("movements", movements);
+    setData(PAGE_MOVEMENTS, movements);
 
     // Actualizar stock del producto
     const updatedProducts = products.map((p) => {
@@ -698,7 +698,7 @@ function saveMovementFromModal() {
       }
       return p;
     });
-    setData("products", updatedProducts);
+    setData(PAGE_PRODUCTS, updatedProducts);
   }
 
   // Cerrar modal y actualizar vista
@@ -749,7 +749,7 @@ function clearInputError(inputId) {
  * @returns {void}
  */
 function initProductAutocomplete(input) {
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
 
   // Crear o actualizar el datalist
   let datalist = document.getElementById("productsDatalist");
@@ -783,11 +783,11 @@ function initProductAutocomplete(input) {
  * @returns {void}
  */
 function openEditMovementModal(id) {
-  const movements = getData("movements") || [];
+  const movements = getData(PAGE_MOVEMENTS) || [];
   const movement = movements.find((m) => m.id === id);
   if (!movement) return;
 
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
   const product = products.find((p) => p.id === movement.productId);
   if (!product) return;
 
@@ -880,11 +880,11 @@ function openEditMovementModal(id) {
 function openDeleteMovementModal(id) {
   MOVEMENTS_STATE.elementToDelete = id;
 
-  const movements = getData("movements") || [];
+  const movements = getData(PAGE_MOVEMENTS) || [];
   const movement = movements.find((m) => m.id === id);
   if (!movement) return;
 
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
   const product = products.find((p) => p.id === movement.productId);
   if (!product) return;
 
@@ -904,17 +904,17 @@ function openDeleteMovementModal(id) {
 function confirmDeleteMovement() {
   if (!MOVEMENTS_STATE.elementToDelete) return;
 
-  const movements = getData("movements") || [];
+  const movements = getData(PAGE_MOVEMENTS) || [];
   const movement = movements.find(
     (m) => m.id === MOVEMENTS_STATE.elementToDelete
   );
   if (!movement) return;
 
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
 
   // Guardar estado undo
   UNDO_STATE.data = movement;
-  UNDO_STATE.type = "movements";
+  UNDO_STATE.type = PAGE_MOVEMENTS;
 
   // Revertir el efecto en el stock del producto
   const updatedProducts = products.map((p) => {
@@ -929,13 +929,13 @@ function confirmDeleteMovement() {
     }
     return p;
   });
-  setData("products", updatedProducts);
+  setData(PAGE_PRODUCTS, updatedProducts);
 
   // Eliminar el movimiento
   const updatedMovements = movements.filter(
     (m) => m.id !== MOVEMENTS_STATE.elementToDelete
   );
-  setData("movements", updatedMovements);
+  setData(PAGE_MOVEMENTS, updatedMovements);
 
   MOVEMENTS_STATE.elementToDelete = null;
   DELETE_STATE.type = null;

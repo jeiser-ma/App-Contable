@@ -36,14 +36,14 @@ function updateModuleCounterFromData() {
   
     // Obtener datos según el módulo
     let data = [];
-    if (currentModule === "products") {
-      data = getData("products") || [];
-    } else if (currentModule === "movements") {
-      data = getData("movements") || [];
-    } else if (currentModule === "inventory") {
-      data = getData("inventory") || [];
-    } else if (currentModule === "expenses") {
-      data = getData("expenses") || [];
+    if (currentModule === PAGE_PRODUCTS) {
+      data = getData(PAGE_PRODUCTS) || [];
+    } else if (currentModule === PAGE_MOVEMENTS) {
+      data = getData(PAGE_MOVEMENTS) || [];
+    } else if (currentModule === PAGE_INVENTORY) {
+      data = getData(PAGE_INVENTORY) || [];
+    } else if (currentModule === PAGE_EXPENSES) {
+      data = getData(PAGE_EXPENSES) || [];
     }
   
     // Por ahora mostrar total, luego se actualizará con el render

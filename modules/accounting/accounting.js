@@ -422,7 +422,7 @@ function buildAccountingProductsForDate(date) {
       .reduce((sum, m) => sum + m.quantity, 0);
 
     // Inventario de hoy
-    const todayInventory = inventory.find(inv => inv.date === date && inv.productId === product.id && inv.status === "CONFIRMED");
+    const todayInventory = inventory.find(inv => inv.date === date && inv.productId === product.id && ["CONFIRMED", "CLOSED"].includes(inv.status));
     let fin = null;
     if (todayInventory) {
       fin = (todayInventory.warehouseQuantity || 0) + (todayInventory.storeQuantity || 0);
@@ -597,7 +597,7 @@ function renderAccountingExpenses() {
 
   // Obtener la lista de gastos del DOM
   const list = document.getElementById(ID_ACCOUNTING_EXPENSES_LIST);
-  console.error("lista de gastos antes de renderizar: ", list);
+  //console.error("lista de gastos antes de renderizar: ", list);
 
   // Validar que existan la lista de gastos, el template y la contabilidad
   if (!list) {
@@ -948,6 +948,8 @@ function reopenAccounting() {
   currentAccounting.closed = false;
   currentAccounting.closedAt = null;
 
+  changeInventoryAccountingStatus("CONFIRMED");
+
   saveAccounting();
   renderAccounting();
   showSnackbar("Contabilidad reabierta correctamente");
@@ -1005,26 +1007,33 @@ function updateProductsAccountingStock() {
 }
 
 /**
- * Cierra los inventarios de los productos de la contabilidad que se está cerrando.
- * Solo se cambian a CLOSED los inventarios cuya fecha coincide y cuyo productId
- * está en la lista de productos de la contabilidad.
+ * Cambia el estado de los inventarios de los productos de la contabilidad.
+ * Cerrar: CONFIRMED → CLOSED. Reabrir: CLOSED → CONFIRMED.
+ * Solo afecta inventarios de la fecha de la contabilidad y cuyos productId están en ella.
+ * @param {string} newStatus - "CLOSED" al cerrar contabilidad, "CONFIRMED" al reabrir
  * @returns {void}
  */
-function closeInventoryAccounting() {
+function changeInventoryAccountingStatus(newStatus) {
   if (!currentAccounting?.products?.length) return;
+  if (newStatus !== "CONFIRMED" && newStatus !== "CLOSED") return;
 
   const productIds = new Set(
     currentAccounting.products.map((p) => p.productId)
   );
   const inventory = getData(PAGE_INVENTORY) || [];
-  
+
+  const isClosing = newStatus === "CLOSED";
   inventory.forEach((inv) => {
-    if (
-      inv.date === currentAccounting.date &&
-      inv.status === "CONFIRMED" &&
-      productIds.has(inv.productId)
-    ) {
+    if (inv.date !== currentAccounting.date || !productIds.has(inv.productId)) return;
+
+    const status = inv.status;
+    const isCurrentlyOpen = status === "CONFIRMED" || status == null;
+    const isCurrentlyClosed = status === "CLOSED";
+
+    if (isClosing && isCurrentlyOpen) {
       inv.status = "CLOSED";
+    } else if (!isClosing && isCurrentlyClosed) {
+      inv.status = "CONFIRMED";
     }
   });
 
@@ -1042,7 +1051,7 @@ function closeAccounting() {
   currentAccounting.closedAt = new Date().toISOString();
 
   updateProductsAccountingStock();
-  closeInventoryAccounting();
+  changeInventoryAccountingStatus("CLOSED");
 
   saveAccounting();
   renderAccounting();

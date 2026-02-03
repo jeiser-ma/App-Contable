@@ -41,6 +41,15 @@ const INVENTORY_STATE = {
 // Exponer el estado globalmente para module-controls.js
 window.INVENTORY_STATE = INVENTORY_STATE;
 
+/**
+ * Indica si un inventario está cerrado (contabilidad de esa fecha cerrada).
+ * @param {Object} [inv] - Objeto de inventario (puede ser null/undefined)
+ * @returns {boolean}
+ */
+function isInventoryClosed(inv) {
+  return inv?.status === "CLOSED";
+}
+
 // ===============================
 // Hook que llama el router
 // ===============================
@@ -136,7 +145,7 @@ async function setupInventoryControls() {
 function openAddInventoryModal(productId) {
   INVENTORY_STATE.elementToEdit = productId;
 
-  const products = getData("products") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
   const product = products.find((p) => p.id === productId);
 
   if (!product) {
@@ -167,7 +176,7 @@ function openAddInventoryModal(productId) {
   // Obtener inventario existente para este producto en esta fecha (si existe)
   const date =
     INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
-  const allInventory = getData("inventory") || [];
+  const allInventory = getData(PAGE_INVENTORY) || [];
   const existingInventory = allInventory.find(
     (inv) =>
       inv.productId === productId &&
@@ -176,7 +185,7 @@ function openAddInventoryModal(productId) {
   );
 
   // Cargar valores existentes o limpiar campos
-  const isClosed = existingInventory?.status === "CLOSED";
+  const isClosed = isInventoryClosed(existingInventory);
   if (existingInventory) {
     warehouseInput.value =
       existingInventory.warehouseQuantity !== null &&
@@ -386,7 +395,7 @@ function saveInventoryFromModal() {
       inv.productId === result.productId &&
       inv.date === result.date
   );
-  if (existing?.status === "CLOSED") {
+  if (isInventoryClosed(existing)) {
     showSnackbar("No se puede editar: la contabilidad de esta fecha está cerrada");
     return;
   }
@@ -410,24 +419,24 @@ function openDeleteInventoryModal(inventoryId) {
     return;
   }
 
-  const inventory = getData("inventory") || [];
+  const inventory = getData(PAGE_INVENTORY) || [];
   const inv = inventory.find((i) => i.id === inventoryId);
   if (!inv) return;
 
   // No permitir eliminar inventarios cerrados (contabilidad cerrada)
-  if (inv.status === "CLOSED") {
+  if (isInventoryClosed(inv)) {
     showSnackbar("No se puede eliminar: la contabilidad de esta fecha está cerrada");
     return;
   }
 
-  const products = getData("products") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
   const product = products.find((p) => p.id === inv.productId);
   const productName = product ? product.name : "Inventario";
 
-  DELETE_STATE.type = "inventory";
+  DELETE_STATE.type = PAGE_INVENTORY;
   DELETE_STATE.id = inventoryId;
 
-  openConfirmDeleteModal("inventory", inventoryId, productName);
+  openConfirmDeleteModal(PAGE_INVENTORY, inventoryId, productName);
 }
 
 /**
@@ -437,22 +446,22 @@ function openDeleteInventoryModal(inventoryId) {
 function confirmDeleteInventory() {
   if (!DELETE_STATE.id) return;
 
-  const inventory = getData("inventory") || [];
+  const inventory = getData(PAGE_INVENTORY) || [];
   const deleted = inventory.find((i) => i.id === DELETE_STATE.id);
   if (!deleted) return;
 
   // No permitir eliminar inventarios cerrados (contabilidad cerrada)
-  if (deleted.status === "CLOSED") {
+  if (isInventoryClosed(deleted)) {
     showSnackbar("No se puede eliminar: la contabilidad de esta fecha está cerrada");
     return;
   }
 
   // Guardar estado para undo
   UNDO_STATE.data = deleted;
-  UNDO_STATE.type = "inventory";
+  UNDO_STATE.type = PAGE_INVENTORY;
 
   const updated = inventory.filter((i) => i.id !== DELETE_STATE.id);
-  setData("inventory", updated);
+  setData(PAGE_INVENTORY, updated);
 
   DELETE_STATE.type = null;
   DELETE_STATE.id = null;
@@ -538,11 +547,11 @@ function renderPendingInventoryList(products, allComplete = false) {
 function renderPartialInventoryList(inventoryCounts) {
   const list = document.getElementById(ID_PARTIAL_INVENTORY_LIST);
   const template = document.getElementById(ID_PARTIAL_CARD_TEMPLATE);
-  const products = getData("products") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
 
   if (!list || !template) return;
 
-  list.innerHTML = "";
+  list.replaceChildren();
 
   if (inventoryCounts.length === 0) {
     return; // No mostrar mensaje si no hay parciales
@@ -591,9 +600,8 @@ function renderPartialInventoryList(inventoryCounts) {
 
     const btnAdd = node.querySelector(".btn-add-inventory");
     if (btnAdd) {
-      if (inv.status === "CLOSED") {
+      if (isInventoryClosed(inv)) {
         btnAdd.disabled = true;
-        //btnAdd.classList.add("opacity-50");
         btnAdd.setAttribute("title", "Contabilidad cerrada: no se puede editar");
         btnAdd.style.cursor = "not-allowed";
       } else {
@@ -603,9 +611,8 @@ function renderPartialInventoryList(inventoryCounts) {
 
     const btnDelete = node.querySelector(".btn-delete-inventory");
     if (btnDelete) {
-      if (inv.status === "CLOSED") {
+      if (isInventoryClosed(inv)) {
         btnDelete.disabled = true;
-        //btnDelete.classList.add("opacity-50");
         btnDelete.setAttribute("title", "Contabilidad cerrada: no se puede eliminar");
         btnDelete.style.cursor = "not-allowed";
       } else {
@@ -625,11 +632,11 @@ function renderPartialInventoryList(inventoryCounts) {
 function renderCompletedInventoryList(inventoryCounts) {
   const list = document.getElementById(ID_COMPLETED_INVENTORY_LIST);
   const template = document.getElementById(ID_COMPLETED_CARD_TEMPLATE);
-  const products = getData("products") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
 
   if (!list || !template) return;
 
-  list.innerHTML = "";
+  list.replaceChildren();
 
   if (inventoryCounts.length === 0) {
     list.innerHTML = `
@@ -661,23 +668,14 @@ function renderCompletedInventoryList(inventoryCounts) {
 
     const btnDelete = node.querySelector(".btn-delete-inventory");
     if (btnDelete) {
-      // Deshabilitar para productos con stock cero o inventarios cerrados (contabilidad cerrada)
-      if (inv.isZeroStock || inv.id?.startsWith("zero-stock-")) {
+      const isZeroStockProduct = (product.quantity || 0) === 0;
+      const isZeroStockInv = inv.isZeroStock || inv.id?.startsWith("zero-stock-");
+      const isClosed = isInventoryClosed(inv);
+
+      if (isZeroStockProduct || isZeroStockInv || isClosed) {
         btnDelete.disabled = true;
-        //btnDelete.classList.add("opacity-50");
-        btnDelete.setAttribute(
-          "title",
-          "No se puede eliminar: producto sin stock"
-        );
         btnDelete.style.cursor = "not-allowed";
-      } else if (inv.status === "CLOSED") {
-        btnDelete.disabled = true;
-        //btnDelete.classList.add("opacity-50");
-        btnDelete.setAttribute(
-          "title",
-          "Contabilidad cerrada: no se puede eliminar"
-        );
-        btnDelete.style.cursor = "not-allowed";
+        btnDelete.title = "No se puede eliminar el inventario de un producto sin stock o contabilidad cerrada";
       } else {
         btnDelete.onclick = () => openDeleteInventoryModal(inv.id);
       }

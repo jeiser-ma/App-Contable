@@ -262,7 +262,7 @@ function deleteUnit(index) {
   const unit = units[index];
   
   // Verificar si está en uso en productos
-  const products = getData("products") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
   const isInUse = products.some(p => p.um && p.um.toLowerCase() === unit.toLowerCase());
   
   if (isInUse) {
@@ -317,7 +317,7 @@ function confirmDeleteUnit() {
   const deleted = units[index];
   
   // Verificar nuevamente si está en uso
-  const products = getData("products") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
   const isInUse = products.some(p => p.um && p.um.toLowerCase() === deleted.toLowerCase());
   
   if (isInUse) {

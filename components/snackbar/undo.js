@@ -101,13 +101,13 @@ function undoDelete() {
     setData(UNDO_STATE.type, data);
 
     // Renderizar según el tipo
-    if (UNDO_STATE.type === "products" && typeof renderProducts === "function") {
+    if (UNDO_STATE.type === PAGE_PRODUCTS && typeof renderProducts === "function") {
       renderProducts();
-    } else if (UNDO_STATE.type === "movements" && typeof renderMovements === "function") {
+    } else if (UNDO_STATE.type === PAGE_MOVEMENTS && typeof renderMovements === "function") {
       renderMovements();
-    } else if (UNDO_STATE.type === "inventory" && typeof renderInventory === "function") {
+    } else if (UNDO_STATE.type === PAGE_INVENTORY && typeof renderInventory === "function") {
       renderInventory();
-    } else if (UNDO_STATE.type === "expenses" && typeof renderExpenses === "function") {
+    } else if (UNDO_STATE.type === PAGE_EXPENSES && typeof renderExpenses === "function") {
       renderExpenses();
     }
   }

@@ -162,7 +162,7 @@ function openAddProductModal() {
  * @param {string} id - ID del producto a editar
  */
 function openEditProductModal(id) {
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
   const product = products.find((p) => p.id === id);
   if (!product) return;
 
@@ -507,7 +507,7 @@ function saveProductFromModal() {
     document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value
   );
 
-  let products = getData("products");
+  let products = getData(PAGE_PRODUCTS);
 
   clearInputError(ID_INPUT_NAME);
   clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
@@ -576,7 +576,7 @@ function saveProductFromModal() {
     });
   }
 
-  setData("products", products);
+  setData(PAGE_PRODUCTS, products);
   toggleModalModules();
   renderProducts();
 }
@@ -628,7 +628,7 @@ function clearInputError(inputId) {
 function openDeleteProductModal(id) {
   PRODUCTS_STATE.elementToDelete = id;
 
-  const product = getData("products").find((p) => p.id === id);
+  const product = getData(PAGE_PRODUCTS).find((p) => p.id === id);
   if (!product) return;
 
   openConfirmDeleteModal("product", id, product.name);
@@ -642,18 +642,18 @@ function openDeleteProductModal(id) {
 function confirmDeleteProduct() {
   if (!PRODUCTS_STATE.elementToDelete) return;
 
-  const products = getData("products");
+  const products = getData(PAGE_PRODUCTS);
   const deleted = products.find((p) => p.id === PRODUCTS_STATE.elementToDelete);
 
   // Guardamos estado undo
   UNDO_STATE.data = deleted;
-  UNDO_STATE.type = "products"; // Nombre de la colección en storage
+  UNDO_STATE.type = PAGE_PRODUCTS; // Nombre de la colección en storage
 
   // Eliminamos
   const updated = products.filter(
     (p) => p.id !== PRODUCTS_STATE.elementToDelete
   );
-  setData("products", updated);
+  setData(PAGE_PRODUCTS, updated);
 
   PRODUCTS_STATE.elementToDelete = null;
   DELETE_STATE.type = null;

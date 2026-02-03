@@ -26,10 +26,10 @@ function updateDashboard() {
   console.log("updateDashboard ejecutado");
   
   // Obtener datos
-  const products = getData("products") || [];
-  const movements = getData("movements") || [];
-  const expenses = getData("expenses") || [];
-  const inventory = getData("inventory") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
+  const movements = getData(PAGE_MOVEMENTS) || [];
+  const expenses = getData(PAGE_EXPENSES) || [];
+  const inventory = getData(PAGE_INVENTORY) || [];
 
   console.log("Total productos:", products.length);
 
@@ -286,13 +286,13 @@ function updateAccountingSummary() {
  * @returns {Object} Objeto de contabilidad
  */
 function createTodayAccounting(today, yesterday) {
-  const products = getData("products") || [];
-  const movements = getData("movements") || [];
-  const inventory = getData("inventory") || [];
-  const expenses = getData("expenses") || [];
+  const products = getData(PAGE_PRODUCTS) || [];
+  const movements = getData(PAGE_MOVEMENTS) || [];
+  const inventory = getData(PAGE_INVENTORY) || [];
+  const expenses = getData(PAGE_EXPENSES) || [];
   
   // Obtener contabilidad de ayer (si existe y está cerrada)
-  const allAccounting = getData("accounting") || [];
+  const allAccounting = getData(PAGE_ACCOUNTING) || [];
   const yesterdayAccounting = allAccounting.find(a => a.date === yesterday && a.closed);
   
   const accountingProducts = products.map(product => {
