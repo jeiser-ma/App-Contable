@@ -441,6 +441,12 @@ function confirmDeleteInventory() {
   const deleted = inventory.find((i) => i.id === DELETE_STATE.id);
   if (!deleted) return;
 
+  // No permitir eliminar inventarios cerrados (contabilidad cerrada)
+  if (deleted.status === "CLOSED") {
+    showSnackbar("No se puede eliminar: la contabilidad de esta fecha está cerrada");
+    return;
+  }
+
   // Guardar estado para undo
   UNDO_STATE.data = deleted;
   UNDO_STATE.type = "inventory";
@@ -587,7 +593,7 @@ function renderPartialInventoryList(inventoryCounts) {
     if (btnAdd) {
       if (inv.status === "CLOSED") {
         btnAdd.disabled = true;
-        btnAdd.classList.add("opacity-50");
+        //btnAdd.classList.add("opacity-50");
         btnAdd.setAttribute("title", "Contabilidad cerrada: no se puede editar");
         btnAdd.style.cursor = "not-allowed";
       } else {
@@ -599,7 +605,7 @@ function renderPartialInventoryList(inventoryCounts) {
     if (btnDelete) {
       if (inv.status === "CLOSED") {
         btnDelete.disabled = true;
-        btnDelete.classList.add("opacity-50");
+        //btnDelete.classList.add("opacity-50");
         btnDelete.setAttribute("title", "Contabilidad cerrada: no se puede eliminar");
         btnDelete.style.cursor = "not-allowed";
       } else {
@@ -658,7 +664,7 @@ function renderCompletedInventoryList(inventoryCounts) {
       // Deshabilitar para productos con stock cero o inventarios cerrados (contabilidad cerrada)
       if (inv.isZeroStock || inv.id?.startsWith("zero-stock-")) {
         btnDelete.disabled = true;
-        btnDelete.classList.add("opacity-50");
+        //btnDelete.classList.add("opacity-50");
         btnDelete.setAttribute(
           "title",
           "No se puede eliminar: producto sin stock"
@@ -666,7 +672,7 @@ function renderCompletedInventoryList(inventoryCounts) {
         btnDelete.style.cursor = "not-allowed";
       } else if (inv.status === "CLOSED") {
         btnDelete.disabled = true;
-        btnDelete.classList.add("opacity-50");
+        //btnDelete.classList.add("opacity-50");
         btnDelete.setAttribute(
           "title",
           "Contabilidad cerrada: no se puede eliminar"
