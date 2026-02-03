@@ -208,6 +208,7 @@ const PAGES_CONFIG = {
 
 // Nombres de los modales compartidos
 const MODAL_CONFIRM_DELETE = "confirm-delete";
+const MODAL_CONFIRM_ACTION = "confirm-action";
 
 // Nombres de los modales de los módulos
 const MODAL_MOVEMENTS = "movements-modal";
@@ -231,6 +232,11 @@ const MODALS_CONFIG = {
     titleAdd: "Confirmar eliminación",
     titleEdit: "Confirmar eliminación",
     icon: "bi-trash",
+  },
+  [MODAL_CONFIRM_ACTION]: {
+    titleAdd: "Confirmar acción",
+    titleEdit: "Confirmar acción",
+    icon: "bi-question-circle",
   },
   // Modales de los módulos
   [MODAL_PRODUCTS]: {

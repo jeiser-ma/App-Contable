@@ -927,16 +927,19 @@ function saveAccounting() {
 }
 
 /**
- * Confirma el cierre de contabilidad
+ * Pide confirmación para reabrir la contabilidad
  * @returns {void}
  */
 function confirmReopenAccounting() {
   if (!currentAccounting) return;
-  // Pedir confirmación para reabrir contabilidad
-  //openConfirmDeleteModal("accounting", currentAccounting.id, "contabilidad");
-  if (confirm("¿Estás seguro de reabrir la contabilidad? Esta acción no se puede deshacer.")) {
-    reopenAccounting();
-  }
+
+  openConfirmActionModal({
+    title: "Reabrir contabilidad",
+    message: "¿Estás seguro de reabrir la contabilidad? Podrás volver a editar inventarios y datos de este día.",
+    confirmText: "Reabrir",
+    confirmButtonClass: "btn-primary",
+    callbackFn: reopenAccounting,
+  });
 }
 
 /**
@@ -979,12 +982,13 @@ function confirmCloseAccounting() {
     return;
   }
 
-  // Pedir confirmación
-  //openConfirmDeleteModal("accounting", currentAccounting.id, "contabilidad");
-
-  if (confirm("¿Estás seguro de cerrar la contabilidad? Esta acción no se puede deshacer.")) {
-    closeAccounting();
-  }
+  openConfirmActionModal({
+    title: "Cerrar contabilidad",
+    message: "¿Estás seguro de cerrar la contabilidad? Se actualizará el stock de productos y no podrás editar los inventarios de esta fecha.",
+    confirmText: "Cerrar contabilidad",
+    confirmButtonClass: "btn-primary",
+    callbackFn: closeAccounting,
+  });
 }
 
 /**

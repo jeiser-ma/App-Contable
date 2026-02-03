@@ -179,6 +179,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Loading confirm-delete");
     loadModal(MODAL_CONFIRM_DELETE);
 
+    // cargamos el modal confirm-action (confirmar cualquier acción: cerrar/reabrir contabilidad, etc.)
+    console.log("Loading confirm-action");
+    loadModal(MODAL_CONFIRM_ACTION);
+
     // Cargamos el componente snackbar para mostrar mensajes de error o éxito
     console.log("Loading component snackbar");
     loadComponent("snackbar");
