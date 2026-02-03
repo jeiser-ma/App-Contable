@@ -398,8 +398,8 @@ function buildAccountingProductsForDate(date) {
     // Inicio es la cantidad del inventario de la contabilidad anterior
     // (de la última contabilidad cerrada)
 
-    // Inicializar el inicio con el stock actual del producto
-    let inicio = product.quantity;
+    // Inicializar el inicio con stock cero
+    let inicio = 0;
 
     // Si hay contabilidad anterior, 
     // actualizar el inicio con la cantidad del inventario de la contabilidad anterior
@@ -1005,6 +1005,33 @@ function updateProductsAccountingStock() {
 }
 
 /**
+ * Cierra los inventarios de los productos de la contabilidad que se está cerrando.
+ * Solo se cambian a CLOSED los inventarios cuya fecha coincide y cuyo productId
+ * está en la lista de productos de la contabilidad.
+ * @returns {void}
+ */
+function closeInventoryAccounting() {
+  if (!currentAccounting?.products?.length) return;
+
+  const productIds = new Set(
+    currentAccounting.products.map((p) => p.productId)
+  );
+  const inventory = getData(PAGE_INVENTORY) || [];
+  
+  inventory.forEach((inv) => {
+    if (
+      inv.date === currentAccounting.date &&
+      inv.status === "CONFIRMED" &&
+      productIds.has(inv.productId)
+    ) {
+      inv.status = "CLOSED";
+    }
+  });
+
+  setData(PAGE_INVENTORY, inventory);
+}
+
+/**
  * Cierra la contabilidad
  * @returns {void}
  */
@@ -1015,6 +1042,7 @@ function closeAccounting() {
   currentAccounting.closedAt = new Date().toISOString();
 
   updateProductsAccountingStock();
+  closeInventoryAccounting();
 
   saveAccounting();
   renderAccounting();

@@ -172,10 +172,11 @@ function openAddInventoryModal(productId) {
     (inv) =>
       inv.productId === productId &&
       inv.date === date &&
-      inv.status === "CONFIRMED"
+      ["CONFIRMED", "CLOSED"].includes(inv.status)
   );
 
   // Cargar valores existentes o limpiar campos
+  const isClosed = existingInventory?.status === "CLOSED";
   if (existingInventory) {
     warehouseInput.value =
       existingInventory.warehouseQuantity !== null &&
@@ -190,6 +191,25 @@ function openAddInventoryModal(productId) {
   } else {
     warehouseInput.value = "";
     storeInput.value = "";
+  }
+
+  // Inventarios cerrados (contabilidad cerrada): solo lectura, no permitir guardar
+  if (isClosed) {
+    warehouseInput.readOnly = true;
+    storeInput.readOnly = true;
+    const btnConfirm = document.getElementById(BTN_ID_CONFIRM_INVENTORY);
+    if (btnConfirm) {
+      btnConfirm.disabled = true;
+      btnConfirm.setAttribute("title", "Contabilidad cerrada: no se puede editar");
+    }
+  } else {
+    warehouseInput.readOnly = false;
+    storeInput.readOnly = false;
+    const btnConfirm = document.getElementById(BTN_ID_CONFIRM_INVENTORY);
+    if (btnConfirm) {
+      btnConfirm.disabled = false;
+      btnConfirm.removeAttribute("title");
+    }
   }
 
   // Limpiar errores
@@ -359,6 +379,18 @@ function saveInventoryFromModal() {
   const result = getValidatedInventoryValuesFromModal();
   if (!result.valid) return;
 
+  // No permitir guardar si el inventario ya está cerrado (contabilidad cerrada)
+  const inventory = getData(PAGE_INVENTORY) || [];
+  const existing = inventory.find(
+    (inv) =>
+      inv.productId === result.productId &&
+      inv.date === result.date
+  );
+  if (existing?.status === "CLOSED") {
+    showSnackbar("No se puede editar: la contabilidad de esta fecha está cerrada");
+    return;
+  }
+
   saveInventory(result.productId, result.date, result.warehouseQuantity, result.storeQuantity);
 
   // Cerrar modal y actualizar vista
@@ -381,6 +413,12 @@ function openDeleteInventoryModal(inventoryId) {
   const inventory = getData("inventory") || [];
   const inv = inventory.find((i) => i.id === inventoryId);
   if (!inv) return;
+
+  // No permitir eliminar inventarios cerrados (contabilidad cerrada)
+  if (inv.status === "CLOSED") {
+    showSnackbar("No se puede eliminar: la contabilidad de esta fecha está cerrada");
+    return;
+  }
 
   const products = getData("products") || [];
   const product = products.find((p) => p.id === inv.productId);
@@ -547,12 +585,26 @@ function renderPartialInventoryList(inventoryCounts) {
 
     const btnAdd = node.querySelector(".btn-add-inventory");
     if (btnAdd) {
-      btnAdd.onclick = () => openAddInventoryModal(inv.productId);
+      if (inv.status === "CLOSED") {
+        btnAdd.disabled = true;
+        btnAdd.classList.add("opacity-50");
+        btnAdd.setAttribute("title", "Contabilidad cerrada: no se puede editar");
+        btnAdd.style.cursor = "not-allowed";
+      } else {
+        btnAdd.onclick = () => openAddInventoryModal(inv.productId);
+      }
     }
 
     const btnDelete = node.querySelector(".btn-delete-inventory");
     if (btnDelete) {
-      btnDelete.onclick = () => openDeleteInventoryModal(inv.id);
+      if (inv.status === "CLOSED") {
+        btnDelete.disabled = true;
+        btnDelete.classList.add("opacity-50");
+        btnDelete.setAttribute("title", "Contabilidad cerrada: no se puede eliminar");
+        btnDelete.style.cursor = "not-allowed";
+      } else {
+        btnDelete.onclick = () => openDeleteInventoryModal(inv.id);
+      }
     }
 
     list.appendChild(node);
@@ -603,13 +655,21 @@ function renderCompletedInventoryList(inventoryCounts) {
 
     const btnDelete = node.querySelector(".btn-delete-inventory");
     if (btnDelete) {
-      // Deshabilitar botón de eliminar para productos con stock cero
+      // Deshabilitar para productos con stock cero o inventarios cerrados (contabilidad cerrada)
       if (inv.isZeroStock || inv.id?.startsWith("zero-stock-")) {
         btnDelete.disabled = true;
         btnDelete.classList.add("opacity-50");
         btnDelete.setAttribute(
           "title",
           "No se puede eliminar: producto sin stock"
+        );
+        btnDelete.style.cursor = "not-allowed";
+      } else if (inv.status === "CLOSED") {
+        btnDelete.disabled = true;
+        btnDelete.classList.add("opacity-50");
+        btnDelete.setAttribute(
+          "title",
+          "Contabilidad cerrada: no se puede eliminar"
         );
         btnDelete.style.cursor = "not-allowed";
       } else {
@@ -635,9 +695,9 @@ function renderInventory() {
   // Filtrar productos por búsqueda
   const filteredProducts = filterInventoryProductsByName(allProducts);
 
-  // Obtener inventarios del día seleccionado
+  // Obtener inventarios del día seleccionado (CONFIRMED y CLOSED se muestran)
   const dayInventory = allInventory.filter(
-    (inv) => inv.date === date && inv.status === "CONFIRMED"
+    (inv) => inv.date === date && ["CONFIRMED", "CLOSED"].includes(inv.status)
   );
 
   // Separar inventarios en parciales y completados
@@ -670,7 +730,7 @@ function renderInventory() {
 
   // Productos con stock cero: persistir inventario 0/0 y mostrarlos como completados
   zeroStockProducts.forEach((product) => {
-    saveInventory(product.id, date, 0, 0,);
+    saveInventory(product.id, date, 0, 0);
 
     // Crear inventario virtual para productos con stock cero
     const virtualInventory = {
