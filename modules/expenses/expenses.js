@@ -145,7 +145,7 @@ function openAddExpenseModal() {
   // Limpiar formulario
   conceptInput.value = "";
   amountInput.value = "";
-  dateInput.value = new Date().toISOString().split("T")[0];
+  dateInput.value = EXPENSES_STATE.filterDate || new Date().toISOString().split("T")[0];
   if (noteInput) noteInput.value = "";
 
   clearExpenseErrors();
