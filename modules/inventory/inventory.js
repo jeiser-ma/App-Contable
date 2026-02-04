@@ -396,7 +396,7 @@ function saveInventoryFromModal() {
       inv.date === result.date
   );
   if (isInventoryClosed(existing)) {
-    showSnackbar("No se puede editar: la contabilidad de esta fecha está cerrada");
+    showToast("No se puede editar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER,3);
     return;
   }
 
@@ -425,7 +425,7 @@ function openDeleteInventoryModal(inventoryId) {
 
   // No permitir eliminar inventarios cerrados (contabilidad cerrada)
   if (isInventoryClosed(inv)) {
-    showSnackbar("No se puede eliminar: la contabilidad de esta fecha está cerrada");
+    showToast("No se puede eliminar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER,3);
     return;
   }
 
@@ -452,7 +452,7 @@ function confirmDeleteInventory() {
 
   // No permitir eliminar inventarios cerrados (contabilidad cerrada)
   if (isInventoryClosed(deleted)) {
-    showSnackbar("No se puede eliminar: la contabilidad de esta fecha está cerrada");
+    showToast("No se puede eliminar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER,3);
     return;
   }
 

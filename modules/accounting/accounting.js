@@ -956,7 +956,6 @@ function reopenAccounting() {
   saveAccounting();
   renderAccounting();
   showToast("Contabilidad reabierta correctamente", TOAST_COLORS.WARNING,3);
-  //showSnackbar("Contabilidad reabierta correctamente");
 }
 
 /**
@@ -968,18 +967,18 @@ function confirmCloseAccounting() {
 
   // Validar que no haya productos sin inventario
   if (validateInventory()) {
-    showSnackbar("No se puede cerrar: faltan productos sin inventario");
+    showToast("No se puede cerrar: faltan productos sin inventario", TOAST_COLORS.DANGER,3);
     return;
   }
 
   // Validar que haya ventas en efectivo o transferencia
   if (currentAccounting.cashSales === 0 || currentAccounting.transferSales === 0) {
-    showSnackbar("No se puede cerrar: faltan ventas en efectivo o transferencia");
+    showToast("No se puede cerrar: faltan ventas en efectivo o transferencia", TOAST_COLORS.DANGER,3);
     return;
   }
 
   if (currentAccounting.closed) {
-    showSnackbar("Esta contabilidad ya está cerrada");
+    showToast("Esta contabilidad ya está cerrada", TOAST_COLORS.PRIMARY,3);
     return;
   }
 
@@ -1061,7 +1060,6 @@ function closeAccounting() {
   saveAccounting();
   renderAccounting();
   showToast("Contabilidad cerrada correctamente", TOAST_COLORS.WARNING,3);
-  //showSnackbar("Contabilidad cerrada correctamente");
 }
 
 
