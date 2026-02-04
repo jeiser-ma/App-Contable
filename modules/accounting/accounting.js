@@ -955,7 +955,7 @@ function reopenAccounting() {
 
   saveAccounting();
   renderAccounting();
-  showToast("Contabilidad reabierta correctamente", TOAST_COLORS.WARNING,3);
+  showToast("Contabilidad reabierta correctamente", TOAST_COLORS.SUCCESS,3);
 }
 
 /**
@@ -1059,7 +1059,7 @@ function closeAccounting() {
 
   saveAccounting();
   renderAccounting();
-  showToast("Contabilidad cerrada correctamente", TOAST_COLORS.WARNING,3);
+  showToast("Contabilidad cerrada correctamente", TOAST_COLORS.SUCCESS,3);
 }
 
 
