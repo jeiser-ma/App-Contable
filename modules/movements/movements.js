@@ -191,7 +191,7 @@ function openAddMovementModal() {
   }
 
   // Fecha por defecto = hoy
-  dateInput.value = new Date().toISOString().split("T")[0];
+  dateInput.value = MOVEMENTS_STATE.filterDate || new Date().toISOString().split("T")[0];
 
   // Configurar autocomplete para el campo de producto
   initProductAutocomplete(productInput);
