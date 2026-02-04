@@ -1,17 +1,25 @@
 <div
   id="snackbar"
-  class="position-fixed start-50 translate-middle-x mb-3 d-none"
+  class="position-fixed end-0 start-0 mx-2 w-auto mb-3 d-none rounded-pill bg-dark bg-opacity-75"
   style="bottom: 60px; z-index: 1055;"
 >
-  <div class="bg-dark text-white rounded-pill px-4 py-2 d-flex align-items-center gap-3 shadow">
+  <div class="d-flex align-items-center gap-1 bg-dark bg-opacity-75 text-white rounded-pill px-3 py-2 shadow"
+  >
 
-    <span id="snackbarText" class="text-nowrap">Elemento eliminado</span>
+    <div id="snackbarText" class="flex-grow-1">Elemento eliminado</div>
 
     <button
       class="btn rounded-pill btn-link btn-sm text-warning text-decoration-none p-0"
       id="btnUndo">
       Deshacer
     </button>
+
+    <button
+      type="button"
+      class="btn-close btn-close-white ps-2"
+      id="snackbarClose"
+      aria-label="Cerrar"
+    ></i></button>
 
   </div>
 </div>

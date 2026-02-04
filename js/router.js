@@ -187,6 +187,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Loading component snackbar");
     loadComponent("snackbar");
 
+    // Cargamos el componente toast para notificaciones (mensaje, color, duración)
+    console.log("Loading component toast");
+    loadComponent("toast");
+
     // Cargamos la página inicial
     console.log("Loading home page");
     loadPage(PAGE_HOME); //poner el home

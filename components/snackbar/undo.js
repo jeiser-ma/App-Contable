@@ -2,6 +2,7 @@
 const ID_BTN_UNDO = "btnUndo";
 const ID_SNACKBAR = "snackbar";
 const ID_SNACKBAR_TEXT = "snackbarText";
+const ID_SNACKBAR_CLOSE = "snackbarClose";
 
 //#endregion
 
@@ -23,8 +24,9 @@ const UNDO_STATE = {
 function showSnackbar(text) {
   const bar = document.getElementById(ID_SNACKBAR);
   const btnUndo = document.getElementById(ID_BTN_UNDO);
+  const btnClose = document.getElementById(ID_SNACKBAR_CLOSE);
   
-  if (!bar || !btnUndo) return;
+  if (!bar || !btnUndo || !btnClose) return;
 
   document.getElementById(ID_SNACKBAR_TEXT).textContent = text;
   bar.classList.remove("d-none");
@@ -115,3 +117,11 @@ function undoDelete() {
   hideSnackbar(); // Esta función ya remueve el listener
   clearUndoState();
 }
+
+
+// Delegación: el snackbar se carga después en components-container
+document.getElementById(ID_COMPONENTS_CONTAINER)?.addEventListener("click", (e) => {
+  if (e.target.id === ID_SNACKBAR_CLOSE) {
+    hideSnackbar();
+  }
+});

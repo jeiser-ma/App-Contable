@@ -151,6 +151,9 @@ function setupClickableCards() {
       e.preventDefault();
       e.stopPropagation();
       console.log("Botón ver detalles clickeado");
+
+      showToast("Mostrando detalles " + getToday(), TOAST_COLORS.PRIMARY, 100);
+
       if (typeof loadPage === "function") {
         loadPage("accounting");
         // Establecer la fecha de hoy en el filtro de contabilidad
