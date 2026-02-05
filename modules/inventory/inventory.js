@@ -513,7 +513,7 @@ function renderPendingInventoryList(products, allComplete = false) {
         "Todos los productos tienen inventario del día",
         "bi-check-circle",
         "Ir a Contabilidad",
-        () => navigateToAccountingWithDateFilter(INVENTORY_STATE.filterDate)
+        () => navigateToPageWithDateFilter(PAGE_ACCOUNTING, INVENTORY_STATE.filterDate)
       );
       if (placeholder) list.appendChild(placeholder);
     }
@@ -647,9 +647,7 @@ function renderCompletedInventoryList(inventoryCounts) {
   if (inventoryCounts.length === 0) {
     const placeholder = createEmptyStatePlaceholder(
       "No hay inventarios realizados para esta fecha",
-      "bi-clipboard-minus",
-      "Ir a inventarios",
-      () => navigateToPage(PAGE_INVENTORY)
+      "bi-clipboard-minus"
     );
     if (placeholder) list.appendChild(placeholder);
     return;

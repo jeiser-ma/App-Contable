@@ -7,6 +7,7 @@
 const ID_ACCOUNTING_PRODUCTS_LIST = "accountingProductsList";
 // ids de alerta de inventario faltante
 const ID_ALERT_MISSING_INVENTORY = "alertMissingInventory";
+const ID_BTN_GO_TO_INVENTORY = "btnGoToInventory";
 // ids de template de productos
 const ID_ACCOUNTING_PRODUCT_CARD_TEMPLATE = "accountingProductCardTemplate";
 const CLASS_ACCOUNTING_PRODUCT_NAME = "accounting-product-name";
@@ -25,6 +26,7 @@ const CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT = "accounting-product-total-amount";
 const ID_ACCOUNTING_EXPENSES_LIST = "accountingExpensesList";
 // ids de alerta de gastos faltantes
 const ID_ALERT_NO_EXPENSES = "alertNoExpenses";
+const ID_BTN_GO_TO_EXPENSES = "btnGoToExpenses";
 // ids de template de gastos
 const ID_ACCOUNTING_EXPENSE_CARD_TEMPLATE = "accountingExpenseCardTemplate";
 const CLASS_ACCOUNTING_EXPENSE_CONCEPT = "accounting-expense-concept";
@@ -204,6 +206,10 @@ async function renderAccounting() {
   const alertMissingInventory = document.getElementById(ID_ALERT_MISSING_INVENTORY);
   if (alertMissingInventory) {
     alertMissingInventory.classList.toggle("d-none", !missingInventory);
+    const btnGoToInv = document.getElementById(ID_BTN_GO_TO_INVENTORY);
+    if (btnGoToInv) {
+      btnGoToInv.onclick = () => navigateToPageWithDateFilter(PAGE_INVENTORY, currentAccounting.date);
+    }
   }
 
   // Validar gastos
@@ -211,6 +217,10 @@ async function renderAccounting() {
   const alertNoExpenses = document.getElementById(ID_ALERT_NO_EXPENSES);
   if (alertNoExpenses) {
     alertNoExpenses.classList.toggle("d-none", !noExpenses);
+    const btnGoToExp = document.getElementById(ID_BTN_GO_TO_EXPENSES);
+    if (btnGoToExp) {
+      btnGoToExp.onclick = () => navigateToPageWithDateFilter(PAGE_EXPENSES, currentAccounting.date);
+    }
   }
 
   // Renderizar lista de productos

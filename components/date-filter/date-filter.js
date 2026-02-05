@@ -87,22 +87,23 @@ async function linkDateAndChipsFilters(moduleName, moduleState, controlName) {
 }
 
 
+
 /**
- * Navega a la página de contabilidad con una fecha filtrada
+ * Navega a la página especificada con una fecha filtrada
+ * @param {string} page - Nombre de la página
  * @param {string} date - Fecha YYYY-MM-DD
  * @returns {void}
  */
-async function navigateToAccountingWithDateFilter(date) {
-  console.log("navigateToAccountingWithDateFilter execution>>>>>> ", date);
+async function navigateToPageWithDateFilter(page, date) {
+  console.log("navigateToPageWithDateFilter execution>>>>>> ", page, date);
   if (typeof loadPage === "function") {
-    // Cargar la página de contabilidad
-    await loadPage(PAGE_ACCOUNTING);
+    // Cargar la página
+    await loadPage(page);
 
-    // Establecer la fecha de hoy en el filtro de contabilidad
-    //ACCOUNTING_STATE.filterDate = date;
-    // obtener el control de fecha
+    // Establecer la fecha en el filtro de la página
+    // obtener el control de fecha de la página
     const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
-    // dispara el evento change para cargar la contabilidad de la fecha seleccionada
+    // dispara el evento change para cargar la página con la fecha seleccionada
     if (dateFilter) {
       dateFilter.value = date;
       dateFilter.onchange();
