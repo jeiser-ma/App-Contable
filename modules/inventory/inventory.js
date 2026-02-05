@@ -122,9 +122,12 @@ async function setupInventoryControls() {
   //setupOrderBy(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
 
   // el inventario no tiene campo de chips filter
-  //await loadModuleControl(CONTROL_CHIPS_FILTER);
+  await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  //setupChipsFilter(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+  await setupChipsFilter(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+
+  // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
+  await linkDateAndChipsFilters(PAGE_INVENTORY, INVENTORY_STATE, CONTROL_DATE_FILTER);
 
   // el inventario no tiene control de contador de elementos
   //await loadModuleControl(CONTROL_LIST_COUNTER);

@@ -44,8 +44,10 @@ function setupDateFilter(moduleName, moduleState, renderFn) {
 async function linkDateAndChipsFilters(moduleName, moduleState, controlName) {
 
   console.warn("linkDateAndChipsFilters>>>>>: " + controlName + " ---> " + moduleName);
+  // Verificar si el modulo es uno de los que tiene chips de fecha
+  const hasModuleChipsDate = [PAGE_ACCOUNTING, PAGE_INVENTORY].includes(moduleName);
   // Validar que sea un modulo con chips de fecha
-  if (moduleName === PAGE_ACCOUNTING) {
+  if (hasModuleChipsDate) {
     
     // obtener el estado del modulo
     // const moduleState = getModuleState(moduleName);

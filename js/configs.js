@@ -152,18 +152,18 @@ const PAGES_CONFIG = {
     sortOptions: [],
     chips: [
       {
-        id: "chip-filter-store",
-        label: "Tienda",
-        icon: "bi-shop-window",
-        color: "btn-outline-success",
-        value: "storeQuantity",
+        id: "chip-filter-yesterday",
+        label: "Ayer",
+        icon: "bi-calendar-event",
+        color: "btn-outline-primary",
+        value: "yesterday",
       },
       {
-        id: "chip-filter-warehouse",
-        label: "Almacén",
-        icon: "bi-houses",
-        color: "btn-outline-primary",
-        value: "warehouseQuantity",
+        id: "chip-filter-today",
+        label: "Hoy",
+        icon: "bi-calendar-event-fill",
+        color: "btn-outline-success",
+        value: "today",
       }
     ]
   },
