@@ -431,12 +431,8 @@ function renderProductsList(products) {
   prodList.innerHTML = "";
 
   if (products.length === 0) {
-    prodList.innerHTML = `
-      <div class="text-center text-muted py-4">
-        <i class="bi bi-search"></i>
-        <p class="mb-0">No se encontraron productos</p>
-      </div>
-    `;
+    const placeholder = createEmptyStatePlaceholder("No se encontraron productos");
+    if (placeholder) prodList.appendChild(placeholder);
     return;
   }
 

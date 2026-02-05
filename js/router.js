@@ -191,6 +191,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Loading component toast");
     loadComponent("toast");
 
+    // Cargamos el componente empty-state para placeholders de listas vacías
+    console.log("Loading component empty-state");
+    loadComponent("empty-state");
+
     // Cargamos la página inicial
     console.log("Loading home page");
     loadPage(PAGE_HOME); //poner el home

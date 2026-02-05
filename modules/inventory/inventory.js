@@ -509,12 +509,13 @@ function renderPendingInventoryList(products, allComplete = false) {
   if (products.length === 0) {
     // Solo mostrar mensaje si todos los productos tienen inventario completo (ambos valores)
     if (allComplete) {
-      list.innerHTML = `
-        <div class="text-center text-muted py-4">
-          <i class="bi bi-check-circle"></i>
-          <p class="mb-0">Todos los productos tienen inventario del día</p>
-        </div>
-      `;
+      const placeholder = createEmptyStatePlaceholder(
+        "Todos los productos tienen inventario del día",
+        "bi-check-circle",
+        "Ir a Contabilidad",
+        () => navigateToAccountingWithDateFilter(INVENTORY_STATE.filterDate)
+      );
+      if (placeholder) list.appendChild(placeholder);
     }
     return;
   }
@@ -539,6 +540,30 @@ function renderPendingInventoryList(products, allComplete = false) {
   });
 }
 
+
+/**
+ * Navega a la página de productos con un filtro aplicado
+ * @param {string} date - Fecha YYYY-MM-DD
+ * @returns {void}
+ */
+async function navigateToAccountingWithDateFilter(date) {
+  console.log("navigateToAccountingWithDateFilter execution>>>>>> ", date);
+  if (typeof loadPage === "function") {
+    // Cargar la página de contabilidad
+    await loadPage(PAGE_ACCOUNTING);
+
+    // Establecer la fecha de hoy en el filtro de contabilidad
+    //ACCOUNTING_STATE.filterDate = date;
+    // obtener el control de fecha
+    const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
+    // dispara el evento change para cargar la contabilidad de la fecha seleccionada
+    if (dateFilter) {
+      dateFilter.value = date;
+      dateFilter.onchange();
+    }
+  }
+}
+
 /**
  * Renderiza la lista de productos parciales
  * @param {Array} inventoryCounts - Lista de conteos de inventario parciales
@@ -554,7 +579,12 @@ function renderPartialInventoryList(inventoryCounts) {
   list.replaceChildren();
 
   if (inventoryCounts.length === 0) {
-    return; // No mostrar mensaje si no hay parciales
+    const placeholder = createEmptyStatePlaceholder(
+      "No hay inventarios parciales para esta fecha",
+      "bi-clipboard"
+    );
+    if (placeholder) list.appendChild(placeholder);
+    return;
   }
 
   inventoryCounts.forEach((inv) => {
@@ -639,12 +669,13 @@ function renderCompletedInventoryList(inventoryCounts) {
   list.replaceChildren();
 
   if (inventoryCounts.length === 0) {
-    list.innerHTML = `
-      <div class="text-center text-muted py-4">
-        <i class="bi bi-clipboard-minus"></i>
-        <p class="mb-0">No hay inventarios realizados para esta fecha</p>
-      </div>
-    `;
+    const placeholder = createEmptyStatePlaceholder(
+      "No hay inventarios realizados para esta fecha",
+      "bi-clipboard-minus",
+      "Ir a inventarios",
+      () => navigateToPage(PAGE_INVENTORY)
+    );
+    if (placeholder) list.appendChild(placeholder);
     return;
   }
 

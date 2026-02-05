@@ -9,7 +9,7 @@
  */
 function onHomePageLoaded() {
   console.log("onHomePageLoaded execution");
-  
+
   // Usar setTimeout para asegurar que el DOM esté completamente renderizado
   setTimeout(() => {
     updateDashboard();
@@ -24,7 +24,7 @@ function onHomePageLoaded() {
  */
 function updateDashboard() {
   console.log("updateDashboard ejecutado");
-  
+
   // Obtener datos
   const products = getData(PAGE_PRODUCTS) || [];
   const movements = getData(PAGE_MOVEMENTS) || [];
@@ -107,15 +107,15 @@ function formatCurrency(amount) {
  */
 function setupClickableCards() {
   console.log("setupClickableCards ejecutado");
-  
+
   const cardLowStock = document.getElementById("cardLowStock");
   const cardCriticalStock = document.getElementById("cardCriticalStock");
   const btnViewAccountingDetails = document.getElementById("btnViewAccountingDetails");
-  
+
   console.log("cardLowStock:", cardLowStock);
   console.log("cardCriticalStock:", cardCriticalStock);
   console.log("btnViewAccountingDetails:", btnViewAccountingDetails);
-  
+
   if (cardLowStock) {
     // Remover listener anterior si existe
     cardLowStock.removeEventListener("click", cardLowStock._clickHandler);
@@ -129,7 +129,7 @@ function setupClickableCards() {
   } else {
     console.error("No se encontró cardLowStock");
   }
-  
+
   if (cardCriticalStock) {
     // Remover listener anterior si existe
     cardCriticalStock.removeEventListener("click", cardCriticalStock._clickHandler);
@@ -143,7 +143,7 @@ function setupClickableCards() {
   } else {
     console.error("No se encontró cardCriticalStock");
   }
-  
+
   if (btnViewAccountingDetails) {
     // Remover listener anterior si existe
     btnViewAccountingDetails.removeEventListener("click", btnViewAccountingDetails._clickHandler);
@@ -153,21 +153,9 @@ function setupClickableCards() {
       console.log("Botón ver detalles clickeado");
 
       if (typeof loadPage === "function") {
-        loadPage("accounting");
-        // Establecer la fecha de hoy en el filtro de contabilidad
-        setTimeout(() => {
-          const dateFilter = document.getElementById("accountingDateFilter");
-          if (dateFilter) {
-            dateFilter.value = getToday();
-            // Disparar el evento change para cargar la contabilidad de hoy
-            if (dateFilter.onchange) {
-              dateFilter.onchange();
-            } else {
-              const event = new Event("change");
-              dateFilter.dispatchEvent(event);
-            }
-          }
-        }, 300);
+        // Cargar la página de contabilidad
+        // Por defecto se carga la contabilidad de hoy
+        loadPage(PAGE_ACCOUNTING);
       }
     };
     btnViewAccountingDetails.addEventListener("click", btnViewAccountingDetails._clickHandler);
@@ -239,34 +227,34 @@ function getSalaryPercentage() {
 function updateAccountingSummary() {
   const today = getToday();
   const yesterday = getYesterday(today);
-  
+
   // Obtener datos
   const allAccounting = getData("accounting") || [];
   let accounting = allAccounting.find(a => a.date === today);
-  
+
   // Si no existe, crear uno nuevo
   if (!accounting) {
     accounting = createTodayAccounting(today, yesterday);
   }
-  
+
   // Actualizar valores en el DOM
   updateMetric("accountingTotalAmount", formatCurrency(accounting.totalAmount || 0));
   updateMetric("accountingTotalExpenses", formatCurrency(accounting.totalExpenses || 0));
   updateMetric("accountingTotalSales", formatCurrency(accounting.totalSales || 0));
-  
+
   // Calcular diferencia
   const difference = (accounting.difference);
   updateMetric("accountingDifference", formatCurrency(difference));
-  
+
   // Aplicar color e icono según la diferencia
   const differenceElement = document.getElementById("accountingDifference");
   const differenceIcon = document.getElementById("accountingDifferenceIcon");
-  
+
   if (differenceElement && differenceIcon) {
     // Remover clases de color anteriores
     differenceElement.classList.remove("text-success", "text-danger", "text-primary");
     differenceIcon.className = "bi";
-    
+
     if (difference === 0) {
       differenceElement.classList.add("text-success");
       differenceIcon.classList.add("bi-check-circle-fill", "text-success");
@@ -291,11 +279,11 @@ function createTodayAccounting(today, yesterday) {
   const movements = getData(PAGE_MOVEMENTS) || [];
   const inventory = getData(PAGE_INVENTORY) || [];
   const expenses = getData(PAGE_EXPENSES) || [];
-  
+
   // Obtener contabilidad de ayer (si existe y está cerrada)
   const allAccounting = getData(PAGE_ACCOUNTING) || [];
   const yesterdayAccounting = allAccounting.find(a => a.date === yesterday && a.closed);
-  
+
   const accountingProducts = products.map(product => {
     // Stock de ayer
     let yesterdayStock = product.quantity;
@@ -305,29 +293,29 @@ function createTodayAccounting(today, yesterday) {
         yesterdayStock = yesterdayProduct.yesterdayStock + yesterdayProduct.yesterdayEntries - yesterdayProduct.yesterdayExits;
       }
     }
-    
+
     // Entradas de ayer
     const yesterdayEntries = movements
       .filter(m => m.date === yesterday && m.type === "IN" && m.productId === product.id)
       .reduce((sum, m) => sum + m.quantity, 0);
-    
+
     // Salidas de ayer
     const yesterdayExits = movements
       .filter(m => m.date === yesterday && m.type === "OUT" && m.productId === product.id)
       .reduce((sum, m) => sum + m.quantity, 0);
-    
+
     // Inventario de hoy
     const todayInventory = inventory.find(inv => inv.date === today && inv.productId === product.id && inv.status === "CONFIRMED");
     let todayInventoryQty = null;
     if (todayInventory) {
       todayInventoryQty = (todayInventory.warehouseQuantity || 0) + (todayInventory.storeQuantity || 0);
     }
-    
+
     // Ventas = stock ayer + entradas ayer - salidas ayer - inventario hoy
-    const sales = todayInventoryQty !== null 
+    const sales = todayInventoryQty !== null
       ? yesterdayStock + yesterdayEntries - yesterdayExits - todayInventoryQty
       : 0;
-    
+
     return {
       productId: product.id,
       yesterdayStock: yesterdayStock,
@@ -339,11 +327,11 @@ function createTodayAccounting(today, yesterday) {
       amount: sales * (product.price || 0)
     };
   });
-  
+
   // Gastos de ayer
   const yesterdayExpenses = expenses.filter(e => e.date === yesterday);
   const totalExpenses = yesterdayExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
-  
+
   // Obtener ventas de contabilidad existente (si existe)
   let cashSales = 0;
   let transferSales = 0;
@@ -352,11 +340,11 @@ function createTodayAccounting(today, yesterday) {
     cashSales = existingAccounting.cashSales || 0;
     transferSales = existingAccounting.transferSales || 0;
   }
-  
+
   const totalAmount = accountingProducts.reduce((sum, p) => sum + p.amount, 0);
   // Total de ventas incluye ventas en efectivo + transferencia + gastos
   const totalSales = cashSales + transferSales + totalExpenses;
-  
+
   return {
     id: existingAccounting?.id || crypto.randomUUID(),
     date: today,

@@ -446,12 +446,8 @@ function renderExpensesList(expenses) {
   list.innerHTML = "";
 
   if (expenses.length === 0) {
-    list.innerHTML = `
-      <div class="text-center text-muted py-4">
-        <i class="bi bi-search"></i>
-        <p class="mb-0">No se encontraron gastos</p>
-      </div>
-    `;
+    const placeholder = createEmptyStatePlaceholder("No se encontraron gastos");
+    if (placeholder) list.appendChild(placeholder);
     return;
   }
 

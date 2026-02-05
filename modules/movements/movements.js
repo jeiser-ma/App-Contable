@@ -435,13 +435,8 @@ function renderMovementsList(movements) {
   movementsList.replaceChildren();
 
   if (movements.length === 0) {
-    // Mostrar mensaje si no hay movimientos
-    movementsList.innerHTML = `
-      <div class="text-center text-muted py-4">
-        <i class="bi bi-search"></i>
-        <p class="mb-0">No se encontraron movimientos</p>
-      </div>
-    `;
+    const placeholder = createEmptyStatePlaceholder("No se encontraron movimientos");
+    if (placeholder) movementsList.appendChild(placeholder);
     return;
   }
 
