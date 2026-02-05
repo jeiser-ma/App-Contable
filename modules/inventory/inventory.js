@@ -540,30 +540,6 @@ function renderPendingInventoryList(products, allComplete = false) {
   });
 }
 
-
-/**
- * Navega a la página de productos con un filtro aplicado
- * @param {string} date - Fecha YYYY-MM-DD
- * @returns {void}
- */
-async function navigateToAccountingWithDateFilter(date) {
-  console.log("navigateToAccountingWithDateFilter execution>>>>>> ", date);
-  if (typeof loadPage === "function") {
-    // Cargar la página de contabilidad
-    await loadPage(PAGE_ACCOUNTING);
-
-    // Establecer la fecha de hoy en el filtro de contabilidad
-    //ACCOUNTING_STATE.filterDate = date;
-    // obtener el control de fecha
-    const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
-    // dispara el evento change para cargar la contabilidad de la fecha seleccionada
-    if (dateFilter) {
-      dateFilter.value = date;
-      dateFilter.onchange();
-    }
-  }
-}
-
 /**
  * Renderiza la lista de productos parciales
  * @param {Array} inventoryCounts - Lista de conteos de inventario parciales
