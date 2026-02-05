@@ -70,6 +70,12 @@ async function onMovementsPageLoaded() {
   // Inicializar el modal después de cargarlo
   await initModalModule(MODAL_MOVEMENTS);
 
+  // Configurar autocomplete del campo de producto del modal
+  initProductAutocomplete();
+
+  // configurar los listeners para el selector de tipo de movimiento del modal
+  setupInOutSelectorListeners();
+
   // Configurar controles del módulo
   await setupMovementsControls();
 
@@ -139,20 +145,17 @@ async function setupMovementsControls() {
  */
 function openAddMovementModal() {
   MOVEMENTS_STATE.elementToEdit = null;
-  MOVEMENTS_STATE.currentType = "in"; // Por defecto entrada
+  // definir tipo de movimiento de entrada por defecto
+  MOVEMENTS_STATE.currentType = "in";
 
-  // Asegurar que el modal esté inicializado
-  initModalModule(MODAL_MOVEMENTS);
+  // definir el header del modal para nuevo movimiento
+  setModalHeader(MODAL_MOVEMENTS, false);
 
-  const title = document.getElementById(ID_MOVEMENT_TITLE);
-  const icon = document.getElementById(ID_MOVEMENT_ICON);
-  const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
+  // Obtener los elementos del modal
   const dateInput = document.getElementById(ID_MOVEMENT_DATE);
   const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
-  const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
-  const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
 
-  if (!title || !icon || !btnConfirm || !dateInput || !productInput) {
+  if (!dateInput || !productInput) {
     console.error("No se encontraron los elementos del modal");
     return;
   }
@@ -161,68 +164,58 @@ function openAddMovementModal() {
   resetMovementForm();
 
   // Configurar tipo por defecto (entrada)
-  if (typeIn) {
-    typeIn.checked = true;
-  }
-  if (typeOut) {
-    typeOut.checked = false;
-  }
+  setInOutSelector("in");
 
-  // Actualizar UI según tipo
-  updateMovementTypeUI();
-
-  // Configurar listeners para el toggle de tipo
-  if (typeIn) {
-    typeIn.onchange = () => {
-      if (typeIn.checked) {
-        MOVEMENTS_STATE.currentType = "in";
-        updateMovementTypeUI();
-      }
-    };
-  }
-
-  if (typeOut) {
-    typeOut.onchange = () => {
-      if (typeOut.checked) {
-        MOVEMENTS_STATE.currentType = "out";
-        updateMovementTypeUI();
-      }
-    };
-  }
-
-  // Fecha por defecto = hoy
+  // establecer la fecha del filtro de fecha sino la fecha de hoy
   dateInput.value = MOVEMENTS_STATE.filterDate || new Date().toISOString().split("T")[0];
-
-  // Configurar autocomplete para el campo de producto
-  initProductAutocomplete(productInput);
 
   // Mostrar el formulario después de hacer todos los ajustes
   showModalModules();
 }
 
+
 /**
- * Actualiza la UI del modal según el tipo de movimiento seleccionado
+ * Configura los listeners para el selector de tipo de movimiento
  * @returns {void}
  */
-function updateMovementTypeUI() {
-  const title = document.getElementById(ID_MOVEMENT_TITLE);
-  const icon = document.getElementById(ID_MOVEMENT_ICON);
-  const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
+function setupInOutSelectorListeners() {
+  // obtener los elementos del selector
+  const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
+  const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
 
-  if (!title || !icon || !btnConfirm) return;
+  // verificar que se encontraron los elementos del selector
+  if (!typeIn || !typeOut) {
+    console.error("No se encontraron los elementos del selector");
+    return;
+  }
 
-  if (MOVEMENTS_STATE.currentType === "in") {
-    title.textContent = MOVEMENTS_STATE.elementToEdit
-      ? "Editar entrada de producto"
-      : "Entrada de producto";
-    icon.className = "bi bi-arrow-right text-success";
-    btnConfirm.className = "btn btn-success rounded-pill btn-sm";
-  } else {
-    title.textContent = MOVEMENTS_STATE.elementToEdit
-      ? "Editar salida de producto"
-      : "Salida de producto";
-    icon.className = "bi bi-arrow-left text-danger";
-    btnConfirm.className = "btn btn-danger rounded-pill btn-sm";
+  // configurar el listener para el tipo de movimiento "in"
+  typeIn.onclick = () => {
+    MOVEMENTS_STATE.currentType = "in";
+    console.log("typeIn clicked, MOVEMENTS_STATE.currentType: ", MOVEMENTS_STATE.currentType);
+  };
+
+  // configurar el listener para el tipo de movimiento "out"
+  typeOut.onclick = () => {
+    MOVEMENTS_STATE.currentType = "out";
+    console.log("typeOut clicked, MOVEMENTS_STATE.currentType: ", MOVEMENTS_STATE.currentType);
+  };
+}
+
+
+/**
+ * Configura el selector de tipo de movimiento
+ * @param {string} type - Tipo de movimiento ("in" | "out")
+ * @returns {void}
+ */
+function setInOutSelector(type) {
+  // obtener el elemento del selector según el tipo
+  const typeElem = type === "out"
+    ? document.getElementById(ID_MOVEMENT_TYPE_OUT)
+    : document.getElementById(ID_MOVEMENT_TYPE_IN);
+
+  if (typeElem) {
+    typeElem.click();
   }
 }
 
@@ -377,8 +370,8 @@ function filterMovements(movements) {
  */
 function sortMovements(movements) {
   return [...movements].sort((a, b) => {
-      v1 = a[MOVEMENTS_STATE.orderBy];
-      v2 = b[MOVEMENTS_STATE.orderBy];
+    v1 = a[MOVEMENTS_STATE.orderBy];
+    v2 = b[MOVEMENTS_STATE.orderBy];
 
     // Para fechas, comparar directamente
     if (MOVEMENTS_STATE.orderBy === "date") {
@@ -655,13 +648,13 @@ function saveMovementFromModal() {
     const updatedMovements = movements.map((m) =>
       m.id === MOVEMENTS_STATE.elementToEdit
         ? {
-            ...m,
-            productId: product.id,
-            type: MOVEMENTS_STATE.currentType.toUpperCase(),
-            quantity: quantity,
-            date: date,
-            note: note || "",
-          }
+          ...m,
+          productId: product.id,
+          type: MOVEMENTS_STATE.currentType.toUpperCase(),
+          quantity: quantity,
+          date: date,
+          note: note || "",
+        }
         : m
     );
     setData(PAGE_MOVEMENTS, updatedMovements);
@@ -738,24 +731,28 @@ function clearInputError(inputId) {
 }
 
 /**
- * Inicializa el autocomplete para el campo de producto
- * Crea un datalist con todos los productos disponibles
- * @param {HTMLElement} input - Elemento input del producto
+ * Inicializa el autocompletado del input de producto en el modal de movimientos.
+ * Crea un <datalist> con los nombres de todos los productos y lo asocia al input
+ * para que el navegador muestre sugerencias al escribir.
  * @returns {void}
  */
-function initProductAutocomplete(input) {
+function initProductAutocomplete() {
+  // obtener los productos
   const products = getData(PAGE_PRODUCTS);
+  // obtener el input de producto
+  const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
 
-  // Crear o actualizar el datalist
-  let datalist = document.getElementById("productsDatalist");
-  if (!datalist) {
-    datalist = document.createElement("datalist");
-    datalist.id = "productsDatalist";
-    document.body.appendChild(datalist);
-  }
+  // verificar que se encontraron los elementos
+  if (!productInput) return;
+  if (!Array.isArray(products)) return;
 
-  // Limpiar opciones previas
-  datalist.innerHTML = "";
+  // Quitar datalist anterior si existe (la función puede llamarse más de una vez)
+  const existing = document.getElementById("productsDatalist");
+  if (existing) existing.remove();
+
+  // crear el datalist de productos
+  const datalist = document.createElement("datalist");
+  datalist.id = "productsDatalist";
 
   // Agregar opciones para cada producto
   products.forEach((product) => {
@@ -764,8 +761,10 @@ function initProductAutocomplete(input) {
     datalist.appendChild(option);
   });
 
-  // Asignar el datalist al input
-  input.setAttribute("list", "productsDatalist");
+  // El datalist debe estar en el DOM para que el input lo use
+  document.body.appendChild(datalist);
+  // asignar el datalist al input de producto
+  productInput.setAttribute("list", "productsDatalist");
 }
 
 // ===============================
@@ -778,74 +777,35 @@ function initProductAutocomplete(input) {
  * @returns {void}
  */
 function openEditMovementModal(id) {
-  const movements = getData(PAGE_MOVEMENTS) || [];
-  const movement = movements.find((m) => m.id === id);
+  // Obtener el movimiento
+  const movement = getDataById(PAGE_MOVEMENTS, id);
   if (!movement) return;
 
-  const products = getData(PAGE_PRODUCTS);
-  const product = products.find((p) => p.id === movement.productId);
+  // Obtener el producto
+  const product = getDataById(PAGE_PRODUCTS, movement.productId);
   if (!product) return;
 
+  // definir el movimiento a editar
   MOVEMENTS_STATE.elementToEdit = id;
-  MOVEMENTS_STATE.currentType = movement.type.toLowerCase();
 
-  // Abrir modal con los datos del movimiento
-  initModalModule(MODAL_MOVEMENTS);
+  // definir el header del modal para editar movimiento
+  setModalHeader(MODAL_MOVEMENTS, true);
 
-  const title = document.getElementById(ID_MOVEMENT_TITLE);
-  const icon = document.getElementById(ID_MOVEMENT_ICON);
-  const btnConfirm = document.getElementById(BTN_ID_CONFIRM_MOVEMENT);
+  // definir el tipo de movimiento
+  // actualiza el movement_state y el selector de tipo de movimiento
+  setInOutSelector(movement.type.toLowerCase());
+
   const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
   const quantityInput = document.getElementById(ID_MOVEMENT_QUANTITY);
   const dateInput = document.getElementById(ID_MOVEMENT_DATE);
   const noteInput = document.getElementById(ID_MOVEMENT_NOTE);
-  const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
-  const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
 
-  if (
-    !title ||
-    !icon ||
-    !btnConfirm ||
-    !productInput ||
-    !quantityInput ||
-    !dateInput
+  // verificar que se encontraron todos los elementos del modal
+  if (!productInput || !quantityInput || !dateInput
   ) {
     console.error("No se encontraron los elementos del modal");
     return;
   }
-
-  // Configurar tipo en el selector
-  if (typeIn && typeOut) {
-    if (movement.type === "IN") {
-      typeIn.checked = true;
-      typeOut.checked = false;
-    } else {
-      typeIn.checked = false;
-      typeOut.checked = true;
-    }
-  }
-
-  // Configurar listeners para el toggle de tipo
-  if (typeIn) {
-    typeIn.onchange = () => {
-      if (typeIn.checked) {
-        MOVEMENTS_STATE.currentType = "in";
-        updateMovementTypeUI();
-      }
-    };
-  }
-
-  if (typeOut) {
-    typeOut.onchange = () => {
-      if (typeOut.checked) {
-        MOVEMENTS_STATE.currentType = "out";
-        updateMovementTypeUI();
-      }
-    };
-  }
-
-  // Actualizar UI según tipo
-  updateMovementTypeUI();
 
   // Llenar campos con datos del movimiento
   productInput.value = product.name;
@@ -860,9 +820,6 @@ function openEditMovementModal(id) {
   clearInputError(ID_MOVEMENT_QUANTITY);
   clearInputError(ID_MOVEMENT_DATE);
 
-  // Configurar autocomplete
-  initProductAutocomplete(productInput);
-
   // Mostrar modal
   showModalModules();
 }
@@ -873,17 +830,20 @@ function openEditMovementModal(id) {
  * @returns {void}
  */
 function openDeleteMovementModal(id) {
+  // definir el movimiento a eliminar
   MOVEMENTS_STATE.elementToDelete = id;
 
-  const movements = getData(PAGE_MOVEMENTS) || [];
-  const movement = movements.find((m) => m.id === id);
+  // Obtener el movimiento
+  const movement = getDataById(PAGE_MOVEMENTS, id);
   if (!movement) return;
 
-  const products = getData(PAGE_PRODUCTS);
-  const product = products.find((p) => p.id === movement.productId);
+  // Obtener el producto
+  const product = getDataById(PAGE_PRODUCTS, movement.productId);
   if (!product) return;
 
+  // definir el tipo de movimiento
   const movementTypeText = movement.type === "IN" ? "entrada" : "salida";
+  // abrir el modal de confirmación de eliminación
   openConfirmDeleteModal(
     "movement",
     id,

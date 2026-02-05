@@ -836,6 +836,7 @@ function renderReopenButton() {
  */
 function openCashSalesModal() {
   initModalModule(MODAL_CASH_SALES);
+  setModalHeader(MODAL_CASH_SALES, false);
   const input = document.getElementById(ID_INPUT_CASH_SALES);
   if (!input || !currentAccounting) return;
 
@@ -850,6 +851,7 @@ function openCashSalesModal() {
  */
 function openTransferSalesModal() {
   initModalModule(MODAL_TRANSFER_SALES);
+  setModalHeader(MODAL_TRANSFER_SALES, false);
   const input = document.getElementById(ID_INPUT_TRANSFER_SALES);
   if (!input || !currentAccounting) return;
 

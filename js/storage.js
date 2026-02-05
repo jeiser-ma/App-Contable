@@ -38,3 +38,18 @@ function setDataById(k, v) {
 
   setData(k, allData);
 }
+
+/**
+ * Obtiene un dato del localStorage por su id
+ * @param {string} k - Clave del dato (ej: PAGE_PRODUCTS - PAGE_MOVEMENTS - PAGE_INVENTORIES - PAGE_EXPENSES)
+ * @param {string} id - ID del dato
+ * @returns {Object} - Valor del dato encontrado o null si no se encuentra
+ */
+function getDataById(k, id) {
+  if (!k || !id) return;
+
+  const allData = getData(k) || [];
+  const data = allData.find(a => a.id === id);
+
+  return data;
+}

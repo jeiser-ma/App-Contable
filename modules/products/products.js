@@ -143,7 +143,7 @@ async function setupProductsControls() {
  * Resetea el formulario y configura el título del modal
  */
 function openAddProductModal() {
-  document.getElementById(ID_PRODUCT_MODAL_TITLE).innerText = "Nuevo producto";
+  setModalHeader(MODAL_PRODUCTS, false);
   document.getElementById(ID_PRODUCT_FORM).reset();
   clearInputError(ID_INPUT_NAME);
   clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
@@ -166,7 +166,7 @@ function openEditProductModal(id) {
   const product = products.find((p) => p.id === id);
   if (!product) return;
 
-  document.getElementById(ID_PRODUCT_MODAL_TITLE).innerText = "Editar producto";
+  setModalHeader(MODAL_PRODUCTS, true);
   clearInputError(ID_INPUT_NAME);
   clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
   clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);

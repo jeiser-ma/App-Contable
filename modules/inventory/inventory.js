@@ -157,6 +157,7 @@ function openAddInventoryModal(productId) {
   }
 
   initModalModule(MODAL_INVENTORY);
+  setModalHeader(MODAL_INVENTORY, false);
 
   const productLabel = document.getElementById(ID_INVENTORY_PRODUCT_LABEL);
   const productStock = document.getElementById("inventoryProductStock");

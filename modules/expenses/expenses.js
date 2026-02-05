@@ -41,6 +41,8 @@ async function onExpensesPageLoaded() {
 
   // Inicializar el modal después de cargarlo
   initModalModule(MODAL_EXPENSES);
+  // Cargar conceptos de gastos en el select 
+  loadExpenseConceptsIntoSelect();
 
   
   // Configurar controles del módulo (buscador, ordenamiento, fecha, botón agregar)
@@ -125,8 +127,10 @@ async function setupExpensesControls() {
 function openAddExpenseModal() {
   EXPENSES_STATE.elementToEdit = null;
 
-  initModalModule(MODAL_EXPENSES);
+  // definir el header del modal para nuevo gasto
+  setModalHeader(MODAL_EXPENSES, false);
 
+  // Obtener los elementos del modal
   const title = document.getElementById(ID_EXPENSE_TITLE);
   const icon = document.getElementById(ID_EXPENSE_ICON);
   const conceptInput = document.getElementById(ID_EXPENSE_CONCEPT);
@@ -139,20 +143,16 @@ function openAddExpenseModal() {
     return;
   }
 
-  title.textContent = "Nuevo gasto";
-  icon.className = "bi bi-cash-coin text-danger";
-
-  // Cargar conceptos de gastos en el select
-  loadExpenseConceptsIntoSelect();
-
-  // Limpiar formulario
+  // Limpiar los campos del formulario
   conceptInput.value = "";
   amountInput.value = "";
   dateInput.value = EXPENSES_STATE.filterDate || new Date().toISOString().split("T")[0];
   if (noteInput) noteInput.value = "";
 
+  // Limpiar errores de validación
   clearExpenseErrors();
 
+  // Mostrar el modal
   showModalModules();
 }
 
@@ -164,9 +164,12 @@ function clearExpenseErrors() {
   [ID_EXPENSE_CONCEPT, ID_EXPENSE_AMOUNT, ID_EXPENSE_DATE].forEach((id) => {
     const input = document.getElementById(id);
     if (!input) return;
+    // Quitar la clase de invalido
     input.classList.remove("is-invalid");
+    // Obtener el feedback del campo
     const feedback = input.nextElementSibling;
     if (feedback && feedback.classList.contains("invalid-feedback")) {
+      // Limpiar el texto del feedback
       feedback.textContent = "";
     }
   });
@@ -259,13 +262,13 @@ function saveExpenseFromModal() {
  * @returns {void}
  */
 function openEditExpenseModal(id) {
-  const expenses = getData(PAGE_EXPENSES) || [];
-  const expense = expenses.find((e) => e.id === id);
+  const expense = getDataById(PAGE_EXPENSES, id);
   if (!expense) return;
 
   EXPENSES_STATE.elementToEdit = id;
 
-  initModalModule(MODAL_EXPENSES);
+  // definir el header del modal
+  setModalHeader(MODAL_EXPENSES, true);
 
   const title = document.getElementById(ID_EXPENSE_TITLE);
   const icon = document.getElementById(ID_EXPENSE_ICON);
@@ -279,21 +282,22 @@ function openEditExpenseModal(id) {
     return;
   }
 
-  title.textContent = "Editar gasto";
-  icon.className = "bi bi-cash-coin text-danger";
-
-  // Cargar conceptos de gastos en el select y seleccionar el del gasto
-  loadExpenseConceptsIntoSelect();
+  // Seleccionar el concepto del gasto
   if (conceptInput && expense.concept) {
     conceptInput.value = expense.concept;
   }
 
+  // llenar el campo de cantidad
   amountInput.value = expense.amount;
+  // llenar el campo de fecha
   dateInput.value = expense.date;
+  // llenar el campo de observaciones
   if (noteInput) noteInput.value = expense.note || "";
 
+  // Limpiar errores de validación
   clearExpenseErrors();
 
+  // Mostrar el modal
   showModalModules();
 }
 

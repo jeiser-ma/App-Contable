@@ -249,53 +249,79 @@ const MODAL_TRANSFER_SALES = "transfer-sales-modal";
 /**
  * @description: Configuración de los modales (centralizada)
  * @type {Object} MODALS_CONFIG
- * @property {string} titleAdd - Título del modal de adición
- * @property {string} titleEdit - Título del modal de edición
- * @info: titleAdd y titleEdit son iguales para los modales que no tienen edición
- * @property {string} icon - Icono del modal
+ * @property {string} titleAdd - Título del modal en modo alta
+ * @property {string} titleEdit - Título del modal en modo edición
+ * @property {string} icon - Clase del icono Bootstrap Icons (ej: "bi-box")
+ * @property {string} [titleId] - ID del elemento donde se establece el título
+ * @property {string} [iconId] - ID del elemento donde se establece el icono
+ * @property {string} [iconExtraClass] - Clases extra del icono (ej: "text-primary px-2")
  */
 const MODALS_CONFIG = {
   // Modales compartidos
   [MODAL_CONFIRM_DELETE]: {
+    titleId: "confirmDeleteTitle",
     titleAdd: "Confirmar eliminación",
     titleEdit: "Confirmar eliminación",
-    icon: "bi-trash",
+    iconId: "confirmDeleteIcon",
+    icon: "bi-exclamation-triangle",
+    iconExtraClass: "text-danger",
   },
   [MODAL_CONFIRM_ACTION]: {
+    titleId: "confirmActionTitle",
     titleAdd: "Confirmar acción",
     titleEdit: "Confirmar acción",
+    iconId: "confirmActionIcon",
     icon: "bi-question-circle",
+    iconExtraClass: "text-primary px-2",
   },
   // Modales de los módulos
   [MODAL_PRODUCTS]: {
+    titleId: "productModalTitle",
     titleAdd: "Nuevo producto",
     titleEdit: "Editar producto",
+    iconId: "productIcon",
     icon: "bi-box",
+    iconExtraClass: "text-primary px-2",
   },
   [MODAL_MOVEMENTS]: {
+    titleId: "movementTitle",
     titleAdd: "Nuevo movimiento",
     titleEdit: "Editar movimiento",
+    iconId: "movementIcon",
     icon: "bi-arrow-repeat",
+    iconExtraClass: "text-success",
   },
   [MODAL_EXPENSES]: {
+    titleId: "expenseTitle",
     titleAdd: "Nuevo gasto",
     titleEdit: "Editar gasto",
+    iconId: "expenseIcon",
     icon: "bi-cash-coin",
+    iconExtraClass: "text-danger",
   },
   [MODAL_INVENTORY]: {
+    titleId: "inventoryTitle",
     titleAdd: "Conteo de inventario",
     titleEdit: "Conteo de inventario",
+    iconId: "inventoryIcon",
     icon: "bi-clipboard-plus",
+    iconExtraClass: "text-primary",
   },
   [MODAL_CASH_SALES]: {
+    titleId: "cashSalesModalTitle",
     titleAdd: "Ventas en efectivo",
     titleEdit: "Ventas en efectivo",
+    iconId: "cashSalesModalIcon",
     icon: "bi-cash",
+    iconExtraClass: "text-success",
   },
   [MODAL_TRANSFER_SALES]: {
+    titleId: "transferSalesModalTitle",
     titleAdd: "Ventas por transferencia",
     titleEdit: "Ventas por transferencia",
+    iconId: "transferSalesModalIcon",
     icon: "bi-credit-card",
+    iconExtraClass: "text-success",
   },
 };
 
