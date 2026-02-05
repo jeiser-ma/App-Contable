@@ -141,7 +141,21 @@ const PAGES_CONFIG = {
         icon: "bi-currency-dollar",
         color: "btn-outline-danger",
         value: "dollars",
-      }*/
+      },*/
+      {
+        id: "chip-filter-yesterday",
+        label: "Ayer",
+        icon: "bi-calendar-event",
+        color: "btn-outline-primary",
+        value: "yesterday",
+      },
+      {
+        id: "chip-filter-today",
+        label: "Hoy",
+        icon: "bi-calendar-event-fill",
+        color: "btn-outline-success",
+        value: "today",
+      }
     ]
   },
   [PAGE_INVENTORY]: {
@@ -151,6 +165,20 @@ const PAGES_CONFIG = {
     isModule: true, // Módulo
     sortOptions: [],
     chips: [
+      /*{
+        id: "chip-filter-store",
+        label: "Tienda",
+        icon: "bi-shop-window",
+        color: "btn-outline-success",
+        value: "storeQuantity",
+      },
+      {
+        id: "chip-filter-warehouse",
+        label: "Almacén",
+        icon: "bi-houses",
+        color: "btn-outline-primary",
+        value: "warehouseQuantity",
+      },*/
       {
         id: "chip-filter-yesterday",
         label: "Ayer",

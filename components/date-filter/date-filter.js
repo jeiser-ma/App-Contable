@@ -45,7 +45,7 @@ async function linkDateAndChipsFilters(moduleName, moduleState, controlName) {
 
   console.warn("linkDateAndChipsFilters>>>>>: " + controlName + " ---> " + moduleName);
   // Verificar si el modulo es uno de los que tiene chips de fecha
-  const hasModuleChipsDate = [PAGE_ACCOUNTING, PAGE_INVENTORY].includes(moduleName);
+  const hasModuleChipsDate = [PAGE_ACCOUNTING, PAGE_INVENTORY, PAGE_EXPENSES].includes(moduleName);
   // Validar que sea un modulo con chips de fecha
   if (hasModuleChipsDate) {
     

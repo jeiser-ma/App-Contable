@@ -97,7 +97,10 @@ async function setupExpensesControls() {
   // cargar el control de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  setupChipsFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+  await setupChipsFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+
+  // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
+  await linkDateAndChipsFilters(PAGE_EXPENSES, EXPENSES_STATE, CONTROL_DATE_FILTER);
 
 
   // Cargar el control de contador de elementos
