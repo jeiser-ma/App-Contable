@@ -617,16 +617,60 @@ function clearInputError(inputId) {
 // ===============================
 
 /**
+ * Indica si un producto está vinculado a movimientos, inventarios (CONFIRMED/CLOSED) o contabilidades cerradas.
+ * No se debe eliminar un producto vinculado.
+ * @param {string} prodId - ID del producto
+ * @returns {boolean} true si está vinculado, false en caso contrario
+ */
+function isProductLinked(prodId) {
+  if (!prodId) return false;
+
+  const movements = getData(PAGE_MOVEMENTS) || [];
+  if (movements.some((m) => m.productId === prodId)) return true;
+
+  const inventory = getData(PAGE_INVENTORY) || [];
+  if (
+    inventory.some(
+      (inv) =>
+        inv.productId === prodId &&
+        (inv.status === "CONFIRMED" || inv.status === "CLOSED")
+    )
+  ) {
+    return true;
+  }
+
+  const accounting = getData(PAGE_ACCOUNTING) || [];
+  if (
+    accounting.some(
+      (acc) =>
+        acc.closed === true &&
+        acc.products?.some((p) => p.productId === prodId)
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Abre el modal para eliminar un producto
  * @param {string} id - ID del producto a eliminar
  * @returns {void}
  */
 function openDeleteProductModal(id) {
-  PRODUCTS_STATE.elementToDelete = id;
-
-  const product = getData(PAGE_PRODUCTS).find((p) => p.id === id);
+  const product = getData(PAGE_PRODUCTS)?.find((p) => p.id === id);
   if (!product) return;
 
+  if (isProductLinked(id)) {
+    showToast(
+      "No se puede eliminar: el producto tiene elementos vinculados", 
+      TOAST_COLORS.DANGER,3
+    );
+    return;
+  }
+
+  PRODUCTS_STATE.elementToDelete = id;
   openConfirmDeleteModal("product", id, product.name);
 }
 
@@ -638,17 +682,27 @@ function openDeleteProductModal(id) {
 function confirmDeleteProduct() {
   if (!PRODUCTS_STATE.elementToDelete) return;
 
+  const idToDel = PRODUCTS_STATE.elementToDelete;
+  if (isProductLinked(idToDel)) {
+    showToast(
+      "No se puede eliminar: el producto tiene elementos vinculados",
+      TOAST_COLORS.DANGER,3
+    );
+    hideConfirmModal();
+    PRODUCTS_STATE.elementToDelete = null;
+    DELETE_STATE.type = null;
+    DELETE_STATE.id = null;
+    return;
+  }
+
   const products = getData(PAGE_PRODUCTS);
-  const deleted = products.find((p) => p.id === PRODUCTS_STATE.elementToDelete);
+  const deleted = products.find((p) => p.id === idToDel);
 
   // Guardamos estado undo
   UNDO_STATE.data = deleted;
   UNDO_STATE.type = PAGE_PRODUCTS; // Nombre de la colección en storage
 
-  // Eliminamos
-  const updated = products.filter(
-    (p) => p.id !== PRODUCTS_STATE.elementToDelete
-  );
+  const updated = products.filter((p) => p.id !== idToDel);
   setData(PAGE_PRODUCTS, updated);
 
   PRODUCTS_STATE.elementToDelete = null;
