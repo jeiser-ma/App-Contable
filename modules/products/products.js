@@ -577,41 +577,6 @@ function saveProductFromModal() {
   renderProducts();
 }
 
-/**
- * Establece un error en el input
- * @param {string} inputId - ID del input
- * @param {string} message - Mensaje de error
- * @returns {void}
- */
-function setInputError(inputId, message) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  input.classList.add("is-invalid");
-
-  const feedback = input.nextElementSibling;
-  if (feedback) {
-    feedback.innerText = message;
-  }
-}
-
-/**
- * Limpia el error en el input
- * @param {string} inputId - ID del input
- * @returns {void}
- */
-function clearInputError(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  input.classList.remove("is-invalid");
-
-  const feedback = input.nextElementSibling;
-  if (feedback) {
-    feedback.innerText = "";
-  }
-}
-
 // ===============================
 // Baja
 // ===============================
@@ -651,6 +616,32 @@ function isProductLinked(prodId) {
   }
 
   return false;
+}
+
+/**
+ * Actualiza la cantidad de un producto sumando (o restando) un valor a la cantidad actual.
+ * @param {string} productId - ID del producto
+ * @param {number} quantityDelta - Cantidad a sumar (positivo = aumentar, negativo = disminuir)
+ * @returns {number|undefined} Nueva cantidad del producto, 
+ * o undefined si el producto no existe, 
+ * o -1 si la nueva cantidad es negativa (error)
+ */
+function updateProductQuantity(productId, quantityDelta) {
+  if (!productId) return undefined; // Error: ID de producto no válido
+
+  const product = getDataById(PAGE_PRODUCTS, productId);
+  if (!product) return undefined; // Error: producto no encontrado
+
+  const currentQuantity = product.quantity ?? 0;
+  const newQuantity = currentQuantity + quantityDelta;
+
+  // Si la nueva cantidad es negativa, no se actualiza
+  if (newQuantity < 0) return -1; // Error: cantidad negativa
+
+  // Actualizar la cantidad del producto
+  product.quantity = newQuantity;
+  setDataById(PAGE_PRODUCTS, product);
+  return newQuantity;
 }
 
 /**

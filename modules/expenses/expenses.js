@@ -44,9 +44,9 @@ async function onExpensesPageLoaded() {
   // Cargar conceptos de gastos en el select 
   loadExpenseConceptsIntoSelect();
 
-  
+
   // Configurar controles del módulo (buscador, ordenamiento, fecha, botón agregar)
-  await setupExpensesControls(); 
+  await setupExpensesControls();
 
   // Configurar botón de confirmar del modal
   const btnConfirm = document.getElementById(BTN_ID_CONFIRM_EXPENSE);
@@ -71,7 +71,7 @@ async function setupExpensesControls() {
   // Mostrar los controles del módulo
   showModuleControls();
 
-  
+
   // Cargar el control de búsqueda
   await loadModuleControl(CONTROL_SEARCH_INPUT);
   // Configurar el control de búsqueda
@@ -88,14 +88,14 @@ async function setupExpensesControls() {
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
   setupDateFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
-   
+
 
   // cargar el control de ordenamiento
   await loadModuleControl(CONTROL_ORDER_BY);
   // Configurar el control de ordenamiento
   setupOrderBy(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
-  
-  
+
+
   // cargar el control de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
@@ -109,13 +109,13 @@ async function setupExpensesControls() {
   await loadModuleControl(CONTROL_LIST_COUNTER);
   // No es necesario configurarle comportamiento, 
   // se actualizará automáticamente al renderizar la lista
-  
+
 
   // cargar el control de limpiar filtros
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
   setupBtnClearFilters(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
-  
+
 }
 
 
@@ -129,28 +129,17 @@ function openAddExpenseModal() {
 
   // definir el header del modal para nuevo gasto
   setModalHeader(MODAL_EXPENSES, false);
+  // Limpiar errores de validación anteriores del modal
+  clearExpenseModalErrors();
 
-  // Obtener los elementos del modal
-  const title = document.getElementById(ID_EXPENSE_TITLE);
-  const icon = document.getElementById(ID_EXPENSE_ICON);
-  const conceptInput = document.getElementById(ID_EXPENSE_CONCEPT);
-  const amountInput = document.getElementById(ID_EXPENSE_AMOUNT);
-  const dateInput = document.getElementById(ID_EXPENSE_DATE);
-  const noteInput = document.getElementById(ID_EXPENSE_NOTE);
-
-  if (!title || !icon || !conceptInput || !amountInput || !dateInput) {
-    console.error("No se encontraron los elementos del modal de gastos");
-    return;
-  }
-
-  // Limpiar los campos del formulario
-  conceptInput.value = "";
-  amountInput.value = "";
-  dateInput.value = EXPENSES_STATE.filterDate || new Date().toISOString().split("T")[0];
-  if (noteInput) noteInput.value = "";
-
-  // Limpiar errores de validación
-  clearExpenseErrors();
+  // Establecer el valor del input de concepto
+  setInputValue(ID_EXPENSE_CONCEPT, "");
+  // Establecer el valor del input de cantidad
+  setInputValue(ID_EXPENSE_AMOUNT, "");
+  // Establecer el valor del input de fecha
+  setInputValue(ID_EXPENSE_DATE, EXPENSES_STATE.filterDate || new Date().toISOString().split("T")[0]);
+  // Establecer el valor del input de observaciones
+  setInputValue(ID_EXPENSE_NOTE, "");
 
   // Mostrar el modal
   showModalModules();
@@ -160,19 +149,8 @@ function openAddExpenseModal() {
  * Limpia los errores de validación del formulario de gastos
  * @returns {void}
  */
-function clearExpenseErrors() {
-  [ID_EXPENSE_CONCEPT, ID_EXPENSE_AMOUNT, ID_EXPENSE_DATE].forEach((id) => {
-    const input = document.getElementById(id);
-    if (!input) return;
-    // Quitar la clase de invalido
-    input.classList.remove("is-invalid");
-    // Obtener el feedback del campo
-    const feedback = input.nextElementSibling;
-    if (feedback && feedback.classList.contains("invalid-feedback")) {
-      // Limpiar el texto del feedback
-      feedback.textContent = "";
-    }
-  });
+function clearExpenseModalErrors() {
+  clearInputErrors([ID_EXPENSE_CONCEPT, ID_EXPENSE_AMOUNT, ID_EXPENSE_DATE, ID_EXPENSE_NOTE]);
 }
 
 /**
@@ -180,52 +158,34 @@ function clearExpenseErrors() {
  * @returns {void}
  */
 function saveExpenseFromModal() {
-  const conceptInput = document.getElementById(ID_EXPENSE_CONCEPT);
-  const amountInput = document.getElementById(ID_EXPENSE_AMOUNT);
-  const dateInput = document.getElementById(ID_EXPENSE_DATE);
-  const noteInput = document.getElementById(ID_EXPENSE_NOTE);
+  // Obtener los valores de los inputs
+  const concept = getInputValue(ID_EXPENSE_CONCEPT).trim();
+  const amount = Number(getInputValue(ID_EXPENSE_AMOUNT));
+  const date = getInputValue(ID_EXPENSE_DATE);
+  const note = getInputValue(ID_EXPENSE_NOTE).trim() || "";
 
-  if (!conceptInput || !amountInput || !dateInput) {
-    console.error("No se encontraron los campos del formulario de gastos");
-    return;
-  }
-
-  clearExpenseErrors();
-
-  const concept = conceptInput.value.trim();
-  const amount = Number(amountInput.value);
-  const date = dateInput.value;
-  const note = noteInput ? noteInput.value.trim() : "";
-
+  // Validar que se ingresó un concepto
   if (!concept) {
-    conceptInput.classList.add("is-invalid");
-    const fb = conceptInput.nextElementSibling;
-    if (fb && fb.classList.contains("invalid-feedback")) {
-      fb.textContent = "Seleccioná un concepto";
-    }
+    setInputError(ID_EXPENSE_CONCEPT, "Seleccioná un concepto");
     return;
   }
 
-  if (!amount || amount <= 0) {
-    amountInput.classList.add("is-invalid");
-    const fb = amountInput.nextElementSibling;
-    if (fb && fb.classList.contains("invalid-feedback")) {
-      fb.textContent = "Ingresá una cantidad válida";
-    }
+  // Validar que se ingresó una cantidad válida
+  if (isNaN(amount) || amount <= 0) {
+    setInputError(ID_EXPENSE_AMOUNT, "Ingresá una cantidad válida");
     return;
   }
 
+  // Validar que se ingresó una fecha
   if (!date) {
-    dateInput.classList.add("is-invalid");
-    const fb = dateInput.nextElementSibling;
-    if (fb && fb.classList.contains("invalid-feedback")) {
-      fb.textContent = "Seleccioná una fecha";
-    }
+    setInputError(ID_EXPENSE_DATE, "Seleccioná una fecha");
     return;
   }
 
+  // Obtener los gastos
   const expenses = getData(PAGE_EXPENSES) || [];
-
+  // Si se está editando un gasto, actualizar el gasto
+  // de lo contrario, crear un nuevo gasto
   if (EXPENSES_STATE.elementToEdit) {
     // Editar
     const idx = expenses.findIndex((e) => e.id === EXPENSES_STATE.elementToEdit);
@@ -251,8 +211,11 @@ function saveExpenseFromModal() {
     expenses.push(newExpense);
   }
 
+  // Guardar los gastos
   setData(PAGE_EXPENSES, expenses);
+  // Cerrar el modal
   hideModalModules();
+  // Renderizar la lista de gastos
   renderExpenses();
 }
 
@@ -270,32 +233,17 @@ function openEditExpenseModal(id) {
   // definir el header del modal
   setModalHeader(MODAL_EXPENSES, true);
 
-  const title = document.getElementById(ID_EXPENSE_TITLE);
-  const icon = document.getElementById(ID_EXPENSE_ICON);
-  const conceptInput = document.getElementById(ID_EXPENSE_CONCEPT);
-  const amountInput = document.getElementById(ID_EXPENSE_AMOUNT);
-  const dateInput = document.getElementById(ID_EXPENSE_DATE);
-  const noteInput = document.getElementById(ID_EXPENSE_NOTE);
+  // Limpiar errores de validación anteriores del modal
+  clearExpenseModalErrors();
 
-  if (!title || !icon || !conceptInput || !amountInput || !dateInput) {
-    console.error("No se encontraron los elementos del modal de gastos");
-    return;
-  }
-
-  // Seleccionar el concepto del gasto
-  if (conceptInput && expense.concept) {
-    conceptInput.value = expense.concept;
-  }
-
-  // llenar el campo de cantidad
-  amountInput.value = expense.amount;
-  // llenar el campo de fecha
-  dateInput.value = expense.date;
-  // llenar el campo de observaciones
-  if (noteInput) noteInput.value = expense.note || "";
-
-  // Limpiar errores de validación
-  clearExpenseErrors();
+  // Establecer el valor del input de concepto
+  setInputValue(ID_EXPENSE_CONCEPT, expense.concept);
+  // Establecer el valor del input de cantidad
+  setInputValue(ID_EXPENSE_AMOUNT, expense.amount);
+  // Establecer el valor del input de fecha
+  setInputValue(ID_EXPENSE_DATE, expense.date);
+  // Establecer el valor del input de observaciones
+  setInputValue(ID_EXPENSE_NOTE, expense.note || "");
 
   // Mostrar el modal
   showModalModules();
@@ -308,7 +256,7 @@ function openEditExpenseModal(id) {
 function loadExpenseConceptsIntoSelect() {
   const select = document.getElementById(ID_EXPENSE_CONCEPT);
   if (!select) return;
-  
+
   // Limpiar opciones existentes (excepto la primera)
   const firstOption = select.querySelector('option[value=""]');
   select.innerHTML = "";
@@ -322,10 +270,10 @@ function loadExpenseConceptsIntoSelect() {
     defaultOption.selected = true;
     select.appendChild(defaultOption);
   }
-  
+
   // Obtener conceptos de gastos
   const concepts = getExpenseConcepts();
-  
+
   // Agregar opciones
   concepts.forEach(concept => {
     const option = document.createElement("option");

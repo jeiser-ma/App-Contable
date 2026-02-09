@@ -19,27 +19,32 @@
           <input type="hidden" id="productId" />
 
           <div class="mb-2">
-            <label class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="inputName" required />
+            <label for="inputName" class="form-label">Nombre</label>
+            <input type="text" class="form-control form-control-sm" id="inputName" required />
             <div class="invalid-feedback">
-              <!-- el mensaje se setea por JS -->
+              Este campo es obligatorio
+              <!-- el mensaje se establece por JS -->
             </div>
           </div>
 
           <div class="mb-2">
-            <label class="form-label">Precio</label>
+            <label for="inputPrice" class="form-label">Precio</label>
             <input
               type="number"
-              class="form-control"
+              class="form-control form-control-sm"
               id="inputPrice"
               min="0"
               step="0.01"
             />
+            <div class="invalid-feedback">
+              El precio debe ser mayor a 0
+              <!-- el mensaje se establece por JS -->
+            </div>
           </div>
 
           <div class="mb-2">
             <label class="form-label">Unidad de medida</label>
-            <select class="form-select" id="inputUM">
+            <select class="form-select form-select-sm" id="inputUM">
               <option value="" selected disabled>Seleccioná una unidad...</option>
               <!-- Se llenan dinámicamente -->
             </select>
@@ -62,7 +67,7 @@
             <label class="form-label">Umbral de stock bajo</label>
             <input
               type="number"
-              class="form-control"
+              class="form-control form-control-sm"
               id="inputLowStockThreshold"
               min="0"
               required
@@ -76,7 +81,7 @@
             <label class="form-label">Umbral de stock crítico</label>
             <input
               type="number"
-              class="form-control"
+              class="form-control form-control-sm"
               id="inputCriticalStockThreshold"
               min="0"
               required

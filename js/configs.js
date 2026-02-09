@@ -20,6 +20,12 @@ const ID_NAV_HOME = "navHome";
 const ID_NAV_ADD = "navAdd";
 const ID_NAV_ACCOUNTING = "navAccounting";
 
+// Tipos de movimientos
+const MOVEMENTS_TYPES = {
+  IN: "IN", // Entrada
+  OUT: "OUT", // Salida
+};
+
 //#endregion
 
 
@@ -105,14 +111,14 @@ const PAGES_CONFIG = {
         label: "Entradas",
         icon: "bi-arrow-right",
         color: "btn-outline-success",
-        value: "in",
+        value: MOVEMENTS_TYPES.IN,
       },
       {
         id: "chip-filter-out",
         label: "Salidas",
         icon: "bi-arrow-left",
         color: "btn-outline-danger",
-        value: "out",
+        value: MOVEMENTS_TYPES.OUT,
       },
     ]
   },

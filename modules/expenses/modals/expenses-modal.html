@@ -1,9 +1,4 @@
-<div
-  class="modal fade"
-  id="expenses-modal"
-  tabindex="-1"
-  aria-hidden="true"
->
+<div class="modal fade" id="expenses-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
 
@@ -13,88 +8,63 @@
           <i id="expenseIcon" class="bi bi-cash-coin text-danger"></i>
           <span id="expenseTitle">Nuevo gasto</span>
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Cerrar"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
       <!-- Body -->
       <div class="modal-body">
-
-        <!-- Concepto -->
-        <div class="mb-2">
-          <label class="form-label small">Concepto</label>
-          <select
-            class="form-select form-select-sm"
-            id="expenseConcept"
-          >
-            <option value="" selected disabled>Seleccioná un concepto...</option>
-            <!-- Se llenan dinámicamente -->
-          </select>
-          <div class="invalid-feedback">
-            Seleccioná un concepto
+        <form id="expenseForm">
+          <!-- Concepto -->
+          <div class="mb-2">
+            <label for="expenseConcept" class="form-label small">Concepto</label>
+            <select class="form-select form-select-sm" id="expenseConcept">
+              <option value="" selected disabled>Seleccioná un concepto...</option>
+              <!-- Se llenan dinámicamente -->
+            </select>
+            <div class="invalid-feedback">
+              Seleccioná un concepto
+            </div>
           </div>
-        </div>
 
-        <!-- Cantidad -->
-        <div class="mb-2">
-          <label class="form-label small">Cantidad</label>
-          <input
-            type="number"
-            class="form-control form-control-sm"
-            id="expenseAmount"
-            min="0"
-            step="0.01"
-          />
-          <div class="invalid-feedback">
-            Ingresá una cantidad válida
+          <!-- Cantidad -->
+          <div class="mb-2">
+            <label for="expenseAmount" class="form-label small">Cantidad</label>
+            <input type="number" class="form-control form-control-sm" id="expenseAmount" min="0" step="0.01" />
+            <div class="invalid-feedback">
+              Ingresá una cantidad válida
+            </div>
           </div>
-        </div>
 
-        <!-- Fecha -->
-        <div class="mb-2">
-          <label class="form-label small">Fecha</label>
-          <input
-            type="date"
-            class="form-control form-control-sm"
-            id="expenseDate"
-          />
-          <div class="invalid-feedback">
-            Seleccioná una fecha
+          <!-- Fecha -->
+          <div class="mb-2">
+            <label for="expenseDate" class="form-label small">Fecha</label>
+            <input type="date" class="form-control form-control-sm" id="expenseDate" />
+            <div class="invalid-feedback">
+              Seleccioná una fecha
+            </div>
+            <div class="invalid-feedback">
+              Ingresá una fecha válida
+            </div>
           </div>
-        </div>
 
-        <!-- Observación -->
-        <div class="mb-2">
-          <label class="form-label small">Observación</label>
-          <textarea
-            class="form-control form-control-sm"
-            id="expenseNote"
-            rows="2"
-            placeholder="Opcional"
-          ></textarea>
-        </div>
-
+          <!-- Observación -->
+          <div class="mb-2">
+            <label for="expenseNote" class="form-label small">Observación</label>
+            <textarea class="form-control form-control-sm" id="expenseNote" rows="2" placeholder="Opcional"></textarea>
+            <div class="invalid-feedback">
+              Ingresá una observación válida
+            </div>
+          </div>
+        </form>
       </div>
 
       <!-- Footer -->
       <div class="modal-footer py-2">
-        <button
-          type="button"
-          class="btn btn-secondary rounded-pill btn-sm"
-          data-bs-dismiss="modal"
-        >
+        <button type="button" class="btn btn-secondary rounded-pill btn-sm" data-bs-dismiss="modal">
           Cancelar
         </button>
 
-        <button
-          type="button"
-          class="btn btn-danger rounded-pill btn-sm"
-          id="btnConfirmExpense"
-        >
+        <button type="button" class="btn btn-danger rounded-pill btn-sm" id="btnConfirmExpense">
           Guardar gasto
         </button>
       </div>
@@ -102,5 +72,3 @@
     </div>
   </div>
 </div>
-
-

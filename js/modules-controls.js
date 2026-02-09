@@ -40,7 +40,7 @@ const MODULES_CONFIG = {
         filterKey: "filterStockStatus",
         filterValue: "critical",
       },
-    ],
+    ]
   },
   expenses: {
     searchPlaceholder: "Buscar gasto...",
@@ -57,7 +57,7 @@ const MODULES_CONFIG = {
     openModalFunction: "openAddExpenseModal",
     addButtonId: "btnAddExpense",
     addButtonTitle: "Agregar gasto",
-    chips: [],
+    chips: []
   },
   movements: {
     searchPlaceholder: "Buscar producto...",
@@ -78,7 +78,7 @@ const MODULES_CONFIG = {
         icon: null,
         colorClass: "success",
         filterKey: "filterType",
-        filterValue: "in",
+        filterValue: MOVEMENTS_TYPES.IN,
       },
       {
         id: "filterOut",
@@ -86,9 +86,9 @@ const MODULES_CONFIG = {
         icon: null,
         colorClass: "danger",
         filterKey: "filterType",
-        filterValue: "out",
+        filterValue: MOVEMENTS_TYPES.OUT,
       },
-    ],
+    ]
   },
   inventory: {
     searchPlaceholder: "Buscar producto...",
@@ -102,8 +102,8 @@ const MODULES_CONFIG = {
     openModalFunction: null, // No hay botón de agregar, se abre desde las cards
     addButtonId: null,
     addButtonTitle: null,
-    chips: [],
-  },
+    chips: []
+  }
 };
 
 /**

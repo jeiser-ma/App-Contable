@@ -296,12 +296,12 @@ function createTodayAccounting(today, yesterday) {
 
     // Entradas de ayer
     const yesterdayEntries = movements
-      .filter(m => m.date === yesterday && m.type === "IN" && m.productId === product.id)
+      .filter(m => m.date === yesterday && m.type === MOVEMENTS_TYPES.IN && m.productId === product.id)
       .reduce((sum, m) => sum + m.quantity, 0);
 
     // Salidas de ayer
     const yesterdayExits = movements
-      .filter(m => m.date === yesterday && m.type === "OUT" && m.productId === product.id)
+      .filter(m => m.date === yesterday && m.type === MOVEMENTS_TYPES.OUT && m.productId === product.id)
       .reduce((sum, m) => sum + m.quantity, 0);
 
     // Inventario de hoy

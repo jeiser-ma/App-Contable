@@ -226,8 +226,8 @@ function openAddInventoryModal(productId) {
   }
 
   // Limpiar errores
-  clearInputError(ID_LOCATION_WAREHOUSE_INPUT);
-  clearInputError(ID_LOCATION_STORE_INPUT);
+  // clearInventoryInputError(ID_LOCATION_WAREHOUSE_INPUT);
+  // clearInventoryInputError(ID_LOCATION_STORE_INPUT);
 
   showModalModules();
 }
@@ -293,8 +293,8 @@ function getValidatedInventoryValuesFromModal() {
   const date = INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
 
   // Limpiar errores previos
-  clearInputError(ID_LOCATION_WAREHOUSE_INPUT);
-  clearInputError(ID_LOCATION_STORE_INPUT);
+  // clearInventoryInputError(ID_LOCATION_WAREHOUSE_INPUT);
+  // clearInventoryInputError(ID_LOCATION_STORE_INPUT);
 
   // Obtener valores (pueden estar vacíos)
   const warehouseValue = warehouseInput.value.trim();
@@ -304,7 +304,8 @@ function getValidatedInventoryValuesFromModal() {
   if (!warehouseValue && !storeValue) {
     setInputError(
       ID_LOCATION_WAREHOUSE_INPUT,
-      "Ingresá al menos una cantidad (almacén o tienda)"
+      "Ingresá al menos una cantidad (almacén o tienda)",
+      "inventoryErrorFeedback"
     );
     return { valid: false };
   }
@@ -317,13 +318,14 @@ function getValidatedInventoryValuesFromModal() {
   if (warehouseQuantity !== null && warehouseQuantity < 0) {
     setInputError(
       ID_LOCATION_WAREHOUSE_INPUT,
-      "La cantidad no puede ser negativa"
+      "La cantidad no puede ser negativa",
+      "inventoryErrorFeedback"
     );
     return { valid: false };
   }
 
   if (storeQuantity !== null && storeQuantity < 0) {
-    setInputError(ID_LOCATION_STORE_INPUT, "La cantidad no puede ser negativa");
+    setInputError(ID_LOCATION_STORE_INPUT, "La cantidad no puede ser negativa", "inventoryErrorFeedback");
     return { valid: false };
   }
 
@@ -331,7 +333,8 @@ function getValidatedInventoryValuesFromModal() {
   if (warehouseValue.includes(",")) {
     setInputError(
       ID_LOCATION_WAREHOUSE_INPUT,
-      "Usá punto (.) en lugar de coma para decimales"
+      "Usá punto (.) en lugar de coma para decimales",
+      "inventoryErrorFeedback"
     );
     return { valid: false };
   }
@@ -339,7 +342,8 @@ function getValidatedInventoryValuesFromModal() {
   if (storeValue.includes(",")) {
     setInputError(
       ID_LOCATION_STORE_INPUT,
-      "Usá punto (.) en lugar de coma para decimales"
+      "Usá punto (.) en lugar de coma para decimales",
+      "inventoryErrorFeedback"
     );
     return { valid: false };
   }
@@ -349,12 +353,12 @@ function getValidatedInventoryValuesFromModal() {
     warehouseValue !== "" &&
     (isNaN(warehouseQuantity) || !isFinite(warehouseQuantity))
   ) {
-    setInputError(ID_LOCATION_WAREHOUSE_INPUT, "Ingresá un número válido");
+    setInputError(ID_LOCATION_WAREHOUSE_INPUT, "Ingresá un número válido", "inventoryErrorFeedback");
     return { valid: false };
   }
 
   if (storeValue !== "" && (isNaN(storeQuantity) || !isFinite(storeQuantity))) {
-    setInputError(ID_LOCATION_STORE_INPUT, "Ingresá un número válido");
+    setInputError(ID_LOCATION_STORE_INPUT, "Ingresá un número válido", "inventoryErrorFeedback");
     return { valid: false };
   }
 
@@ -368,8 +372,8 @@ function getValidatedInventoryValuesFromModal() {
       (warehouseQuantity ?? 0) + (storeQuantity ?? 0);
     if (totalInventory > productStock) {
       const errorMessage = `La suma (${totalInventory}) supera el stock disponible (${productStock})`;
-      setInputError(ID_LOCATION_WAREHOUSE_INPUT, errorMessage);
-      setInputError(ID_LOCATION_STORE_INPUT, errorMessage);
+      setInputError(ID_LOCATION_WAREHOUSE_INPUT, errorMessage, "inventoryErrorFeedback");
+      setInputError(ID_LOCATION_STORE_INPUT, errorMessage, "inventoryErrorFeedback");
       return { valid: false };
     }
   }
@@ -794,39 +798,13 @@ function renderInventory() {
   renderCompletedInventoryList(filteredCompletedInventory);
 }
 
-// Variable para almacenar el mensaje de error actual
-let currentInventoryError = null;
-
 /**
- * Establece un error en el input
- * @param {string} inputId - ID del input
- * @param {string} message - Mensaje de error
- * @returns {void}
- */
-function setInputError(inputId, message) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  input.classList.add("is-invalid");
-
-  // Guardar el mensaje de error actual
-  currentInventoryError = message;
-
-  // Mostrar el mensaje en el feedback compartido
-  const feedback = document.getElementById("inventoryErrorFeedback");
-  if (feedback) {
-    feedback.textContent = message;
-    feedback.style.display = "block";
-    feedback.classList.add("d-block");
-  }
-}
-
-/**
- * Limpia el error en el input
+ * Limpia el error en el input de inventario.
+ * El feedback es compartido: solo se oculta cuando ambos campos (almacén y tienda) están sin error.
  * @param {string} inputId - ID del input
  * @returns {void}
  */
-function clearInputError(inputId) {
+function clearInventoryInputError(inputId) {
   const input = document.getElementById(inputId);
   if (!input) return;
 
@@ -842,11 +820,10 @@ function clearInputError(inputId) {
     storeInput && storeInput.classList.contains("is-invalid");
 
   if (!warehouseHasError && !storeHasError) {
-    currentInventoryError = null;
     const feedback = document.getElementById("inventoryErrorFeedback");
     if (feedback) {
       feedback.textContent = "";
-      feedback.style.display = "none";
+      feedback.style.display = "";
       feedback.classList.remove("d-block");
     }
   }

@@ -36,7 +36,9 @@ const CLASS_ACCOUNTING_EXPENSE_AMOUNT = "accounting-expense-amount";
 const ID_CASH_SALES_AMOUNT = "cashSalesAmount";
 const ID_TRANSFER_SALES_AMOUNT = "transferSalesAmount";
 // ids de inputs de ventas en efectivo y transferencia
+const ID_CASH_SALES_FORM = "cashSalesForm";
 const ID_INPUT_CASH_SALES = "cashSalesInput";
+const ID_TRANSFER_SALES_FORM = "transferSalesForm";
 const ID_INPUT_TRANSFER_SALES = "transferSalesInput";
 // ids de los campos de mensajes de validación de ventas en efectivo y transferencia
 const ID_INVALID_FEEDBACK_CASH_SALES = "cashSalesInput-invalid-feedback";
@@ -423,12 +425,12 @@ function buildAccountingProductsForDate(date) {
 
     // Entradas de ayer
     const yesterdayEntries = movements
-      .filter(m => m.date === yesterday && m.type === "IN" && m.productId === product.id)
+      .filter(m => m.date === yesterday && m.type === MOVEMENTS_TYPES.IN && m.productId === product.id)
       .reduce((sum, m) => sum + m.quantity, 0);
 
     // Salidas de ayer
     const yesterdayExits = movements
-      .filter(m => m.date === yesterday && m.type === "OUT" && m.productId === product.id)
+      .filter(m => m.date === yesterday && m.type === MOVEMENTS_TYPES.OUT && m.productId === product.id)
       .reduce((sum, m) => sum + m.quantity, 0);
 
     // Inventario de hoy
@@ -835,13 +837,17 @@ function renderReopenButton() {
  * @returns {void}
  */
 function openCashSalesModal() {
+  // Inicializar el modal de ventas en efectivo
   initModalModule(MODAL_CASH_SALES);
+  // Configurar el header del modal
   setModalHeader(MODAL_CASH_SALES, false);
-  const input = document.getElementById(ID_INPUT_CASH_SALES);
-  if (!input || !currentAccounting) return;
 
-  clearInputError(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES);
-  input.value = currentAccounting.cashSales || "";
+  // Limpiar errores anteriores del input
+  clearInputError(ID_INPUT_CASH_SALES);
+  // Establecer el valor del input
+  setInputValue(ID_INPUT_CASH_SALES, currentAccounting.cashSales || "");
+
+  // Mostrar el modal
   showModalModules();
 }
 
@@ -850,13 +856,17 @@ function openCashSalesModal() {
  * @returns {void}
  */
 function openTransferSalesModal() {
+  // Inicializar el modal de ventas por transferencia
   initModalModule(MODAL_TRANSFER_SALES);
+  // Configurar el header del modal
   setModalHeader(MODAL_TRANSFER_SALES, false);
-  const input = document.getElementById(ID_INPUT_TRANSFER_SALES);
-  if (!input || !currentAccounting) return;
+  
+  // Limpiar errores anteriores del input
+  clearInputError(ID_INPUT_TRANSFER_SALES);
+  // Establecer el valor del input
+  setInputValue(ID_INPUT_TRANSFER_SALES, currentAccounting.transferSales || "");
 
-  clearInputError(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES);
-  input.value = currentAccounting.transferSales || "";
+  // Mostrar el modal
   showModalModules();
 }
 
@@ -865,7 +875,7 @@ function openTransferSalesModal() {
  * @returns {void}
  */
 function saveCashSales() {
-  saveSalesGeneric(ID_INPUT_CASH_SALES, ID_INVALID_FEEDBACK_CASH_SALES);
+  saveSalesGeneric(ID_INPUT_CASH_SALES);
 }
 
 /**
@@ -873,39 +883,29 @@ function saveCashSales() {
  * @returns {void}
  */
 function saveTransferSales() {
-  saveSalesGeneric(ID_INPUT_TRANSFER_SALES, ID_INVALID_FEEDBACK_TRANSFER_SALES);
+  saveSalesGeneric(ID_INPUT_TRANSFER_SALES);
 }
 
 /**
  * Función genérica para guardar las ventas por transferencia o en efectivo
  * @param {string} inputId - ID del campo de entrada
- * @param {string} invalidFeedbackId - ID del campo de mensaje de error
  * @returns {void}
  */
-function saveSalesGeneric(inputId, invalidFeedbackId) {
-  const input = document.getElementById(inputId);
-  if (!input || !currentAccounting) return;
+function saveSalesGeneric(inputId) {
+  if (!currentAccounting) return;
 
-  // Limpiar errores previos
-  clearInputError(inputId, invalidFeedbackId);
-
-  // Validar campo vacío
-  if (input.value === "" || input.value.trim() === "") {
-    showInputError(inputId, invalidFeedbackId, "Ingresá una cantidad");
-    return;
-  }
-
-  const amount = parseFloat(input.value);
+  // Obtener el valor del input
+  const amount = parseFloat(getInputValue(inputId));
 
   // Validar que sea un número válido
   if (isNaN(amount)) {
-    showInputError(inputId, invalidFeedbackId, "La cantidad ingresada no es un número válido");
+    setInputError(inputId, "Ingresá una cantidad válida");
     return;
   }
 
   // Validar que no sea negativo
-  if (amount < 0) {
-    showInputError(inputId, invalidFeedbackId, "La cantidad no puede ser negativa");
+  if (amount <= 0) {
+    setInputError(inputId, "La cantidad debe ser mayor a 0");
     return;
   }
 
@@ -935,7 +935,6 @@ function saveAccounting() {
   if (!currentAccounting) return;
 
   setDataById(PAGE_ACCOUNTING, currentAccounting);
-
 }
 
 /**
@@ -1111,36 +1110,3 @@ function getYesterday(date) {
 
 
 
-//  PONER EN UN .JS PARA MANAGE INPUTS FEEDBACKS
-/**
- * Muestra un error en un campo de entrada
- * @param {string} inputId - ID del campo de entrada
- * @param {string} feedbackId - ID del campo de mensaje de error
- * @param {string} message - Mensaje de error a mostrar
- * @returns {void}
- */
-function showInputError(inputId, feedbackId, message) {
-  const input = document.getElementById(inputId);
-  const feedback = document.getElementById(feedbackId);
-  if (!input || !feedback) return;
-
-  input.classList.add("is-invalid");
-  feedback.textContent = message;
-
-}
-
-/**
- * Limpia el error de un campo de entrada
- * @param {string} inputId - ID del campo de entrada
- * @param {string} feedbackId - ID del campo de mensaje de error
- * @returns {void}
- */
-function clearInputError(inputId, feedbackId) {
-  const input = document.getElementById(inputId);
-  const feedback = document.getElementById(feedbackId);
-  if (!input || !feedback) return;
-
-  input.classList.remove("is-invalid");
-  feedback.textContent = "";
-
-}

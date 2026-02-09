@@ -1,9 +1,4 @@
-<div
-  class="modal fade"
-  id="movements-modal"
-  tabindex="-1"
-  aria-hidden="true"
->
+<div class="modal fade" id="movements-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
 
@@ -13,119 +8,74 @@
           <i id="movementIcon" class="bi bi-arrow-right text-success"></i>
           <span id="movementTitle">Entrada de producto</span>
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Cerrar"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
       <!-- Body -->
       <div class="modal-body">
+        <form id="movementForm">
+          <!-- Toggle Button: Entrada / Salida -->
+          <div class="mb-3">
+            <label class="form-label small">Acción</label>
+            <div class="btn-group w-100 gap-4" role="group" id="movementTypeToggle">
+              <input type="radio" class="btn-check" name="movementType" id="movementTypeIn" value="IN" checked />
+              <label class="btn btn-outline-success rounded-pill" for="movementTypeIn">
+                <i class="bi bi-arrow-right"></i> Entrada
+              </label>
 
-        <!-- Toggle Button: Entrada / Salida -->
-        <div class="mb-3">
-          <label class="form-label small">Acción</label>
-          <div class="btn-group w-100 gap-4" role="group" id="movementTypeToggle">
-            <input
-              type="radio"
-              class="btn-check"
-              name="movementType"
-              id="movementTypeIn"
-              value="in"
-              checked
-            />
-            <label
-              class="btn btn-outline-success rounded-pill"
-              for="movementTypeIn"
-            >
-              <i class="bi bi-arrow-right"></i> Entrada
-            </label>
-
-            <input
-              type="radio"
-              class="btn-check"
-              name="movementType"
-              id="movementTypeOut"
-              value="out"
-            />
-            <label
-              class="btn btn-outline-danger rounded-pill"
-              for="movementTypeOut"
-            >
-              <i class="bi bi-arrow-left"></i> Salida
-            </label>
+              <input type="radio" class="btn-check" name="movementType" id="movementTypeOut" value="OUT" />
+              <label class="btn btn-outline-danger rounded-pill" for="movementTypeOut">
+                <i class="bi bi-arrow-left"></i> Salida
+              </label>
+            </div>
           </div>
-        </div>
 
-        <!-- Producto -->
-        <div class="mb-2">
-          <label class="form-label small">Producto</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            id="movementProduct"
-            placeholder="Buscar producto…"
-            autocomplete="off"
-          />
-          <div class="invalid-feedback">
-            Seleccioná un producto
+          <!-- Producto -->
+          <div class="mb-2">
+            <label for="movementProduct" class="form-label small">Producto</label>
+            <input type="text" class="form-control form-control-sm" id="movementProduct" placeholder="Buscar producto…"
+              autocomplete="off" />
+            <div class="invalid-feedback">
+              Seleccioná un producto
+            </div>
           </div>
-        </div>
 
-        <!-- Cantidad -->
-        <div class="mb-2">
-          <label class="form-label small">Cantidad</label>
-          <input
-            type="number"
-            class="form-control form-control-sm"
-            id="movementQuantity"
-            min="1"
-          />
-          <div class="invalid-feedback">
-            Ingresá una cantidad válida
+          <!-- Cantidad -->
+          <div class="mb-2">
+            <label for="movementQuantity" class="form-label small">Cantidad</label>
+            <input type="number" class="form-control form-control-sm" id="movementQuantity" min="1" />
+            <div class="invalid-feedback">
+              Ingresá una cantidad válida
+            </div>
           </div>
-        </div>
 
-        <!-- Fecha -->
-        <div class="mb-2">
-          <label class="form-label small">Fecha</label>
-          <input
-            type="date"
-            class="form-control form-control-sm"
-            id="movementDate"
-          />
-        </div>
+          <!-- Fecha -->
+          <div class="mb-2">
+            <label for="movementDate" class="form-label small">Fecha</label>
+            <input type="date" class="form-control form-control-sm" id="movementDate" />
+            <div class="invalid-feedback">
+              Ingresá una fecha válida
+            </div>
+          </div>
 
-        <!-- Observación -->
-        <div class="mb-2">
-          <label class="form-label small">Observación</label>
-          <textarea
-            class="form-control form-control-sm"
-            id="movementNote"
-            rows="2"
-            placeholder="Opcional"
-          ></textarea>
-        </div>
-
+          <!-- Observación -->
+          <div class="mb-2">
+            <label for="movementNote" class="form-label small">Observación</label>
+            <textarea class="form-control form-control-sm" id="movementNote" rows="2" placeholder="Opcional"></textarea>
+            <div class="invalid-feedback">
+              Ingresá una observación válida
+            </div>
+          </div>
+        </form>
       </div>
 
       <!-- Footer -->
       <div class="modal-footer py-2">
-        <button
-          type="button"
-          class="btn btn-secondary rounded-pill btn-sm"
-          data-bs-dismiss="modal"
-        >
+        <button type="button" class="btn btn-secondary rounded-pill btn-sm" data-bs-dismiss="modal">
           Cancelar
         </button>
 
-        <button
-          type="button"
-          class="btn btn-success rounded-pill btn-sm"
-          id="btnConfirmMovement"
-        >
+        <button type="button" class="btn btn-success rounded-pill btn-sm" id="btnConfirmMovement">
           Confirmar
         </button>
       </div>

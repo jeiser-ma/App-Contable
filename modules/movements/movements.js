@@ -38,13 +38,13 @@ const MOVEMENTS_STATE = {
   // Dirección de ordenamiento (asc | desc)
   orderDir: "desc",
   // Tipo de movimiento filtrado (para los chips de filtro)
-  chipFiltered: null, // "in" | "out" | null (todos)
+  chipFiltered: null, // "IN" | "OUT" | null (todos)
   // ID del movimiento que se va a editar
   elementToEdit: null,
   // ID del movimiento que se va a eliminar
   elementToDelete: null,
   // Tipo de movimiento actual (para el modal)
-  currentType: null, // "in" | "out" | null
+  currentType: null, // "IN" | "OUT" | null
 };
 
 // Exponer el estado globalmente para module-controls.js
@@ -139,14 +139,14 @@ async function setupMovementsControls() {
 
 
 /**
- * Abre el formulario para entrada (type=in) o salida (type=out)
- * @param {string} type - Tipo de movimiento ("in" | "out")
+ * Abre el formulario para entrada (type=IN) o salida (type=OUT)
+ * @param {string} type - Tipo de movimiento ("IN" | "OUT")
  * @returns {void}
  */
 function openAddMovementModal() {
   MOVEMENTS_STATE.elementToEdit = null;
   // definir tipo de movimiento de entrada por defecto
-  MOVEMENTS_STATE.currentType = "in";
+  MOVEMENTS_STATE.currentType = MOVEMENTS_TYPES.IN;
 
   // definir el header del modal para nuevo movimiento
   setModalHeader(MODAL_MOVEMENTS, false);
@@ -164,7 +164,7 @@ function openAddMovementModal() {
   resetMovementForm();
 
   // Configurar tipo por defecto (entrada)
-  setInOutSelector("in");
+  setInOutSelector(MOVEMENTS_TYPES.IN);
 
   // establecer la fecha del filtro de fecha sino la fecha de hoy
   dateInput.value = MOVEMENTS_STATE.filterDate || new Date().toISOString().split("T")[0];
@@ -189,15 +189,15 @@ function setupInOutSelectorListeners() {
     return;
   }
 
-  // configurar el listener para el tipo de movimiento "in"
+  // configurar el listener para el tipo de movimiento "IN"
   typeIn.onclick = () => {
-    MOVEMENTS_STATE.currentType = "in";
+    MOVEMENTS_STATE.currentType = MOVEMENTS_TYPES.IN;
     console.log("typeIn clicked, MOVEMENTS_STATE.currentType: ", MOVEMENTS_STATE.currentType);
   };
 
-  // configurar el listener para el tipo de movimiento "out"
+  // configurar el listener para el tipo de movimiento "OUT"
   typeOut.onclick = () => {
-    MOVEMENTS_STATE.currentType = "out";
+    MOVEMENTS_STATE.currentType = MOVEMENTS_TYPES.OUT;
     console.log("typeOut clicked, MOVEMENTS_STATE.currentType: ", MOVEMENTS_STATE.currentType);
   };
 }
@@ -205,12 +205,12 @@ function setupInOutSelectorListeners() {
 
 /**
  * Configura el selector de tipo de movimiento
- * @param {string} type - Tipo de movimiento ("in" | "out")
+ * @param {string} type - Tipo de movimiento ("IN" | "OUT")
  * @returns {void}
  */
 function setInOutSelector(type) {
   // obtener el elemento del selector según el tipo
-  const typeElem = type === "out"
+  const typeElem = type === MOVEMENTS_TYPES.OUT
     ? document.getElementById(ID_MOVEMENT_TYPE_OUT)
     : document.getElementById(ID_MOVEMENT_TYPE_IN);
 
@@ -289,11 +289,11 @@ function initMovementFilters() {
 
   if (filterIn) {
     filterIn.onclick = () => {
-      if (MOVEMENTS_STATE.chipFiltered === "in") {
+      if (MOVEMENTS_STATE.chipFiltered === MOVEMENTS_TYPES.IN) {
         MOVEMENTS_STATE.chipFiltered = null;
         filterIn.classList.remove("active");
       } else {
-        MOVEMENTS_STATE.chipFiltered = "in";
+        MOVEMENTS_STATE.chipFiltered = MOVEMENTS_TYPES.IN;
         filterIn.classList.add("active");
         if (filterOut) filterOut.classList.remove("active");
       }
@@ -304,11 +304,11 @@ function initMovementFilters() {
 
   if (filterOut) {
     filterOut.onclick = () => {
-      if (MOVEMENTS_STATE.chipFiltered === "out") {
+      if (MOVEMENTS_STATE.chipFiltered === MOVEMENTS_TYPES.OUT) {
         MOVEMENTS_STATE.chipFiltered = null;
         filterOut.classList.remove("active");
       } else {
-        MOVEMENTS_STATE.chipFiltered = "out";
+        MOVEMENTS_STATE.chipFiltered = MOVEMENTS_TYPES.OUT;
         filterOut.classList.add("active");
         if (filterIn) filterIn.classList.remove("active");
       }
@@ -351,7 +351,7 @@ function filterMovements(movements) {
   // Filtro por tipo (in/out)
   if (MOVEMENTS_STATE.chipFiltered) {
     filtered = filtered.filter(
-      (m) => m.type === MOVEMENTS_STATE.chipFiltered.toUpperCase()
+      (m) => m.type === MOVEMENTS_STATE.chipFiltered //.toUpperCase()
     );
   }
 
@@ -451,7 +451,7 @@ function renderMovementsList(movements) {
     const meta = node.querySelector(".movement-meta");
 
     // Configurar icono según tipo (IN = + verde, OUT = - rojo)
-    if (m.type === "IN") {
+    if (m.type === MOVEMENTS_TYPES.IN) {
       iconDiv.classList.add("bg-success");
       iconI.className = "bi bi-plu bi-arrow-right text-white";
     } else {
@@ -512,79 +512,73 @@ function renderMovements() {
  * @returns {void}
  */
 function saveMovementFromModal() {
+
+
   const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
   const quantityInput = document.getElementById(ID_MOVEMENT_QUANTITY);
   const dateInput = document.getElementById(ID_MOVEMENT_DATE);
   const noteInput = document.getElementById(ID_MOVEMENT_NOTE);
-  const typeIn = document.getElementById(ID_MOVEMENT_TYPE_IN);
-  const typeOut = document.getElementById(ID_MOVEMENT_TYPE_OUT);
+
 
   if (!productInput || !quantityInput || !dateInput) {
     console.error("No se encontraron los campos del formulario");
     return;
   }
 
-  // Obtener tipo de movimiento del selector
-  if (typeIn && typeIn.checked) {
-    MOVEMENTS_STATE.currentType = "in";
-  } else if (typeOut && typeOut.checked) {
-    MOVEMENTS_STATE.currentType = "out";
-  } else {
-    console.error("No se ha seleccionado el tipo de movimiento");
-    return;
-  }
+  // El tipo de movimiento del selector ya está definido en MOVEMENTS_STATE.currentType 
+  // Se actualiza cuando se hace clic en el selector de tipo de movimiento
 
-  const productName = productInput.value.trim();
-  const quantity = Number(quantityInput.value);
-  const date = dateInput.value;
-  const note = noteInput ? noteInput.value.trim() : "";
 
-  // Limpiar errores previos
-  clearInputError(ID_MOVEMENT_PRODUCT);
-  clearInputError(ID_MOVEMENT_QUANTITY);
-  clearInputError(ID_MOVEMENT_DATE);
+  const productName = getInputValue(ID_MOVEMENT_PRODUCT).trim();
+  const quantity = Number(getInputValue(ID_MOVEMENT_QUANTITY));
+  const date = getInputValue(ID_MOVEMENT_DATE);
+  const note = getInputValue(ID_MOVEMENT_NOTE).trim() || "";
 
   // Validaciones
+  // Validar que se ingresó un producto
   if (!productName) {
     setInputError(ID_MOVEMENT_PRODUCT, "Seleccioná un producto");
     return;
   }
 
+  // Validar que el producto existe
   const products = getData(PAGE_PRODUCTS);
   const product = products.find(
     (p) => p.name.toLowerCase() === productName.toLowerCase()
   );
-
+  // Si el producto no existe, mostrar error
   if (!product) {
     setInputError(ID_MOVEMENT_PRODUCT, "El producto no existe");
     return;
   }
 
-  if (!quantity || quantity <= 0) {
+  // Validar que se ingresó una cantidad válida
+  if (isNaN(quantity) || quantity <= 0) {
     setInputError(ID_MOVEMENT_QUANTITY, "Ingresá una cantidad válida");
     return;
   }
 
+  // Obtener el movimiento a editar si existe
+  const editingMovement = MOVEMENTS_STATE.elementToEdit ? getDataById(PAGE_MOVEMENTS, MOVEMENTS_STATE.elementToEdit) : null;
+
   // Validar stock para salidas (solo si es nuevo movimiento o si cambió la cantidad/producto)
-  if (MOVEMENTS_STATE.currentType === "out") {
+  if (MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.OUT) {
     let availableStock = product.quantity;
 
     // Si estamos editando, considerar el stock que se revertirá
     if (MOVEMENTS_STATE.elementToEdit) {
-      const movements = getData(PAGE_MOVEMENTS) || [];
-      const existingMovement = movements.find(
-        (m) => m.id === MOVEMENTS_STATE.elementToEdit
-      );
-      if (existingMovement && existingMovement.productId === product.id) {
+
+      // Si el movimiento existe y es del mismo producto, considerar el stock que se revertirá
+      if (editingMovement && editingMovement.productId === product.id) {
         // Si es el mismo producto, el stock disponible incluye la cantidad que se revertirá
-        if (existingMovement.type === "IN") {
-          availableStock -= existingMovement.quantity; // Ya estaba sumado
+        if (editingMovement.type === MOVEMENTS_TYPES.IN) {
+          availableStock -= editingMovement.quantity; // Ya estaba sumado
         } else {
-          availableStock += existingMovement.quantity; // Se revertirá la resta
+          availableStock += editingMovement.quantity; // Se revertirá la resta
         }
       } else if (
-        existingMovement &&
-        existingMovement.productId !== product.id
+        editingMovement &&
+        editingMovement.productId !== product.id
       ) {
         // Si cambió el producto, no hay efecto de reversión en el nuevo producto
         // El stock disponible es el actual
@@ -600,68 +594,130 @@ function saveMovementFromModal() {
     }
   }
 
+  // Validar que se ingresó una fecha
   if (!date) {
     setInputError(ID_MOVEMENT_DATE, "Seleccioná una fecha");
     return;
   }
 
-  // Guardar movimiento
+  // GUARDAR MOVIMIENTO
+
+
+
+
+
+
+
+
   const movements = getData(PAGE_MOVEMENTS) || [];
 
   if (MOVEMENTS_STATE.elementToEdit) {
-    // EDITAR: Buscar el movimiento existente para revertir su efecto en el stock
-    const existingMovement = movements.find(
-      (m) => m.id === MOVEMENTS_STATE.elementToEdit
-    );
-    if (existingMovement) {
-      // Revertir el efecto del movimiento anterior en el producto anterior
-      const oldProductId = existingMovement.productId;
-      const isSameProduct = oldProductId === product.id;
+    // EDITAR: Actualizar movimiento existente
 
-      const updatedProducts = products.map((p) => {
-        // Revertir efecto en el producto anterior
-        if (p.id === oldProductId) {
-          if (existingMovement.type === "IN") {
-            return { ...p, quantity: p.quantity - existingMovement.quantity };
-          } else {
-            return { ...p, quantity: p.quantity + existingMovement.quantity };
-          }
-        }
-        return p;
-      });
 
-      // Aplicar el nuevo efecto en el producto (puede ser el mismo o diferente)
-      const finalProducts = updatedProducts.map((p) => {
-        if (p.id === product.id) {
-          if (MOVEMENTS_STATE.currentType === "in") {
-            return { ...p, quantity: p.quantity + quantity };
-          } else {
-            return { ...p, quantity: p.quantity - quantity };
-          }
-        }
-        return p;
-      });
-      setData(PAGE_PRODUCTS, finalProducts);
+
+    // Si el movimiento existe, revertir su efecto en el stock del producto anterior
+    // if (editingMovement && editingMovement.productId !== product.id) {
+    //   // Si estamos editando y se cambió el producto
+    //   // Revertir el efecto del movimiento anterior en el producto anterior
+    //   const oldProductId = editingMovement.productId;
+    //   // Verificar si el producto anterior es el mismo que el nuevo producto
+    //   const isSameProduct = oldProductId === product.id;
+
+    //   // Actualizar el stock del producto anterior
+    //   let deltaQuantity = editingMovement.type === MOVEMENTS_TYPES.IN ? -editingMovement.quantity : editingMovement.quantity;
+    //   let newQuantity = updateProductQuantity(oldProductId, deltaQuantity);
+    //   if (newQuantity === -1) {
+    //     setInputError(ID_MOVEMENT_QUANTITY, "Stock insuficiente para revertir el movimiento");
+    //     return;
+    //   }
+
+    // const updatedProducts = products.map((p) => {
+    //   // Revertir efecto en el producto anterior
+    //   if (p.id === oldProductId) {
+    //     if (editingMovement.type === MOVEMENTS_TYPES.IN) {
+    //       return { ...p, quantity: p.quantity - editingMovement.quantity };
+    //     } else {
+    //       return { ...p, quantity: p.quantity + editingMovement.quantity };
+    //     }
+    //   }
+    //   return p;
+    // });
+
+    //Aplicar el nuevo efecto en el producto (puede ser el mismo o diferente)
+    // const finalProducts = updatedProducts.map((p) => {
+    //   if (p.id === product.id) {
+    //     if (MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN) {
+    //       return { ...p, quantity: p.quantity + quantity };
+    //     } else {
+    //       return { ...p, quantity: p.quantity - quantity };
+    //     }
+    //   }
+    //   return p;
+    // });
+    // setData(PAGE_PRODUCTS, finalProducts);
+    //  }
+
+    // // Actualizar el movimiento
+    // const updatedMovements = movements.map((m) =>
+    //   m.id === MOVEMENTS_STATE.elementToEdit
+    //     ? {
+    //       ...m,
+    //       productId: product.id,
+    //       type: MOVEMENTS_STATE.currentType.toUpperCase(),
+    //       quantity: quantity,
+    //       date: date,
+    //       note: note || "",
+    //     }
+    //     : m
+    // );
+    // setData(PAGE_MOVEMENTS, updatedMovements);
+
+
+
+
+    // Primero:
+    // Si estamos editando el movimiento y se cambió el producto
+    // Revertir el efecto del movimiento anterior en el producto anterior
+    if (editingMovement && editingMovement.productId !== product.id) {
+      console.log("Revertir el efecto del movimiento anterior en el producto anterior");
+      // Actualizar el stock del producto anterior
+      let deltaQuantity = editingMovement.type === MOVEMENTS_TYPES.IN ? -editingMovement.quantity : editingMovement.quantity;
+      let newQuantity = updateProductQuantity(editingMovement.productId, deltaQuantity);
+      if (newQuantity === -1) {
+        // DUDA: ¿Qué hacer si el stock insuficiente?
+        setInputError(ID_MOVEMENT_QUANTITY, "Stock insuficiente para revertir el movimiento");
+        return;
+      }
     }
 
+    // Segundo:
+    // Aplicar el nuevo efecto en el producto actual (puede ser el mismo o diferente)
+    console.log("Aplicar el nuevo efecto en el producto actual (puede ser el mismo o diferente)");
+    let deltaQuantity = MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN ? quantity : -quantity;
+    let newQuantity = updateProductQuantity(product.id, deltaQuantity);
+    if (newQuantity === -1) {
+      setInputError(ID_MOVEMENT_QUANTITY, "Stock insuficiente para aplicar el movimiento");
+      return;
+    }
+
+    // Tercero:
     // Actualizar el movimiento
-    const updatedMovements = movements.map((m) =>
-      m.id === MOVEMENTS_STATE.elementToEdit
-        ? {
-          ...m,
-          productId: product.id,
-          type: MOVEMENTS_STATE.currentType.toUpperCase(),
-          quantity: quantity,
-          date: date,
-          note: note || "",
-        }
-        : m
-    );
-    setData(PAGE_MOVEMENTS, updatedMovements);
+    console.log("Actualizar el movimiento que estamos editando");
+    const updatedMovement = {
+      ...editingMovement,
+      productId: product.id,
+      type: MOVEMENTS_STATE.currentType.toUpperCase(),
+      quantity: quantity,
+      date: date,
+      note: note || "",
+    }
+    setDataById(PAGE_MOVEMENTS, updatedMovement);
 
     MOVEMENTS_STATE.elementToEdit = null;
   } else {
     // NUEVO: Crear nuevo movimiento
+    console.log("Crear nuevo movimiento");
     const newMovement = {
       id: crypto.randomUUID(),
       productId: product.id,
@@ -672,13 +728,14 @@ function saveMovementFromModal() {
       createdAt: new Date().toISOString(),
     };
 
-    movements.push(newMovement);
-    setData(PAGE_MOVEMENTS, movements);
+    // movements.push(newMovement);
+    // setData(PAGE_MOVEMENTS, movements);
+    setDataById(PAGE_MOVEMENTS, newMovement);
 
     // Actualizar stock del producto
     const updatedProducts = products.map((p) => {
       if (p.id === product.id) {
-        if (MOVEMENTS_STATE.currentType === "in") {
+        if (MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN) {
           return { ...p, quantity: p.quantity + quantity };
         } else {
           return { ...p, quantity: p.quantity - quantity };
@@ -693,41 +750,6 @@ function saveMovementFromModal() {
   hideModalModules();
   MOVEMENTS_STATE.currentType = null;
   renderMovements();
-}
-
-/**
- * Establece un error en el input
- * @param {string} inputId - ID del input
- * @param {string} message - Mensaje de error
- * @returns {void}
- */
-function setInputError(inputId, message) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  input.classList.add("is-invalid");
-
-  const feedback = input.nextElementSibling;
-  if (feedback && feedback.classList.contains("invalid-feedback")) {
-    feedback.innerText = message;
-  }
-}
-
-/**
- * Limpia el error en el input
- * @param {string} inputId - ID del input
- * @returns {void}
- */
-function clearInputError(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  input.classList.remove("is-invalid");
-
-  const feedback = input.nextElementSibling;
-  if (feedback && feedback.classList.contains("invalid-feedback")) {
-    feedback.innerText = "";
-  }
 }
 
 /**
@@ -842,7 +864,7 @@ function openDeleteMovementModal(id) {
   if (!product) return;
 
   // definir el tipo de movimiento
-  const movementTypeText = movement.type === "IN" ? "entrada" : "salida";
+  const movementTypeText = movement.type === MOVEMENTS_TYPES.IN ? "entrada" : "salida";
   // abrir el modal de confirmación de eliminación
   openConfirmDeleteModal(
     "movement",
@@ -874,7 +896,7 @@ function confirmDeleteMovement() {
   // Revertir el efecto en el stock del producto
   const updatedProducts = products.map((p) => {
     if (p.id === movement.productId) {
-      if (movement.type === "IN") {
+      if (movement.type === MOVEMENTS_TYPES.IN) {
         // Si era entrada, restar la cantidad
         return { ...p, quantity: p.quantity - movement.quantity };
       } else {
