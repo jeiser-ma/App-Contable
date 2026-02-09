@@ -143,16 +143,29 @@ async function setupProductsControls() {
  * Resetea el formulario y configura el título del modal
  */
 function openAddProductModal() {
-  setModalHeader(MODAL_PRODUCTS, false);
-  document.getElementById(ID_PRODUCT_FORM).reset();
-  clearInputError(ID_INPUT_NAME);
-  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
-  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
-  document.getElementById(ID_PRODUCT_ID).value = "";
+  // Resetear el estado de edición porque es un nuevo producto y no hay producto para editar
+  PRODUCTS_STATE.elementToEdit = null;
 
-  // Cargar unidades de medida en el select
+  // definir el header del modal para nuevo producto
+  setModalHeader(MODAL_PRODUCTS, false);
+  // Limpiar errores de validación anteriores del modal
+  clearInputErrors([ID_INPUT_NAME, ID_INPUT_LOW_STOCK_THRESHOLD, ID_INPUT_CRITICAL_STOCK_THRESHOLD]);
+
+  // Resetear el formulario del modal
+  // Establecer el valor del input de ID
+  setInputValue(ID_PRODUCT_ID, "");
+  // Establecer el valor del input de nombre
+  setInputValue(ID_INPUT_NAME, "");
+  // Establecer el valor del input de precio
+  setInputValue(ID_INPUT_PRICE, "");
+  // Establecer el valor del input de umbral de stock bajo
+  setInputValue(ID_INPUT_LOW_STOCK_THRESHOLD, "");
+  // Establecer el valor del input de umbral de stock crítico
+  setInputValue(ID_INPUT_CRITICAL_STOCK_THRESHOLD, "");
+  // Cargar unidades de medida en el select y seleccionar la del producto
   loadUnitsIntoSelect();
 
+  // Mostrar modal
   toggleModalModules();
 }
 
@@ -162,30 +175,35 @@ function openAddProductModal() {
  * @param {string} id - ID del producto a editar
  */
 function openEditProductModal(id) {
-  const products = getData(PAGE_PRODUCTS);
-  const product = products.find((p) => p.id === id);
+  // Obtener el producto a editar
+  const product = getDataById(PAGE_PRODUCTS, id);
   if (!product) return;
+  
+  // Resetear el estado de edición porque es un nuevo producto y no hay producto para editar
+  PRODUCTS_STATE.elementToEdit = id;
 
+  // definir el header del modal para editar producto
   setModalHeader(MODAL_PRODUCTS, true);
-  clearInputError(ID_INPUT_NAME);
-  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
-  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
-  document.getElementById(ID_PRODUCT_ID).value = product.id;
-  document.getElementById(ID_INPUT_NAME).value = product.name;
-  document.getElementById(ID_INPUT_PRICE).value = product.price;
-  //document.getElementById(ID_INPUT_QUANTITY).value = product.quantity;
-  document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value =
-    product.lowStockThreshold || "";
-  document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value =
-    product.criticalStockThreshold || "";
 
+  // Limpiar errores de validación anteriores del modal
+  clearInputErrors([ID_INPUT_NAME, ID_INPUT_LOW_STOCK_THRESHOLD, ID_INPUT_CRITICAL_STOCK_THRESHOLD]);
+
+  // Establecer el valor del input de ID
+  setInputValue(ID_PRODUCT_ID, product.id);
+  // Establecer el valor del input de nombre
+  setInputValue(ID_INPUT_NAME, product.name);
+  // Establecer el valor del input de precio
+  setInputValue(ID_INPUT_PRICE, product.price);
+  // Establecer el valor del input de umbral de stock bajo
+  setInputValue(ID_INPUT_LOW_STOCK_THRESHOLD, product.lowStockThreshold || "");
+  // Establecer el valor del input de umbral de stock crítico
+  setInputValue(ID_INPUT_CRITICAL_STOCK_THRESHOLD, product.criticalStockThreshold || "");
   // Cargar unidades de medida en el select y seleccionar la del producto
   loadUnitsIntoSelect();
-  const umSelect = document.getElementById(ID_INPUT_UM);
-  if (umSelect && product.um) {
-    umSelect.value = product.um;
-  }
+  // Establecer el valor del input de unidad de medida
+  setInputValue(ID_INPUT_UM, product.um);
 
+  // Mostrar modal
   toggleModalModules();
 }
 
@@ -491,24 +509,21 @@ function renderProducts() {
  * @returns {void}
  */
 function saveProductFromModal() {
-  const id = document.getElementById(ID_PRODUCT_ID).value;
-  const name = document.getElementById(ID_INPUT_NAME).value.trim();
-  const price = Number(document.getElementById(ID_INPUT_PRICE).value);
-  const um = document.getElementById(ID_INPUT_UM).value.trim();
-  //const quantity = Number(document.getElementById(ID_INPUT_QUANTITY).value);
-  const lowStockThreshold = Number(
-    document.getElementById(ID_INPUT_LOW_STOCK_THRESHOLD).value
-  );
-  const criticalStockThreshold = Number(
-    document.getElementById(ID_INPUT_CRITICAL_STOCK_THRESHOLD).value
-  );
+  // Obtener los valores de los inputs
+  const id = getInputValue(ID_PRODUCT_ID);
+  const name = getInputValue(ID_INPUT_NAME).trim();
+  const price = Number(getInputValue(ID_INPUT_PRICE));
+  const um = getInputValue(ID_INPUT_UM).trim();
+  const lowStockThreshold = Number(getInputValue(ID_INPUT_LOW_STOCK_THRESHOLD));
+  const criticalStockThreshold = Number(getInputValue(ID_INPUT_CRITICAL_STOCK_THRESHOLD));
 
+  // Obtener los productos
   let products = getData(PAGE_PRODUCTS);
 
-  clearInputError(ID_INPUT_NAME);
-  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
-  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
+  // Limpiar errores de validación anteriores del modal
+  clearInputErrors([ID_INPUT_NAME, ID_INPUT_LOW_STOCK_THRESHOLD, ID_INPUT_CRITICAL_STOCK_THRESHOLD]);
 
+  // Validaciones
   // nombre obligatorio
   if (!name) {
     setInputError(ID_INPUT_NAME, "El nombre es obligatorio");
@@ -535,6 +550,7 @@ function saveProductFromModal() {
   }
 
   if (!criticalStockThreshold || criticalStockThreshold < 0) {
+    
     setInputError(
       ID_INPUT_CRITICAL_STOCK_THRESHOLD,
       "El umbral de stock crítico es obligatorio"
@@ -545,35 +561,47 @@ function saveProductFromModal() {
   // Si hay un id de producto es una edición si no, es un alta de producto
   if (id) {
     // EDITAR
-    // el producto se actualiza sin modificar la cantidad
-    products = products.map((p) =>
-      p.id === id
-        ? {
-            ...p,
-            name,
-            price,
-            um,
-            lowStockThreshold,
-            criticalStockThreshold,
-          }
-        : p
-    );
+
+    // obtener el producto a editar
+    const productToEdit = getDataById(PAGE_PRODUCTS, id);
+    if (!productToEdit) {
+      setInputError(ID_PRODUCT_ID, "El producto no existe");
+      return;
+    }
+    // actualizar el producto
+    productToEdit = {
+      ...productToEdit,
+      name,
+      price,
+      um,
+      lowStockThreshold,
+      criticalStockThreshold,
+    };
+    // guardar el producto actualizado
+    setDataById(PAGE_PRODUCTS, productToEdit);
+
   } else {
     // ALTA
+
+    // crear el producto
     // el producto se inicializa con cantidad 0
-    products.push({
+    const newProduct = {
       id: crypto.randomUUID(),
       name,
       price,
       um,
       quantity:0,
       lowStockThreshold,
-      criticalStockThreshold,
-    });
+      criticalStockThreshold
+    };
+    // guardar el producto creado
+    setDataById(PAGE_PRODUCTS, newProduct);
   }
 
-  setData(PAGE_PRODUCTS, products);
+  // Cerrar el modal
   toggleModalModules();
+
+  // Renderizar la lista de productos
   renderProducts();
 }
 

@@ -125,6 +125,7 @@ async function setupExpensesControls() {
  * @returns {void}
  */
 function openAddExpenseModal() {
+  // Resetear el estado de edición porque es un nuevo gasto y no hay gasto para editar
   EXPENSES_STATE.elementToEdit = null;
 
   // definir el header del modal para nuevo gasto
@@ -182,22 +183,27 @@ function saveExpenseFromModal() {
     return;
   }
 
-  // Obtener los gastos
-  const expenses = getData(PAGE_EXPENSES) || [];
   // Si se está editando un gasto, actualizar el gasto
   // de lo contrario, crear un nuevo gasto
   if (EXPENSES_STATE.elementToEdit) {
     // Editar
-    const idx = expenses.findIndex((e) => e.id === EXPENSES_STATE.elementToEdit);
-    if (idx === -1) return;
 
-    expenses[idx] = {
-      ...expenses[idx],
+    // Obtener el gasto a editar
+    const expenseToEdit = getDataById(PAGE_EXPENSES, EXPENSES_STATE.elementToEdit);
+    if (!expenseToEdit) {
+      setInputError(ID_EXPENSE_CONCEPT, "El gasto no existe");
+      return;
+    }
+    // Actualizar el gasto
+    expenseToEdit = {
+      ...expenseToEdit,
       concept,
       amount,
       date,
       note,
     };
+    // guardar el gasto actualizado
+    setDataById(PAGE_EXPENSES, expenseToEdit);
   } else {
     // Crear
     const newExpense = {
@@ -208,11 +214,10 @@ function saveExpenseFromModal() {
       note,
       createdAt: new Date().toISOString(),
     };
-    expenses.push(newExpense);
+    // guardar el gasto creado
+    setDataById(PAGE_EXPENSES, newExpense);
   }
 
-  // Guardar los gastos
-  setData(PAGE_EXPENSES, expenses);
   // Cerrar el modal
   hideModalModules();
   // Renderizar la lista de gastos
@@ -246,7 +251,7 @@ function openEditExpenseModal(id) {
   setInputValue(ID_EXPENSE_NOTE, expense.note || "");
 
   // Mostrar el modal
-  showModalModules();
+  toggleModalModules();
 }
 
 /**

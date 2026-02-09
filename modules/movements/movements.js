@@ -144,21 +144,7 @@ async function setupMovementsControls() {
  * @returns {void}
  */
 function openAddMovementModal() {
-  setModalHeader(MODAL_PRODUCTS, false);
-  document.getElementById(ID_PRODUCT_FORM).reset();
-  clearInputError(ID_INPUT_NAME);
-  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
-  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
-  document.getElementById(ID_PRODUCT_ID).value = "";
-
-  // Cargar unidades de medida en el select
-  loadUnitsIntoSelect();
-
-  toggleModalModules();
-
-  /************************************************************** */
-
-
+  // Resetear el estado de edición porque es un nuevo movimiento y no hay movimiento para editar
   MOVEMENTS_STATE.elementToEdit = null;
 
   // definir el header del modal para nuevo movimiento
@@ -169,26 +155,17 @@ function openAddMovementModal() {
   // Configurar tipo por defecto (entrada)
   setInOutSelector(MOVEMENTS_TYPES.IN);
 
-  // Obtener los elementos del modal
-  const dateInput = document.getElementById(ID_MOVEMENT_DATE);
-  const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
-
-  if (!dateInput || !productInput) {
-    console.error("No se encontraron los elementos del modal");
-    return;
-  }
-
-  // Reset del formulario
-  
-  resetMovementForm();
-
-  
-
-  // establecer la fecha del filtro de fecha sino la fecha de hoy
-  dateInput.value = MOVEMENTS_STATE.filterDate || new Date().toISOString().split("T")[0];
+  // Establecer el valor del input de producto
+  setInputValue(ID_MOVEMENT_PRODUCT, "");
+  // Establecer el valor del input de cantidad  
+  setInputValue(ID_MOVEMENT_QUANTITY, "");
+  // Establecer el valor del input de fecha
+  setInputValue(ID_MOVEMENT_DATE, MOVEMENTS_STATE.filterDate || new Date().toISOString().split("T")[0]);
+  // Establecer el valor del input de observaciones
+  setInputValue(ID_MOVEMENT_NOTE, "");
 
   // Mostrar el formulario después de hacer todos los ajustes
-  showModalModules();
+  toggleModalModules();
 }
 
 
@@ -840,37 +817,26 @@ function openEditMovementModal(id) {
   // definir el header del modal para editar movimiento
   setModalHeader(MODAL_MOVEMENTS, true);
 
+  // Limpiar errores de validación anteriores del modal
+  clearInputErrors([ID_MOVEMENT_PRODUCT, ID_MOVEMENT_QUANTITY, ID_MOVEMENT_DATE, ID_MOVEMENT_NOTE]);
+
   // definir el tipo de movimiento
   // actualiza el movement_state y el selector de tipo de movimiento
   setInOutSelector(movement.type);
 
-  const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
-  const quantityInput = document.getElementById(ID_MOVEMENT_QUANTITY);
-  const dateInput = document.getElementById(ID_MOVEMENT_DATE);
-  const noteInput = document.getElementById(ID_MOVEMENT_NOTE);
-
-  // verificar que se encontraron todos los elementos del modal
-  if (!productInput || !quantityInput || !dateInput
-  ) {
-    console.error("No se encontraron los elementos del modal");
-    return;
-  }
 
   // Llenar campos con datos del movimiento
-  productInput.value = product.name;
-  quantityInput.value = movement.quantity;
-  dateInput.value = movement.date;
-  if (noteInput) {
-    noteInput.value = movement.note || "";
-  }
-
-  // Limpiar errores
-  clearInputError(ID_MOVEMENT_PRODUCT);
-  clearInputError(ID_MOVEMENT_QUANTITY);
-  clearInputError(ID_MOVEMENT_DATE);
+  // Establecer el valor del input de producto
+  setInputValue(ID_MOVEMENT_PRODUCT, product.name);
+  // Establecer el valor del input de cantidad
+  setInputValue(ID_MOVEMENT_QUANTITY, movement.quantity);
+  // Establecer el valor del input de fecha
+  setInputValue(ID_MOVEMENT_DATE, movement.date);
+  // Establecer el valor del input de observaciones
+  setInputValue(ID_MOVEMENT_NOTE, movement.note || "");
 
   // Mostrar modal
-  showModalModules();
+  toggleModalModules();
 }
 
 /**
