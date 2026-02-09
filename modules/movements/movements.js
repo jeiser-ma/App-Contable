@@ -144,12 +144,30 @@ async function setupMovementsControls() {
  * @returns {void}
  */
 function openAddMovementModal() {
+  setModalHeader(MODAL_PRODUCTS, false);
+  document.getElementById(ID_PRODUCT_FORM).reset();
+  clearInputError(ID_INPUT_NAME);
+  clearInputError(ID_INPUT_LOW_STOCK_THRESHOLD);
+  clearInputError(ID_INPUT_CRITICAL_STOCK_THRESHOLD);
+  document.getElementById(ID_PRODUCT_ID).value = "";
+
+  // Cargar unidades de medida en el select
+  loadUnitsIntoSelect();
+
+  toggleModalModules();
+
+  /************************************************************** */
+
+
   MOVEMENTS_STATE.elementToEdit = null;
-  // definir tipo de movimiento de entrada por defecto
-  MOVEMENTS_STATE.currentType = MOVEMENTS_TYPES.IN;
 
   // definir el header del modal para nuevo movimiento
   setModalHeader(MODAL_MOVEMENTS, false);
+  // Limpiar errores de validación anteriores del modal
+  clearInputErrors([ID_MOVEMENT_PRODUCT, ID_MOVEMENT_QUANTITY, ID_MOVEMENT_DATE, ID_MOVEMENT_NOTE]);
+
+  // Configurar tipo por defecto (entrada)
+  setInOutSelector(MOVEMENTS_TYPES.IN);
 
   // Obtener los elementos del modal
   const dateInput = document.getElementById(ID_MOVEMENT_DATE);
@@ -161,10 +179,10 @@ function openAddMovementModal() {
   }
 
   // Reset del formulario
+  
   resetMovementForm();
 
-  // Configurar tipo por defecto (entrada)
-  setInOutSelector(MOVEMENTS_TYPES.IN);
+  
 
   // establecer la fecha del filtro de fecha sino la fecha de hoy
   dateInput.value = MOVEMENTS_STATE.filterDate || new Date().toISOString().split("T")[0];
@@ -588,7 +606,7 @@ function saveMovementFromModal() {
     if (availableStock < quantity) {
       setInputError(
         ID_MOVEMENT_QUANTITY,
-        `Stock insuficiente. Disponible: ${availableStock}`
+        `Stock insuficiente. Disponible: ${product.quantity}`
       );
       return;
     }
@@ -601,15 +619,7 @@ function saveMovementFromModal() {
   }
 
   // GUARDAR MOVIMIENTO
-
-
-
-
-
-
-
-
-  const movements = getData(PAGE_MOVEMENTS) || [];
+  //const movements = getData(PAGE_MOVEMENTS) || [];
 
   if (MOVEMENTS_STATE.elementToEdit) {
     // EDITAR: Actualizar movimiento existente
@@ -681,11 +691,14 @@ function saveMovementFromModal() {
     // Revertir el efecto del movimiento anterior en el producto anterior
     if (editingMovement && editingMovement.productId !== product.id) {
       console.log("Revertir el efecto del movimiento anterior en el producto anterior");
+      console.log("editingMovement: ", editingMovement.productId);
+      console.log("product: ", product.id);
       // Actualizar el stock del producto anterior
       let deltaQuantity = editingMovement.type === MOVEMENTS_TYPES.IN ? -editingMovement.quantity : editingMovement.quantity;
       let newQuantity = updateProductQuantity(editingMovement.productId, deltaQuantity);
+      console.log("newQuantity: ", newQuantity);
       if (newQuantity === -1) {
-        // DUDA: ¿Qué hacer si el stock insuficiente?
+        // Si el stock es insuficiente, mostrar error y no revertir el movimiento
         setInputError(ID_MOVEMENT_QUANTITY, "Stock insuficiente para revertir el movimiento");
         return;
       }
@@ -707,7 +720,7 @@ function saveMovementFromModal() {
     const updatedMovement = {
       ...editingMovement,
       productId: product.id,
-      type: MOVEMENTS_STATE.currentType.toUpperCase(),
+      type: MOVEMENTS_STATE.currentType, //.toUpperCase(),
       quantity: quantity,
       date: date,
       note: note || "",
@@ -716,12 +729,23 @@ function saveMovementFromModal() {
 
     MOVEMENTS_STATE.elementToEdit = null;
   } else {
-    // NUEVO: Crear nuevo movimiento
+    // NUEVO: 
+
+    //1. Actualizar stock del producto para ver si hay suficiente stock
+    let deltaQuantity = MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN ? quantity : -quantity;
+    let newQuantity = updateProductQuantity(product.id, deltaQuantity);
+    if (newQuantity === -1) {
+      // Si el stock es insuficiente, mostrar error y no crear el movimiento
+      setInputError(ID_MOVEMENT_QUANTITY, "Stock insuficiente para aplicar el movimiento");
+      return;
+    }
+
+    //2. Crear nuevo movimiento
     console.log("Crear nuevo movimiento");
     const newMovement = {
       id: crypto.randomUUID(),
       productId: product.id,
-      type: MOVEMENTS_STATE.currentType.toUpperCase(),
+      type: MOVEMENTS_STATE.currentType, //.toUpperCase(),
       quantity: quantity,
       date: date,
       note: note || "",
@@ -730,20 +754,23 @@ function saveMovementFromModal() {
 
     // movements.push(newMovement);
     // setData(PAGE_MOVEMENTS, movements);
-    setDataById(PAGE_MOVEMENTS, newMovement);
+     setDataById(PAGE_MOVEMENTS, newMovement);
 
-    // Actualizar stock del producto
-    const updatedProducts = products.map((p) => {
-      if (p.id === product.id) {
-        if (MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN) {
-          return { ...p, quantity: p.quantity + quantity };
-        } else {
-          return { ...p, quantity: p.quantity - quantity };
-        }
-      }
-      return p;
-    });
-    setData(PAGE_PRODUCTS, updatedProducts);
+    // // Actualizar stock del producto
+    // const updatedProducts = products.map((p) => {
+    //   if (p.id === product.id) {
+    //     if (MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN) {
+    //       return { ...p, quantity: p.quantity + quantity };
+    //     } else {
+    //       return { ...p, quantity: p.quantity - quantity };
+    //     }
+    //   }
+    //   return p;
+    // });
+    // setData(PAGE_PRODUCTS, updatedProducts);
+
+
+    
   }
 
   // Cerrar modal y actualizar vista
@@ -815,7 +842,7 @@ function openEditMovementModal(id) {
 
   // definir el tipo de movimiento
   // actualiza el movement_state y el selector de tipo de movimiento
-  setInOutSelector(movement.type.toLowerCase());
+  setInOutSelector(movement.type);
 
   const productInput = document.getElementById(ID_MOVEMENT_PRODUCT);
   const quantityInput = document.getElementById(ID_MOVEMENT_QUANTITY);
