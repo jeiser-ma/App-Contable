@@ -524,10 +524,10 @@ function saveMovementFromModal() {
   // Se actualiza cuando se hace clic en el selector de tipo de movimiento
 
 
-  const productName = getInputValue(ID_MOVEMENT_PRODUCT).trim();
-  const quantity = Number(getInputValue(ID_MOVEMENT_QUANTITY));
+  const productName = getInputValue(ID_MOVEMENT_PRODUCT);
+  const quantity = getInputValue(ID_MOVEMENT_QUANTITY);
   const date = getInputValue(ID_MOVEMENT_DATE);
-  const note = getInputValue(ID_MOVEMENT_NOTE).trim() || "";
+  const note = getInputValue(ID_MOVEMENT_NOTE) || "";
 
   // Validaciones
   // Validar que se ingresó un producto

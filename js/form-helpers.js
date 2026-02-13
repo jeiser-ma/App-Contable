@@ -171,10 +171,14 @@ function clearInputState(inputId, invalidFeedbackId, validFeedbackId) {
  */
 function setInputValue(inputId, value) {
   const input = document.getElementById(inputId);
-  if (!input) return;
+  if (!input) {
+    console.error(`Input con ID ${inputId} no encontrado`);
+    return false;
+  }
 
   input.value = value;
 }
+
 /**
  * Establece el valor de un input
  * @param {string} inputId - ID del input
@@ -183,7 +187,27 @@ function setInputValue(inputId, value) {
  */
 function getInputValue(inputId) {
   const input = document.getElementById(inputId);
-  if (!input) return;
+  if (!input) {
+    console.error(`Input con ID ${inputId} no encontrado`);
+    return false;
+  }
 
-  return input.value;
+  return input.value.trim();
+}
+
+
+/**
+ * Establece el valor de un input
+ * @param {string} labelId - ID del label
+ * @param {string} value - Valor a setear en el input
+ * @returns {void}
+ */
+function setLabelText(labelId, value) {
+  const label = document.getElementById(labelId);
+  if (!label) {
+    console.error(`Label con ID ${labelId} no encontrado`);
+    return false;
+  }
+
+  label.textContent = value;
 }

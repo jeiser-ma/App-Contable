@@ -146,40 +146,47 @@ async function setupInventoryControls() {
  * @returns {void}
  */
 function openAddInventoryModal(productId) {
-  INVENTORY_STATE.elementToEdit = productId;
-
-  const products = getData(PAGE_PRODUCTS) || [];
-  const product = products.find((p) => p.id === productId);
-
+  
+  // Obtener el producto
+  const product = getDataById(PAGE_PRODUCTS, productId);
+  // const products = getData(PAGE_PRODUCTS) || [];
+  // const product = products.find((p) => p.id === productId);
   if (!product) {
     console.error("Producto no encontrado");
     return;
   }
+  
+  // Definir el producto a editar
+  INVENTORY_STATE.elementToEdit = productId;
 
+  // Inicializar el modal
   initModalModule(MODAL_INVENTORY);
+  // Definir el header del modal para inventario de un producto
   setModalHeader(MODAL_INVENTORY, false);
+  
+  // Mostrar nombre del producto
+  setLabelText(ID_INVENTORY_PRODUCT_LABEL, product.name);
+  //  const productLabel = document.getElementById(ID_INVENTORY_PRODUCT_LABEL);
+  //productLabel.textContent = product.name;
+  
+  // Mostrar stock del producto
+  setLabelText(ID_INVENTORY_PRODUCT_STOCK, product.quantity || 0);
+  // const productStock = document.getElementById("inventoryProductStock");
+    //if (productStock) {
+    //  productStock.textContent = product.quantity || 0;
+    //}
 
-  const productLabel = document.getElementById(ID_INVENTORY_PRODUCT_LABEL);
-  const productStock = document.getElementById("inventoryProductStock");
   const warehouseInput = document.getElementById(ID_LOCATION_WAREHOUSE_INPUT);
   const storeInput = document.getElementById(ID_LOCATION_STORE_INPUT);
 
-  if (!productLabel || !warehouseInput || !storeInput) {
+  if (!warehouseInput || !storeInput) {
     console.error("No se encontraron los elementos del modal de inventario");
     return;
   }
 
-  // Mostrar nombre del producto
-  productLabel.textContent = product.name;
-
-  // Mostrar stock del producto
-  if (productStock) {
-    productStock.textContent = product.quantity || 0;
-  }
-
   // Obtener inventario existente para este producto en esta fecha (si existe)
-  const date =
-    INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
+  // const date = INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
+  const date = INVENTORY_STATE.filterDate || getToday();
   const allInventory = getData(PAGE_INVENTORY) || [];
   const existingInventory = allInventory.find(
     (inv) =>
@@ -297,8 +304,8 @@ function getValidatedInventoryValuesFromModal() {
   // clearInventoryInputError(ID_LOCATION_STORE_INPUT);
 
   // Obtener valores (pueden estar vacíos)
-  const warehouseValue = warehouseInput.value.trim();
-  const storeValue = storeInput.value.trim();
+  const warehouseValue = getInputValue(ID_LOCATION_WAREHOUSE_INPUT).trim();
+  const storeValue = getInputValue(ID_LOCATION_STORE_INPUT).trim();
 
   // Validar que al menos uno tenga valor
   if (!warehouseValue && !storeValue) {
