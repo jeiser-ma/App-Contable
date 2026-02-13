@@ -13,6 +13,7 @@ const ID_PARTIAL_CARD_TEMPLATE = "partialInventoryCardTemplate";
 const ID_COMPLETED_CARD_TEMPLATE = "completedInventoryCardTemplate";
 
 const ID_INVENTORY_PRODUCT_LABEL = "inventoryProductLabel";
+const ID_INVENTORY_PRODUCT_STOCK = "inventoryProductStock";
 const ID_LOCATION_WAREHOUSE_INPUT = "locationWarehouseInput";
 const ID_LOCATION_STORE_INPUT = "locationStoreInput";
 
@@ -146,16 +147,14 @@ async function setupInventoryControls() {
  * @returns {void}
  */
 function openAddInventoryModal(productId) {
-  
+
   // Obtener el producto
   const product = getDataById(PAGE_PRODUCTS, productId);
-  // const products = getData(PAGE_PRODUCTS) || [];
-  // const product = products.find((p) => p.id === productId);
   if (!product) {
     console.error("Producto no encontrado");
     return;
   }
-  
+
   // Definir el producto a editar
   INVENTORY_STATE.elementToEdit = productId;
 
@@ -163,29 +162,15 @@ function openAddInventoryModal(productId) {
   initModalModule(MODAL_INVENTORY);
   // Definir el header del modal para inventario de un producto
   setModalHeader(MODAL_INVENTORY, false);
-  
+
   // Mostrar nombre del producto
   setLabelText(ID_INVENTORY_PRODUCT_LABEL, product.name);
-  //  const productLabel = document.getElementById(ID_INVENTORY_PRODUCT_LABEL);
-  //productLabel.textContent = product.name;
-  
+
   // Mostrar stock del producto
   setLabelText(ID_INVENTORY_PRODUCT_STOCK, product.quantity || 0);
-  // const productStock = document.getElementById("inventoryProductStock");
-    //if (productStock) {
-    //  productStock.textContent = product.quantity || 0;
-    //}
 
-  const warehouseInput = document.getElementById(ID_LOCATION_WAREHOUSE_INPUT);
-  const storeInput = document.getElementById(ID_LOCATION_STORE_INPUT);
-
-  if (!warehouseInput || !storeInput) {
-    console.error("No se encontraron los elementos del modal de inventario");
-    return;
-  }
 
   // Obtener inventario existente para este producto en esta fecha (si existe)
-  // const date = INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
   const date = INVENTORY_STATE.filterDate || getToday();
   const allInventory = getData(PAGE_INVENTORY) || [];
   const existingInventory = allInventory.find(
@@ -196,47 +181,20 @@ function openAddInventoryModal(productId) {
   );
 
   // Cargar valores existentes o limpiar campos
-  const isClosed = isInventoryClosed(existingInventory);
   if (existingInventory) {
-    warehouseInput.value =
-      existingInventory.warehouseQuantity !== null &&
-        existingInventory.warehouseQuantity !== undefined
-        ? existingInventory.warehouseQuantity
-        : "";
-    storeInput.value =
-      existingInventory.storeQuantity !== null &&
-        existingInventory.storeQuantity !== undefined
-        ? existingInventory.storeQuantity
-        : "";
+    setInputValue(ID_LOCATION_WAREHOUSE_INPUT, existingInventory.warehouseQuantity != null ? existingInventory.warehouseQuantity : "");
+    setInputValue(ID_LOCATION_STORE_INPUT, existingInventory.storeQuantity != null ? existingInventory.storeQuantity : "");
   } else {
-    warehouseInput.value = "";
-    storeInput.value = "";
-  }
-
-  // Inventarios cerrados (contabilidad cerrada): solo lectura, no permitir guardar
-  if (isClosed) {
-    warehouseInput.readOnly = true;
-    storeInput.readOnly = true;
-    const btnConfirm = document.getElementById(BTN_ID_CONFIRM_INVENTORY);
-    if (btnConfirm) {
-      btnConfirm.disabled = true;
-      btnConfirm.setAttribute("title", "Contabilidad cerrada: no se puede editar");
-    }
-  } else {
-    warehouseInput.readOnly = false;
-    storeInput.readOnly = false;
-    const btnConfirm = document.getElementById(BTN_ID_CONFIRM_INVENTORY);
-    if (btnConfirm) {
-      btnConfirm.disabled = false;
-      btnConfirm.removeAttribute("title");
-    }
+    setInputValue(ID_LOCATION_WAREHOUSE_INPUT, "");
+    setInputValue(ID_LOCATION_STORE_INPUT, "");
   }
 
   // Limpiar errores
-  // clearInventoryInputError(ID_LOCATION_WAREHOUSE_INPUT);
-  // clearInventoryInputError(ID_LOCATION_STORE_INPUT);
+  clearInventoryInputError(ID_LOCATION_WAREHOUSE_INPUT);
+  clearInventoryInputError(ID_LOCATION_STORE_INPUT);
 
-  showModalModules();
+  // Mostrar el modal
+  toggleModalModules();
 }
 
 /**
@@ -250,35 +208,22 @@ function openAddInventoryModal(productId) {
  */
 function saveInventory(productId, date, warehouseQuantity, storeQuantity) {
   const inventory = getData(PAGE_INVENTORY) || [];
-  const existingIndex = inventory.findIndex(
+  const existingInv = inventory.find(
     (inv) => inv.productId === productId && inv.date === date
   );
 
-  let finalId = crypto.randomUUID();
-  let finalCreatedAt = new Date().toISOString();
-  if (existingIndex >= 0) {
-    finalId = inventory[existingIndex].id;
-    finalCreatedAt = inventory[existingIndex].createdAt;
-  }
-
-  const inventoryData = {
-    id: finalId,
+  const finalInv = {
+    id: existingInv ? existingInv.id : crypto.randomUUID(), 
     productId,
     warehouseQuantity: warehouseQuantity ?? null,
     storeQuantity: storeQuantity ?? null,
     date,
     status: "CONFIRMED",
-    createdAt: finalCreatedAt,
+    createdAt: existingInv ? existingInv.createdAt : new Date().toISOString(),
   };
+  setDataById(PAGE_INVENTORY, finalInv);
 
-  if (existingIndex >= 0) {
-    inventory[existingIndex] = inventoryData;
-  } else {
-    inventory.push(inventoryData);
-  }
-
-  setData(PAGE_INVENTORY, inventory);
-  return inventoryData;
+  return finalInv;
 }
 
 /**
@@ -287,25 +232,24 @@ function saveInventory(productId, date, warehouseQuantity, storeQuantity) {
  * @returns {{ valid: boolean, date?: string, warehouseQuantity?: number|null, storeQuantity?: number|null, productId?: string }} Resultado de validación y valores
  */
 function getValidatedInventoryValuesFromModal() {
-  const warehouseInput = document.getElementById(ID_LOCATION_WAREHOUSE_INPUT);
-  const storeInput = document.getElementById(ID_LOCATION_STORE_INPUT);
 
-  if (!warehouseInput || !storeInput || !INVENTORY_STATE.elementToEdit) {
-    console.error(
-      "No se encontraron los campos del formulario o el producto actual"
-    );
+  const date = INVENTORY_STATE.filterDate || getToday();
+
+  // Obtener valores (pueden estar vacíos)
+  const warehouseValue = getInputValue(ID_LOCATION_WAREHOUSE_INPUT);
+  const storeValue = getInputValue(ID_LOCATION_STORE_INPUT);
+
+  
+  // Validar que sean números válidos
+  if (warehouseValue !== "" && isNaN(warehouseValue)) {
+    setInputError(ID_LOCATION_WAREHOUSE_INPUT, "Ingresá un número válido", "inventoryErrorFeedback");
     return { valid: false };
   }
 
-  const date = INVENTORY_STATE.filterDate || new Date().toISOString().split("T")[0];
-
-  // Limpiar errores previos
-  // clearInventoryInputError(ID_LOCATION_WAREHOUSE_INPUT);
-  // clearInventoryInputError(ID_LOCATION_STORE_INPUT);
-
-  // Obtener valores (pueden estar vacíos)
-  const warehouseValue = getInputValue(ID_LOCATION_WAREHOUSE_INPUT).trim();
-  const storeValue = getInputValue(ID_LOCATION_STORE_INPUT).trim();
+  if (storeValue !== "" && isNaN(storeValue)) {
+    setInputError(ID_LOCATION_STORE_INPUT, "Ingresá un número válido", "inventoryErrorFeedback");
+    return { valid: false };
+  }
 
   // Validar que al menos uno tenga valor
   if (!warehouseValue && !storeValue) {
@@ -314,12 +258,19 @@ function getValidatedInventoryValuesFromModal() {
       "Ingresá al menos una cantidad (almacén o tienda)",
       "inventoryErrorFeedback"
     );
+    setInputError(
+      ID_LOCATION_STORE_INPUT,
+      "Ingresá al menos una cantidad (almacén o tienda)",
+      "inventoryErrorFeedback"
+    );
     return { valid: false };
   }
+
 
   // Convertir a números (si está vacío, se manejará después)
   let warehouseQuantity = warehouseValue === "" ? null : Number(warehouseValue);
   let storeQuantity = storeValue === "" ? null : Number(storeValue);
+
 
   // Validar que no sean negativos (solo si tienen valor)
   if (warehouseQuantity !== null && warehouseQuantity < 0) {
@@ -355,24 +306,10 @@ function getValidatedInventoryValuesFromModal() {
     return { valid: false };
   }
 
-  // Validar que sean números válidos
-  if (
-    warehouseValue !== "" &&
-    (isNaN(warehouseQuantity) || !isFinite(warehouseQuantity))
-  ) {
-    setInputError(ID_LOCATION_WAREHOUSE_INPUT, "Ingresá un número válido", "inventoryErrorFeedback");
-    return { valid: false };
-  }
-
-  if (storeValue !== "" && (isNaN(storeQuantity) || !isFinite(storeQuantity))) {
-    setInputError(ID_LOCATION_STORE_INPUT, "Ingresá un número válido", "inventoryErrorFeedback");
-    return { valid: false };
-  }
 
 
   // Validar que la suma no supere el stock total del producto
-  const products = getData(PAGE_PRODUCTS) || [];
-  const product = products.find((p) => p.id === INVENTORY_STATE.elementToEdit);
+  const product = getDataById(PAGE_PRODUCTS, INVENTORY_STATE.elementToEdit);
   if (product) {
     const productStock = product.quantity || 0;
     const totalInventory =
@@ -405,21 +342,24 @@ function saveInventoryFromModal() {
 
   // No permitir guardar si el inventario ya está cerrado (contabilidad cerrada)
   const inventory = getData(PAGE_INVENTORY) || [];
-  const existing = inventory.find(
+  const existingInv = inventory.find(
     (inv) =>
       inv.productId === result.productId &&
       inv.date === result.date
   );
-  if (isInventoryClosed(existing)) {
-    showToast("No se puede editar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER,3);
+  if (isInventoryClosed(existingInv)) {
+    showToast("No se puede editar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER, 3);
     return;
   }
-
+  
+  // Guardar el inventario
   saveInventory(result.productId, result.date, result.warehouseQuantity, result.storeQuantity);
 
   // Cerrar modal y actualizar vista
   hideModalModules();
+  // Limpiar el elemento a editar
   INVENTORY_STATE.elementToEdit = null;
+  // Renderizar la lista de inventario
   renderInventory();
 }
 
@@ -440,7 +380,7 @@ function openDeleteInventoryModal(inventoryId) {
 
   // No permitir eliminar inventarios cerrados (contabilidad cerrada)
   if (isInventoryClosed(inv)) {
-    showToast("No se puede eliminar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER,3);
+    showToast("No se puede eliminar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER, 3);
     return;
   }
 
@@ -467,7 +407,7 @@ function confirmDeleteInventory() {
 
   // No permitir eliminar inventarios cerrados (contabilidad cerrada)
   if (isInventoryClosed(deleted)) {
-    showToast("No se puede eliminar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER,3);
+    showToast("No se puede eliminar: la contabilidad de esta fecha está cerrada", TOAST_COLORS.DANGER, 3);
     return;
   }
 
