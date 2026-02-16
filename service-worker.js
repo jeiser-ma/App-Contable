@@ -45,8 +45,9 @@ const PRECACHE_URLS = [
   "pages/home.html",
   "pages/settings.html",
   "modules/accounting/accounting.html",
+  "modules/accounting/accounting.js",
   "modules/products/products.html",
-  "modules/accounting/accounting.js"
+  "modules/products/products.js"
 ];
 
 // Precacha URL por URL para que un fallo (ej. 404) no deje la caché vacía
