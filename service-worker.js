@@ -10,7 +10,7 @@
 const CACHE_NAME_PREFIX = "app-contable-";
 
 // Debe coincidir con version.json; al cambiar, el archivo SW cambia y la PWA se actualiza
-const APP_VERSION = "1.0.4";
+const APP_VERSION = "1.0.5";
 
 function getCacheName() {
   return CACHE_NAME_PREFIX + APP_VERSION;
