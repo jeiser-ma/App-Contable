@@ -47,6 +47,7 @@ const PRECACHE_URLS = [
   "modules/accounting/accounting.html",
   "modules/accounting/accounting.js",
   "modules/products/products.html",
+  "modules/products/modals/products-modal.html",
   "modules/products/products.js"
 ];
 
