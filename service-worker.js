@@ -24,10 +24,40 @@ function getCacheName() {
 
 const NETWORK_FIRST_DESTINATIONS = ["document", "script", "stylesheet"];
 
+// Recursos críticos para precachear: la app podrá abrir offline tras la primera visita online
+const PRECACHE_URLS = [
+  "index.html",
+  "layout.html",
+  "version.json",
+  "manifest.json",
+  "css/bootstrap.min.css",
+  "css/bootstrap-icons.min.css",
+  "css/styles.css",
+  "js/bootstrap.bundle.min.js",
+  "js/configs.js",
+  "js/auth.js",
+  "js/storage.js",
+  "js/modal-helpers.js",
+  "js/form-helpers.js",
+  "js/router.js",
+  "js/modules-controls.js",
+  "js/modules-modals.js",
+  "js/navigation.js",
+  "js/home.js",
+  "js/settings.js",
+  "pages/home.html",
+  "pages/settings.html"
+];
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     getAppVersion()
       .then((ver) => { CACHE_VERSION = ver; })
+      .then(() =>
+        caches.open(getCacheName()).then((cache) =>
+          cache.addAll(PRECACHE_URLS).catch(() => {})
+        )
+      )
       .then(() => self.skipWaiting())
   );
 });
