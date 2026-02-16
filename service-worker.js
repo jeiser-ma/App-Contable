@@ -44,6 +44,7 @@ const PRECACHE_URLS = [
   "js/settings.js",
   "pages/home.html",
   "pages/settings.html",
+  "pages/products.html",
   "pages/accounting.html"
 ];
 
