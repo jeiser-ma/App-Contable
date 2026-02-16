@@ -17,6 +17,8 @@ const ID_CONCEPT_ERROR_FEEDBACK = "conceptErrorFeedback";
 const ID_INPUT_SALARY_PERCENTAGE = "inputSalaryPercentage";
 const ID_BTN_SAVE_SALARY_PERCENTAGE = "btnSaveSalaryPercentage";
 const ID_SALARY_PERCENTAGE_ERROR_FEEDBACK = "salaryPercentageErrorFeedback";
+
+const ID_APP_VERSION_TEXT = "appVersionText";
 //#endregion
 
 /**
@@ -40,6 +42,19 @@ function onSettingsPageLoaded() {
   
   // Cargar porcentaje de salario actual
   loadSalaryPercentage();
+
+  setupAppVersion();
+}
+
+/**
+ * Muestra la versión de la app en el elemento #appVersionText (getAppVersion en configs.js).
+ * @returns {void}
+ */
+function setupAppVersion() {
+  // const versionEl = document.getElementById("appVersionText");
+  // if (versionEl) {
+    getAppVersion().then((ver) => { setLabelText(ID_APP_VERSION_TEXT, ver); });
+  // }
 }
 
 /**

@@ -1,31 +1,51 @@
 /**
  * Service Worker - App Contable (PWA)
  *
- * IMPORTANTE: Cuando subas una actualización a GitHub Pages, cambia CACHE_VERSION
- * (ej. 'v2', 'v3') para que los usuarios reciban la nueva versión sin borrar caché.
- * Los datos de la app (localStorage) no se pierden.
+ * La versión (y la caché) se toma de version.json.
+ * Al publicar una actualización, cambia "version" en version.json (ej. "1.0.1")
+ * para que los usuarios reciban la nueva versión. Los datos (localStorage) no se pierden.
  */
 
-const CACHE_VERSION = "v1";
-const CACHE_NAME = "app-contable-" + CACHE_VERSION;
+const CACHE_NAME_PREFIX = "app-contable-";
 
-// Tipos de recurso que siempre deben intentar red primero (evitar caché vieja)
+// Se rellena en install/activate al leer version.json
+let CACHE_VERSION = "1.0.0";
+
+function getAppVersion() {
+  return fetch("version.json", { cache: "reload" })
+    .then((r) => r.json())
+    .then((data) => data.version || "1.0.0")
+    .catch(() => "1.0.0");
+}
+
+function getCacheName() {
+  return CACHE_NAME_PREFIX + CACHE_VERSION;
+}
+
 const NETWORK_FIRST_DESTINATIONS = ["document", "script", "stylesheet"];
 
 self.addEventListener("install", (event) => {
-  console.log("Service Worker instalado");
-  self.skipWaiting();
+  event.waitUntil(
+    getAppVersion()
+      .then((ver) => { CACHE_VERSION = ver; })
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((names) => {
-      return Promise.all(
-        names
-          .filter((name) => name.startsWith("app-contable-") && name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
-      );
-    }).then(() => self.clients.claim())
+    getAppVersion()
+      .then((ver) => { CACHE_VERSION = ver; })
+      .then(() =>
+        caches.keys().then((names) => {
+          return Promise.all(
+            names
+              .filter((name) => name.startsWith(CACHE_NAME_PREFIX) && name !== getCacheName())
+              .map((name) => caches.delete(name))
+          );
+        })
+      )
+      .then(() => self.clients.claim())
   );
 });
 
@@ -35,9 +55,7 @@ self.addEventListener("fetch", (event) => {
   const isNav = event.request.mode === "navigate";
 
   // Solo aplicamos a nuestra propia origen (no a CDNs externos)
-  if (url.origin !== self.location.origin) {
-    return;
-  }
+  if (url.origin !== self.location.origin) return;
 
   // Para HTML, JS y CSS: red primero, sin usar caché del navegador (siempre versión nueva)
   if (isNav || NETWORK_FIRST_DESTINATIONS.includes(dest)) {
@@ -45,7 +63,7 @@ self.addEventListener("fetch", (event) => {
       fetch(event.request, { cache: "reload" })
         .then((response) => {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          caches.open(getCacheName()).then((cache) => cache.put(event.request, clone));
           return response;
         })
         .catch(() =>
@@ -61,7 +79,7 @@ self.addEventListener("fetch", (event) => {
       if (cached) return cached;
       return fetch(event.request).then((response) => {
         const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        caches.open(getCacheName()).then((cache) => cache.put(event.request, clone));
         return response;
       });
     })
