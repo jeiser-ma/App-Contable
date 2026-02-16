@@ -77,6 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.onclick = logout;
   }
 
+  // Registrar Service Worker (PWA): prioriza red para HTML/JS/CSS y evita caché vieja
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js").catch(() => {});
+  }
+
 });
 
 
