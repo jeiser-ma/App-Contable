@@ -22,7 +22,7 @@ function getCacheName() {
 
 const NETWORK_FIRST_DESTINATIONS = ["document", "script", "stylesheet"];
 
-// Recursos críticos para precachear: la app podrá abrir offline tras la primera visita online
+// Lista completa para que toda la app funcione offline sin haber visitado cada página antes
 const PRECACHE_URLS = [
   "index.html",
   "layout.html",
@@ -44,11 +44,52 @@ const PRECACHE_URLS = [
   "js/settings.js",
   "pages/home.html",
   "pages/settings.html",
+  "modules/products/products.html",
+  "modules/products/products.js",
+  "modules/products/modals/products-modal.html",
+  "modules/movements/movements.html",
+  "modules/movements/movements.js",
+  "modules/movements/modals/movements-modal.html",
+  "modules/inventory/inventory.html",
+  "modules/inventory/inventory.js",
+  "modules/inventory/modals/inventory-modal.html",
+  "modules/expenses/expenses.html",
+  "modules/expenses/expenses.js",
+  "modules/expenses/modals/expenses-modal.html",
   "modules/accounting/accounting.html",
   "modules/accounting/accounting.js",
-  "modules/products/products.html",
-  "modules/products/modals/products-modal.html",
-  "modules/products/products.js"
+  "modules/accounting/modals/cash-sales-modal.html",
+  "modules/accounting/modals/transfer-sales-modal.html",
+  "components/confirm-delete/confirm-delete.html",
+  "components/confirm-delete/confirm-delete.js",
+  "components/confirm-action/confirm-action.html",
+  "components/confirm-action/confirm-action.js",
+  "components/toast/toast.html",
+  "components/toast/toast.js",
+  "components/empty-state/empty-state.html",
+  "components/empty-state/empty-state.js",
+  "components/snackbar/snackbar.html",
+  "components/snackbar/undo.js",
+  "components/search-input/search-input.html",
+  "components/search-input/search-input.js",
+  "components/btn-add/btn-add.html",
+  "components/btn-add/btn-add.js",
+  "components/order-by/order-by.html",
+  "components/order-by/order-by.js",
+  "components/date-filter/date-filter.html",
+  "components/date-filter/date-filter.js",
+  "components/chips-filter/chips-filter.html",
+  "components/chips-filter/chips-filter.js",
+  "components/btn-clear-filters/btn-clear-filters.html",
+  "components/btn-clear-filters/btn-clear-filters.js",
+  "components/list-counter/list-counter.html",
+  "components/list-counter/list-counter.js",
+  // "data/Estructuras/accounting.json",
+  // "data/Estructuras/inventoryCount.json",
+  // "data/Estructuras/products.json",
+  // "data/Estructuras/expenses.json",
+  // "data/Estructuras/productMovements.json",
+  // "img/app-icon.png"
 ];
 
 // Precacha URL por URL para que un fallo (ej. 404) no deje la caché vacía
