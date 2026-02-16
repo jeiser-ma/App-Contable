@@ -10,7 +10,7 @@
 const CACHE_NAME_PREFIX = "app-contable-";
 
 // Debe coincidir con version.json; al cambiar, el archivo SW cambia y la PWA se actualiza
-const APP_VERSION = "1.0.5";
+const APP_VERSION = "1.0.6";
 
 function getCacheName() {
   return CACHE_NAME_PREFIX + APP_VERSION;
@@ -44,11 +44,20 @@ const PRECACHE_URLS = [
   "pages/accounting.html"
 ];
 
+// Precacha URL por URL para que un fallo (ej. 404) no deje la caché vacía
+function precacheAll(cache) {
+  return Promise.all(
+    PRECACHE_URLS.map((url) =>
+      cache.add(url).catch(() => {})
+    )
+  );
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(getCacheName())
-      .then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {}))
+      .then(precacheAll)
       .then(() => self.skipWaiting())
   );
 });
@@ -76,7 +85,7 @@ self.addEventListener("fetch", (event) => {
   // Solo aplicamos a nuestra propia origen (no a CDNs externos)
   if (url.origin !== self.location.origin) return;
 
-  // Para HTML, JS y CSS: red primero, sin usar caché del navegador (siempre versión nueva)
+  // Para HTML, JS y CSS: red primero; si falla (ej. sin internet), usar caché
   if (isNav || NETWORK_FIRST_DESTINATIONS.includes(dest)) {
     event.respondWith(
       fetch(event.request, { cache: "reload" })
@@ -86,7 +95,15 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() =>
-          caches.match(event.request).then((cached) => cached || fetch(event.request))
+          caches.match(event.request).then((cached) => {
+            if (cached) return cached;
+            // Sin conexión y sin caché para esta URL: para navegación, intentar servir index.html
+            if (isNav) {
+              const fallbackUrl = new URL("index.html", self.location.href).href;
+              return caches.match(fallbackUrl);
+            }
+            return Promise.reject(new Error("offline"));
+          })
         )
     );
     return;
