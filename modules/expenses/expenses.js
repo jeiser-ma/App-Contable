@@ -342,9 +342,8 @@ function filterExpenses(expenses) {
 
   // Filtro por texto de búsqueda (concepto)
   if (EXPENSES_STATE.searchText) {
-    const text = EXPENSES_STATE.searchText.toLowerCase();
     filtered = filtered.filter((e) =>
-      e.concept.toLowerCase().includes(text)
+      e.concept.toLowerCase().includes(EXPENSES_STATE.searchText.toLowerCase())
     );
   }
 
