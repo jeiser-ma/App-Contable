@@ -1,25 +1,19 @@
 /**
  * Service Worker - App Contable (PWA)
  *
- * La versión (y la caché) se toma de version.json.
- * Al publicar una actualización, cambia "version" en version.json (ej. "1.0.1")
- * para que los usuarios reciban la nueva versión. Los datos (localStorage) no se pierden.
+ * IMPORTANTE: Al publicar, actualizar en dos sitios el mismo número de versión:
+ * 1. version.json → "version": "1.0.1"
+ * 2. Aquí abajo → APP_VERSION = "1.0.1"
+ * Así el navegador detecta el cambio y actualiza la PWA sin tener que borrar caché.
  */
 
 const CACHE_NAME_PREFIX = "app-contable-";
 
-// Se rellena en install/activate al leer version.json
-let CACHE_VERSION = "1.0.0";
-
-function getAppVersion() {
-  return fetch("version.json", { cache: "reload" })
-    .then((r) => r.json())
-    .then((data) => data.version || "1.0.0")
-    .catch(() => "1.0.0");
-}
+// Debe coincidir con version.json; al cambiar, el archivo SW cambia y la PWA se actualiza
+const APP_VERSION = "1.0.3";
 
 function getCacheName() {
-  return CACHE_NAME_PREFIX + CACHE_VERSION;
+  return CACHE_NAME_PREFIX + APP_VERSION;
 }
 
 const NETWORK_FIRST_DESTINATIONS = ["document", "script", "stylesheet"];
@@ -51,30 +45,24 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    getAppVersion()
-      .then((ver) => { CACHE_VERSION = ver; })
-      .then(() =>
-        caches.open(getCacheName()).then((cache) =>
-          cache.addAll(PRECACHE_URLS).catch(() => {})
-        )
-      )
+    caches
+      .open(getCacheName())
+      .then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {}))
       .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    getAppVersion()
-      .then((ver) => { CACHE_VERSION = ver; })
-      .then(() =>
-        caches.keys().then((names) => {
-          return Promise.all(
-            names
-              .filter((name) => name.startsWith(CACHE_NAME_PREFIX) && name !== getCacheName())
-              .map((name) => caches.delete(name))
-          );
-        })
-      )
+    caches
+      .keys()
+      .then((names) => {
+        return Promise.all(
+          names
+            .filter((name) => name.startsWith(CACHE_NAME_PREFIX) && name !== getCacheName())
+            .map((name) => caches.delete(name))
+        );
+      })
       .then(() => self.clients.claim())
   );
 });

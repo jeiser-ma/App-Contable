@@ -77,9 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.onclick = logout;
   }
 
-  // Registrar Service Worker (PWA): prioriza red para HTML/JS/CSS y evita caché vieja
+  // Registrar Service Worker (PWA). Con ?v= se evita caché del propio SW y se detectan actualizaciones
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js").catch(() => {});
+    getAppVersion()
+      .then((ver) => navigator.serviceWorker.register("service-worker.js?v=" + ver))
+      .catch(() => navigator.serviceWorker.register("service-worker.js"));
   }
 
 });
