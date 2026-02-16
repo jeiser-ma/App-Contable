@@ -3,15 +3,15 @@
 
 //#region Constants
 
+/** Versión de la app. Único lugar a actualizar al publicar cambios (la PWA se actualiza al cambiar esto). */
+const APP_VERSION = "1.0.7";
+
 /**
- * Obtiene la versión de la app desde version.json (misma fuente que el Service Worker).
- * @returns {Promise<string>} Promesa que resuelve a la versión (ej. "1.0.0") o "1.0.0" si falla.
+ * Devuelve la versión de la app (por compatibilidad con código que usa getAppVersion().then(...)).
+ * @returns {Promise<string>}
  */
 function getAppVersion() {
-  return fetch("version.json", { cache: "reload" })
-    .then((r) => r.json())
-    .then((data) => data.version || "1.0.0")
-    .catch(() => "1.0.0");
+  return Promise.resolve(APP_VERSION);
 }
 
 // IDs containers del layout

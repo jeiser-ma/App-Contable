@@ -1,19 +1,23 @@
 /**
  * Service Worker - App Contable (PWA)
- *
- * IMPORTANTE: Al publicar, actualizar en dos sitios el mismo número de versión:
- * 1. version.json → "version": "1.0.1"
- * 2. Aquí abajo → APP_VERSION = "1.0.1"
- * Así el navegador detecta el cambio y actualiza la PWA sin tener que borrar caché.
+ * La versión se obtiene de la URL con la que se registra (service-worker.js?v=X.X.X),
+ * definida en js/configs.js → APP_VERSION. Solo hay que actualizar la versión allí.
  */
 
 const CACHE_NAME_PREFIX = "app-contable-";
 
-// Debe coincidir con version.json; al cambiar, el archivo SW cambia y la PWA se actualiza
-const APP_VERSION = "1.0.6";
+function getAppVersionFromScriptURL() {
+  try {
+    const url = new URL(self.registration.scriptURL);
+    const v = url.searchParams.get("v");
+    return v || "1.0.0";
+  } catch (_) {
+    return "1.0.0";
+  }
+}
 
 function getCacheName() {
-  return CACHE_NAME_PREFIX + APP_VERSION;
+  return CACHE_NAME_PREFIX + getAppVersionFromScriptURL();
 }
 
 const NETWORK_FIRST_DESTINATIONS = ["document", "script", "stylesheet"];
@@ -22,7 +26,6 @@ const NETWORK_FIRST_DESTINATIONS = ["document", "script", "stylesheet"];
 const PRECACHE_URLS = [
   "index.html",
   "layout.html",
-  "version.json",
   "manifest.json",
   "css/bootstrap.min.css",
   "css/bootstrap-icons.min.css",
@@ -79,11 +82,20 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
+  const pathname = url.pathname;
   const dest = event.request.destination;
   const isNav = event.request.mode === "navigate";
 
   // Solo aplicamos a nuestra propia origen (no a CDNs externos)
   if (url.origin !== self.location.origin) return;
+
+  // service-worker.js: siempre red, nunca caché (para que la app detecte actualizaciones)
+  if (pathname.endsWith("service-worker.js")) {
+    event.respondWith(
+      fetch(event.request, { cache: "reload" })
+    );
+    return;
+  }
 
   // Para HTML, JS y CSS: red primero; si falla (ej. sin internet), usar caché
   if (isNav || NETWORK_FIRST_DESTINATIONS.includes(dest)) {

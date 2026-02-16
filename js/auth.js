@@ -79,9 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Registrar Service Worker (PWA). Con ?v= se evita caché del propio SW y se detectan actualizaciones
   if ("serviceWorker" in navigator) {
-    getAppVersion()
-      .then((ver) => navigator.serviceWorker.register("service-worker.js?v=" + ver))
-      .catch(() => navigator.serviceWorker.register("service-worker.js"));
+    const ver = typeof APP_VERSION !== "undefined" ? APP_VERSION : "1.0.0";
+    navigator.serviceWorker.register("service-worker.js?v=" + ver);
   }
 
 });
