@@ -466,7 +466,7 @@ function renderMovementsList(movements) {
     });
 
     // Mostrar cantidad con icono de caja (similar a productos)
-    meta.innerHTML = `<i class="bi bi-calendar"></i> ${formattedDate} • <i class="bi bi-boxes"></i> ${m.quantity} `;
+    meta.innerHTML = `<i class="bi bi-calendar"></i> ${formattedDate} • <i class="bi bi-boxes"></i> ${formatTo2(m.quantity)} `;
 
     // Configurar botones de acción
     node.querySelector(".btn-edit-movement").onclick = () =>
@@ -525,7 +525,7 @@ function saveMovementFromModal() {
 
 
   const productName = getInputValue(ID_MOVEMENT_PRODUCT);
-  const quantity = getInputValue(ID_MOVEMENT_QUANTITY);
+  const quantity = parseFloat(getInputValue(ID_MOVEMENT_QUANTITY));
   const date = getInputValue(ID_MOVEMENT_DATE);
   const note = getInputValue(ID_MOVEMENT_NOTE) || "";
 
@@ -548,7 +548,7 @@ function saveMovementFromModal() {
   }
 
   // Validar que se ingresó una cantidad válida
-  if (isNaN(quantity) || quantity <= 0) {
+  if (Number.isNaN(quantity) || quantity <= 0) {
     setInputError(ID_MOVEMENT_QUANTITY, "Ingresá una cantidad válida");
     return;
   }
@@ -583,7 +583,7 @@ function saveMovementFromModal() {
     if (availableStock < quantity) {
       setInputError(
         ID_MOVEMENT_QUANTITY,
-        `Stock insuficiente. Disponible: ${product.quantity}`
+        `Stock insuficiente. Disponible: ${formatTo2(product.quantity)}`
       );
       return;
     }
@@ -594,6 +594,8 @@ function saveMovementFromModal() {
     setInputError(ID_MOVEMENT_DATE, "Seleccioná una fecha");
     return;
   }
+
+  const quantityRounded = roundTo2(quantity);
 
   // GUARDAR MOVIMIENTO
   //const movements = getData(PAGE_MOVEMENTS) || [];
@@ -684,7 +686,7 @@ function saveMovementFromModal() {
     // Segundo:
     // Aplicar el nuevo efecto en el producto actual (puede ser el mismo o diferente)
     console.log("Aplicar el nuevo efecto en el producto actual (puede ser el mismo o diferente)");
-    let deltaQuantity = MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN ? quantity : -quantity;
+    let deltaQuantity = MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN ? quantityRounded : -quantityRounded;
     let newQuantity = updateProductQuantity(product.id, deltaQuantity);
     if (newQuantity === -1) {
       setInputError(ID_MOVEMENT_QUANTITY, "Stock insuficiente para aplicar el movimiento");
@@ -698,7 +700,7 @@ function saveMovementFromModal() {
       ...editingMovement,
       productId: product.id,
       type: MOVEMENTS_STATE.currentType, //.toUpperCase(),
-      quantity: quantity,
+      quantity: quantityRounded,
       date: date,
       note: note || "",
     }
@@ -709,7 +711,7 @@ function saveMovementFromModal() {
     // NUEVO: 
 
     //1. Actualizar stock del producto para ver si hay suficiente stock
-    let deltaQuantity = MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN ? quantity : -quantity;
+    let deltaQuantity = MOVEMENTS_STATE.currentType === MOVEMENTS_TYPES.IN ? quantityRounded : -quantityRounded;
     let newQuantity = updateProductQuantity(product.id, deltaQuantity);
     if (newQuantity === -1) {
       // Si el stock es insuficiente, mostrar error y no crear el movimiento
@@ -723,7 +725,7 @@ function saveMovementFromModal() {
       id: crypto.randomUUID(),
       productId: product.id,
       type: MOVEMENTS_STATE.currentType, //.toUpperCase(),
-      quantity: quantity,
+      quantity: quantityRounded,
       date: date,
       note: note || "",
       createdAt: new Date().toISOString(),
@@ -829,7 +831,7 @@ function openEditMovementModal(id) {
   // Establecer el valor del input de producto
   setInputValue(ID_MOVEMENT_PRODUCT, product.name);
   // Establecer el valor del input de cantidad
-  setInputValue(ID_MOVEMENT_QUANTITY, movement.quantity);
+  setInputValue(ID_MOVEMENT_QUANTITY, formatTo2(movement.quantity));
   // Establecer el valor del input de fecha
   setInputValue(ID_MOVEMENT_DATE, movement.date);
   // Establecer el valor del input de observaciones

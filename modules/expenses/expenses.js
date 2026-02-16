@@ -161,7 +161,7 @@ function clearExpenseModalErrors() {
 function saveExpenseFromModal() {
   // Obtener los valores de los inputs
   const concept = getInputValue(ID_EXPENSE_CONCEPT).trim();
-  const amount = Number(getInputValue(ID_EXPENSE_AMOUNT));
+  const amount = parseFloat(getInputValue(ID_EXPENSE_AMOUNT));
   const date = getInputValue(ID_EXPENSE_DATE);
   const note = getInputValue(ID_EXPENSE_NOTE).trim() || "";
 
@@ -172,7 +172,7 @@ function saveExpenseFromModal() {
   }
 
   // Validar que se ingresó una cantidad válida
-  if (isNaN(amount) || amount <= 0) {
+  if (Number.isNaN(amount) || amount <= 0) {
     setInputError(ID_EXPENSE_AMOUNT, "Ingresá una cantidad válida");
     return;
   }
@@ -183,38 +183,35 @@ function saveExpenseFromModal() {
     return;
   }
 
+  const amountRounded = roundTo2(amount);
+
   // Si se está editando un gasto, actualizar el gasto
   // de lo contrario, crear un nuevo gasto
   if (EXPENSES_STATE.elementToEdit) {
     // Editar
-
-    // Obtener el gasto a editar
     const expenseToEdit = getDataById(PAGE_EXPENSES, EXPENSES_STATE.elementToEdit);
     if (!expenseToEdit) {
       setInputError(ID_EXPENSE_CONCEPT, "El gasto no existe");
       return;
     }
-    // Actualizar el gasto
-    expenseToEdit = {
+    const updatedExpense = {
       ...expenseToEdit,
       concept,
-      amount,
+      amount: amountRounded,
       date,
       note,
     };
-    // guardar el gasto actualizado
-    setDataById(PAGE_EXPENSES, expenseToEdit);
+    setDataById(PAGE_EXPENSES, updatedExpense);
   } else {
     // Crear
     const newExpense = {
       id: crypto.randomUUID(),
       concept,
-      amount,
+      amount: amountRounded,
       date,
       note,
       createdAt: new Date().toISOString(),
     };
-    // guardar el gasto creado
     setDataById(PAGE_EXPENSES, newExpense);
   }
 
@@ -244,7 +241,7 @@ function openEditExpenseModal(id) {
   // Establecer el valor del input de concepto
   setInputValue(ID_EXPENSE_CONCEPT, expense.concept);
   // Establecer el valor del input de cantidad
-  setInputValue(ID_EXPENSE_AMOUNT, expense.amount);
+  setInputValue(ID_EXPENSE_AMOUNT, formatTo2(expense.amount));
   // Establecer el valor del input de fecha
   setInputValue(ID_EXPENSE_DATE, expense.date);
   // Establecer el valor del input de observaciones
@@ -427,7 +424,7 @@ function renderExpensesList(expenses) {
     });
 
     if (metaEl) {
-      metaEl.innerHTML = `<i class="bi bi-calendar"></i> ${formattedDate} • <i class="bi bi-currency-dollar"></i> ${e.amount}`;
+      metaEl.innerHTML = `<i class="bi bi-calendar"></i> ${formattedDate} • <i class="bi bi-currency-dollar"></i> ${formatTo2(e.amount)}`;
     }
 
     const btnEdit = node.querySelector(".btn-edit-expense");

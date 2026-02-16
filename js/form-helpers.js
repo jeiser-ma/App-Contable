@@ -4,6 +4,30 @@
  * Usar después de cargar configs.js (depende del DOM).
  */
 
+//#region Redondeo y formato numérico (2 decimales)
+
+/**
+ * Redondea un valor (string o number) a 2 decimales. Para guardar en storage o usar en cálculos consistentes.
+ * @param {string|number} value - Valor a redondear
+ * @returns {number} Número redondeado a 2 decimales, o 0 si no es un número válido
+ */
+function roundTo2(value) {
+  const n = parseFloat(value);
+  return Number.isNaN(n) ? 0 : Math.round(n * 100) / 100;
+}
+
+/**
+ * Formatea un valor para mostrar al usuario (siempre 2 decimales).
+ * @param {string|number} value - Valor a formatear
+ * @returns {string} Cadena con 2 decimales, o "" si no es un número válido
+ */
+function formatTo2(value) {
+  const n = Number(value);
+  return Number.isNaN(n) ? "" : n.toFixed(2);
+}
+
+//#endregion
+
 //#region Reset de formularios
 
 /**

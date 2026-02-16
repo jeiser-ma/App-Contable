@@ -167,7 +167,7 @@ function openAddInventoryModal(productId) {
   setLabelText(ID_INVENTORY_PRODUCT_LABEL, product.name);
 
   // Mostrar stock del producto
-  setLabelText(ID_INVENTORY_PRODUCT_STOCK, product.quantity || 0);
+  setLabelText(ID_INVENTORY_PRODUCT_STOCK, formatTo2(product.quantity || 0));
 
 
   // Obtener inventario existente para este producto en esta fecha (si existe)
@@ -182,8 +182,8 @@ function openAddInventoryModal(productId) {
 
   // Cargar valores existentes o limpiar campos
   if (existingInventory) {
-    setInputValue(ID_LOCATION_WAREHOUSE_INPUT, existingInventory.warehouseQuantity != null ? existingInventory.warehouseQuantity : "");
-    setInputValue(ID_LOCATION_STORE_INPUT, existingInventory.storeQuantity != null ? existingInventory.storeQuantity : "");
+    setInputValue(ID_LOCATION_WAREHOUSE_INPUT, existingInventory.warehouseQuantity != null ? formatTo2(existingInventory.warehouseQuantity) : "");
+    setInputValue(ID_LOCATION_STORE_INPUT, existingInventory.storeQuantity != null ? formatTo2(existingInventory.storeQuantity) : "");
   } else {
     setInputValue(ID_LOCATION_WAREHOUSE_INPUT, "");
     setInputValue(ID_LOCATION_STORE_INPUT, "");
@@ -215,8 +215,8 @@ function saveInventory(productId, date, warehouseQuantity, storeQuantity) {
   const finalInv = {
     id: existingInv ? existingInv.id : crypto.randomUUID(), 
     productId,
-    warehouseQuantity: warehouseQuantity ?? null,
-    storeQuantity: storeQuantity ?? null,
+    warehouseQuantity: warehouseQuantity != null ? roundTo2(warehouseQuantity) : null,
+    storeQuantity: storeQuantity != null ? roundTo2(storeQuantity) : null,
     date,
     status: "CONFIRMED",
     createdAt: existingInv ? existingInv.createdAt : new Date().toISOString(),
@@ -267,9 +267,9 @@ function getValidatedInventoryValuesFromModal() {
   }
 
 
-  // Convertir a números (si está vacío, se manejará después)
-  let warehouseQuantity = warehouseValue === "" ? null : Number(warehouseValue);
-  let storeQuantity = storeValue === "" ? null : Number(storeValue);
+  // Convertir a números (si está vacío, se manejará después) y redondear a 2 decimales
+  let warehouseQuantity = warehouseValue === "" ? null : roundTo2(parseFloat(warehouseValue));
+  let storeQuantity = storeValue === "" ? null : roundTo2(parseFloat(storeValue));
 
 
   // Validar que no sean negativos (solo si tienen valor)
@@ -483,7 +483,7 @@ function renderPendingInventoryList(products, allComplete = false) {
 
     const productStock = node.querySelector(".pending-product-stock");
     if (productStock) {
-      productStock.textContent = product.quantity || 0;
+      productStock.textContent = formatTo2(product.quantity || 0);
     }
 
     const btnAdd = node.querySelector(".btn-add-inventory");
@@ -532,7 +532,7 @@ function renderPartialInventoryList(inventoryCounts) {
 
     const productStock = node.querySelector(".partial-product-stock");
     if (productStock) {
-      productStock.textContent = product.quantity || 0;
+      productStock.textContent = formatTo2(product.quantity || 0);
     }
 
     // Mostrar valores, usar "--" si no está definido
@@ -541,7 +541,7 @@ function renderPartialInventoryList(inventoryCounts) {
         inv.warehouseQuantity !== null &&
         inv.warehouseQuantity !== undefined
       ) {
-        warehouseQty.textContent = inv.warehouseQuantity;
+        warehouseQty.textContent = formatTo2(inv.warehouseQuantity);
       } else {
         warehouseQty.textContent = "--";
         warehouseQty.classList.add("text-muted");
@@ -550,7 +550,7 @@ function renderPartialInventoryList(inventoryCounts) {
     if (storeQty) {
       // El icono siempre mantiene el color verde, solo el texto cambia
       if (inv.storeQuantity !== null && inv.storeQuantity !== undefined) {
-        storeQty.textContent = inv.storeQuantity;
+        storeQty.textContent = formatTo2(inv.storeQuantity);
       } else {
         storeQty.textContent = "--";
       }
@@ -621,10 +621,10 @@ function renderCompletedInventoryList(inventoryCounts) {
 
     if (productName) productName.textContent = product.name;
     if (productStock) {
-      productStock.textContent = product.quantity || 0;
+      productStock.textContent = formatTo2(product.quantity || 0);
     }
-    if (warehouseQty) warehouseQty.textContent = inv.warehouseQuantity || 0;
-    if (storeQty) storeQty.textContent = inv.storeQuantity || 0;
+    if (warehouseQty) warehouseQty.textContent = formatTo2(inv.warehouseQuantity ?? 0);
+    if (storeQty) storeQty.textContent = formatTo2(inv.storeQuantity ?? 0);
 
     const btnDelete = node.querySelector(".btn-delete-inventory");
     if (btnDelete) {

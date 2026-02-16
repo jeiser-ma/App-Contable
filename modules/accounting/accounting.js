@@ -293,7 +293,7 @@ async function calculateNominalSalary() {
     return;
   }
 
-  currentAccounting.nominalSalary = currentAccounting.totalAmount * currentAccounting.salaryPercentage / 100;
+  currentAccounting.nominalSalary = roundTo2(currentAccounting.totalAmount * currentAccounting.salaryPercentage / 100);
 }
 
 /**
@@ -310,8 +310,10 @@ async function calculateRealSalary() {
   if (currentAccounting.difference < 0) {
     // si la diferencia es negativa, el salario real es el salario nominal más la diferencia
     // se suma porque la diferencia ya es negativa 
-    currentAccounting.realSalary = currentAccounting.nominalSalary + currentAccounting.difference;
-  };
+    currentAccounting.realSalary = roundTo2(currentAccounting.nominalSalary + currentAccounting.difference);
+  } else {
+    currentAccounting.realSalary = roundTo2(currentAccounting.nominalSalary);
+  }
 }
 
 /**
@@ -323,16 +325,16 @@ async function createNewAccounting(date) {
   // Construir la lista de productos de la contabilidad
   const accountingProducts = buildAccountingProductsForDate(date);
   // Calcular el importe total de los productos
-  const totalAmount = accountingProducts.reduce((sum, p) => sum + p.amount, 0);
+  const totalAmount = roundTo2(accountingProducts.reduce((sum, p) => sum + p.amount, 0));
   // Construir la lista de gastos de la contabilidad
   const accountingExpenses = buildAccountingExpensesForDate(date);
   // Calcular el total de gastos
-  const totalExpenses = accountingExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  const totalExpenses = roundTo2(accountingExpenses.reduce((sum, e) => sum + (e.amount || 0), 0));
 
   // la diferencia es el total de ventas menos el importe total 
   // (incluye ventas en efectivo + transferencia + total de gastos)
   // (en una contabilidad nueva,total de ventas = total de gastos)
-  const difference = totalExpenses - totalAmount;
+  const difference = roundTo2(totalExpenses - totalAmount);
   // Obtener el porcentaje de salario configurado
   const salaryPercentage = getSalaryPercentage();
 
@@ -376,14 +378,14 @@ async function refreshOpenAccountingData() {
   currentAccounting.expenses = buildAccountingExpensesForDate(currentAccounting.date);
 
   //Actualizar total de gastos
-  currentAccounting.totalExpenses = currentAccounting.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  currentAccounting.totalExpenses = roundTo2(currentAccounting.expenses.reduce((sum, e) => sum + (e.amount || 0), 0));
   // Actualizar total de ventas (incluye ventas en efectivo + transferencia + gastos)
-  currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses;
+  currentAccounting.totalSales = roundTo2(currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses);
 
   // Actualizar importe total (suma de los productos de la contabilidad actual)
-  currentAccounting.totalAmount = currentAccounting.products.reduce((sum, p) => sum + p.amount, 0);
+  currentAccounting.totalAmount = roundTo2(currentAccounting.products.reduce((sum, p) => sum + p.amount, 0));
   // Actualizar diferencia (importe total - total de ventas)
-  currentAccounting.difference = currentAccounting.totalSales - currentAccounting.totalAmount;
+  currentAccounting.difference = roundTo2(currentAccounting.totalSales - currentAccounting.totalAmount);
 
   // Actualizar el porcentaje de salario a partir del porcentaje de salario configurado
   currentAccounting.salaryPercentage = getSalaryPercentage();
@@ -445,6 +447,9 @@ function buildAccountingProductsForDate(date) {
       ? inicio + yesterdayEntries - yesterdayExits - fin
       : null; // null indica que falta inventario de hoy
 
+    const unitPrice = roundTo2(product.price || 0);
+    const amount = sales !== null ? roundTo2(sales * (product.price || 0)) : 0;
+
     return {
       productId: product.id,
       yesterdayStock: inicio,
@@ -452,8 +457,8 @@ function buildAccountingProductsForDate(date) {
       yesterdayExits: yesterdayExits,
       todayInventory: fin,
       sales: sales,
-      unitPrice: product.price || 0,
-      amount: sales * (product.price || 0)
+      unitPrice,
+      amount
     };
   });
 }
@@ -592,8 +597,8 @@ async function createProductCardFromTemplate(clonedTemplate, productName, produc
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TODAY_INVENTORY).textContent = product.todayInventory === null ? "--" : product.todayInventory;
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_SALES).textContent = product.sales === null ? "--" : product.sales;
 
-  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE).textContent = product.unitPrice.toFixed(2);
-  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT).textContent = product.amount.toFixed(2);
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_UNIT_PRICE).textContent = formatTo2(product.unitPrice);
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_PRODUCT_TOTAL_AMOUNT).textContent = formatTo2(product.amount);
   return clonedTemplate;
 
 }
@@ -665,7 +670,7 @@ function renderAccountingExpenses() {
  */
 async function createExpenseCardFromTemplate(clonedTemplate, expense) {
   clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_CONCEPT).textContent = expense.concept;
-  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_AMOUNT).textContent = "-$ " + expense.amount.toFixed(2);
+  clonedTemplate.querySelector("." + CLASS_ACCOUNTING_EXPENSE_AMOUNT).textContent = "-$ " + formatTo2(expense.amount);
   return clonedTemplate;
 }
 
@@ -680,13 +685,13 @@ function renderSalesSection() {
   // Actualizar montos de ventas en efectivo
   const cashAmount = document.getElementById(ID_CASH_SALES_AMOUNT);
   if (cashAmount) {
-    cashAmount.textContent = `$ ${currentAccounting.cashSales.toFixed(2)}`;
+    cashAmount.textContent = `$ ${formatTo2(currentAccounting.cashSales)}`;
   }
 
   // Actualizar montos de ventas por transferencia
   const transferAmount = document.getElementById(ID_TRANSFER_SALES_AMOUNT);
   if (transferAmount) {
-    transferAmount.textContent = `$ ${currentAccounting.transferSales.toFixed(2)}`;
+    transferAmount.textContent = `$ ${formatTo2(currentAccounting.transferSales)}`;
   }
 }
 
@@ -701,19 +706,19 @@ function renderTotals() {
   // Importe Total 
   const btnTotalAmount = document.getElementById(ID_BTN_TOTAL_AMOUNT);
   if (btnTotalAmount) {
-    btnTotalAmount.innerHTML = `Importe Total: $ ${currentAccounting.totalAmount.toFixed(2)}`;
+    btnTotalAmount.innerHTML = `Importe Total: $ ${formatTo2(currentAccounting.totalAmount)}`;
   }
 
   // Total de gastos
   const btnTotalExpenses = document.getElementById(ID_BTN_TOTAL_EXPENSES);
   if (btnTotalExpenses) {
-    btnTotalExpenses.innerHTML = `Total Gastos: $ ${currentAccounting.totalExpenses.toFixed(2)}`;
+    btnTotalExpenses.innerHTML = `Total Gastos: $ ${formatTo2(currentAccounting.totalExpenses)}`;
   }
 
   // Total de ventas (incluye ventas en efectivo + transferencia + gastos)
   const btnTotalSales = document.getElementById(ID_BTN_TOTAL_SALES);
   if (btnTotalSales) {
-    btnTotalSales.innerHTML = `Total Ventas: $ ${currentAccounting.totalSales.toFixed(2)}`;
+    btnTotalSales.innerHTML = `Total Ventas: $ ${formatTo2(currentAccounting.totalSales)}`;
   }
 }
 
@@ -730,12 +735,12 @@ function renderClosingSection() {
 
   // Actualizar el campo Importe Total
   if (totalAmount) {
-    totalAmount.textContent = `$${currentAccounting.totalAmount.toFixed(2)}`;
+    totalAmount.textContent = `$${formatTo2(currentAccounting.totalAmount)}`;
   }
 
   // Actualizar el campo de total de ventas
   if (totalSales) {
-    totalSales.textContent = `$${currentAccounting.totalSales.toFixed(2)}`;
+    totalSales.textContent = `$${formatTo2(currentAccounting.totalSales)}`;
   }
 
   // Actualizar el campo de diferencia
@@ -760,7 +765,7 @@ function renderSalarySection() {
 
   // Actualizar el campo de salario nominal
   if (nominal) {
-    nominal.textContent = `$ ${currentAccounting.nominalSalary.toFixed(2)}`;
+    nominal.textContent = `$ ${formatTo2(currentAccounting.nominalSalary)}`;
   }
 
   // Actualizar el campo de diferencia de salario
@@ -768,7 +773,7 @@ function renderSalarySection() {
 
   // Actualizar el campo de salario real
   if (real) {
-    real.textContent = `$ ${currentAccounting.realSalary.toFixed(2)}`;
+    real.textContent = `$ ${formatTo2(currentAccounting.realSalary)}`;
   }
 }
 
@@ -781,7 +786,7 @@ function formatDifferenceField(fieldId) {
   if (!currentAccounting || !field) return;
 
   // Actualizar el texto del campo
-  field.textContent = `$${currentAccounting.difference.toFixed(2)}`;
+  field.textContent = `$${formatTo2(currentAccounting.difference)}`;
   field.className = "fw-semibold";
 
   // Colorear según el valor
@@ -845,7 +850,7 @@ function openCashSalesModal() {
   // Limpiar errores anteriores del input
   clearInputError(ID_INPUT_CASH_SALES);
   // Establecer el valor del input
-  setInputValue(ID_INPUT_CASH_SALES, currentAccounting.cashSales || "");
+  setInputValue(ID_INPUT_CASH_SALES, currentAccounting.cashSales != null && currentAccounting.cashSales !== "" ? formatTo2(currentAccounting.cashSales) : "");
 
   // Mostrar el modal
   showModalModules();
@@ -864,7 +869,7 @@ function openTransferSalesModal() {
   // Limpiar errores anteriores del input
   clearInputError(ID_INPUT_TRANSFER_SALES);
   // Establecer el valor del input
-  setInputValue(ID_INPUT_TRANSFER_SALES, currentAccounting.transferSales || "");
+  setInputValue(ID_INPUT_TRANSFER_SALES, currentAccounting.transferSales != null && currentAccounting.transferSales !== "" ? formatTo2(currentAccounting.transferSales) : "");
 
   // Mostrar el modal
   showModalModules();
@@ -909,15 +914,16 @@ function saveSalesGeneric(inputId) {
     return;
   }
 
-  // Actualizar ventas en efectivo o transferencia
+  // Actualizar ventas en efectivo o transferencia (guardar con 2 decimales)
+  const amountRounded = roundTo2(amount);
   if (inputId === ID_INPUT_CASH_SALES) {
-    currentAccounting.cashSales = amount;
+    currentAccounting.cashSales = amountRounded;
   } else if (inputId === ID_INPUT_TRANSFER_SALES) {
-    currentAccounting.transferSales = amount;
+    currentAccounting.transferSales = amountRounded;
   }
 
   // Actualizar total de ventas (incluye ventas en efectivo + transferencia + gastos)
-  currentAccounting.totalSales = currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses;
+  currentAccounting.totalSales = roundTo2(currentAccounting.cashSales + currentAccounting.transferSales + currentAccounting.totalExpenses);
 
   // Guardar la contabilidad
   saveAccounting();

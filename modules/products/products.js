@@ -193,7 +193,7 @@ function openEditProductModal(id) {
   // Establecer el valor del input de nombre
   setInputValue(ID_INPUT_NAME, product.name);
   // Establecer el valor del input de precio
-  setInputValue(ID_INPUT_PRICE, product.price);
+  setInputValue(ID_INPUT_PRICE, formatTo2(product.price));
   // Establecer el valor del input de umbral de stock bajo
   setInputValue(ID_INPUT_LOW_STOCK_THRESHOLD, product.lowStockThreshold || "");
   // Establecer el valor del input de umbral de stock crítico
@@ -475,8 +475,8 @@ function renderProductsList(products) {
 
     const metaEl = node.querySelector(".product-meta");
     if (metaEl) {
-      metaEl.innerHTML = `<i class="bi ${quantityIcon} ${quantityColor}"></i> <span class="${quantityColor}">${p.quantity}</span> 
-      • <i class="bi bi-currency-dollar"></i> ${p.price} 
+      metaEl.innerHTML = `<i class="bi ${quantityIcon} ${quantityColor}"></i> <span class="${quantityColor}">${formatTo2(p.quantity)}</span> 
+      • <i class="bi bi-currency-dollar"></i> ${formatTo2(p.price)} 
       • <i class="bi bi-beaker small"></i> ${p.um}`;
     }
 
@@ -512,7 +512,7 @@ function saveProductFromModal() {
   // Obtener los valores de los inputs
   const id = getInputValue(ID_PRODUCT_ID);
   const name = getInputValue(ID_INPUT_NAME).trim();
-  const price = Number(getInputValue(ID_INPUT_PRICE));
+  const price = parseFloat(getInputValue(ID_INPUT_PRICE));
   const um = getInputValue(ID_INPUT_UM).trim();
   const lowStockThreshold = Number(getInputValue(ID_INPUT_LOW_STOCK_THRESHOLD));
   const criticalStockThreshold = Number(getInputValue(ID_INPUT_CRITICAL_STOCK_THRESHOLD));
@@ -558,43 +558,37 @@ function saveProductFromModal() {
     return;
   }
 
+  const priceRounded = roundTo2(price);
+
   // Si hay un id de producto es una edición si no, es un alta de producto
   if (id) {
     // EDITAR
-
-    // obtener el producto a editar
     const productToEdit = getDataById(PAGE_PRODUCTS, id);
     if (!productToEdit) {
       setInputError(ID_PRODUCT_ID, "El producto no existe");
       return;
     }
-    // actualizar el producto
-    productToEdit = {
+    const updatedProduct = {
       ...productToEdit,
       name,
-      price,
+      price: priceRounded,
       um,
       lowStockThreshold,
       criticalStockThreshold,
     };
-    // guardar el producto actualizado
-    setDataById(PAGE_PRODUCTS, productToEdit);
+    setDataById(PAGE_PRODUCTS, updatedProduct);
 
   } else {
     // ALTA
-
-    // crear el producto
-    // el producto se inicializa con cantidad 0
     const newProduct = {
       id: crypto.randomUUID(),
       name,
-      price,
+      price: priceRounded,
       um,
-      quantity:0,
+      quantity: 0,
       lowStockThreshold,
       criticalStockThreshold
     };
-    // guardar el producto creado
     setDataById(PAGE_PRODUCTS, newProduct);
   }
 
@@ -661,7 +655,7 @@ function updateProductQuantity(productId, quantityDelta) {
   if (!product) return undefined; // Error: producto no encontrado
 
   const currentQuantity = product.quantity ?? 0;
-  const newQuantity = currentQuantity + quantityDelta;
+  const newQuantity = roundTo2(currentQuantity + quantityDelta);
 
   // Si la nueva cantidad es negativa, no se actualiza
   if (newQuantity < 0) return -1; // Error: cantidad negativa
