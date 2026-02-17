@@ -108,7 +108,7 @@
       <span class="flex-grow-1">Última actualización</span>
       <span id="appLastUpdateDateText" class="fw-medium text-dark rounded-pill border px-2">--</span>
     </div>
-    <div class="mb-1 d-flex align-items-center">
+    <div id="appVersionContainer" class="mb-1 d-flex align-items-center">
       <span class="flex-grow-1">Versión</span>
       <span id="appVersionText" class="fw-medium text-dark rounded-pill border px-2">--</span>
     </div>
@@ -119,18 +119,17 @@
     </div>
   </div>
 
-  <div class="mb-4 pt-3 border-top">
-    <button class="btn btn-outline-primary rounded-pill d-flex align-items-center w-100 px-1 py-1"
+  <div class="mb-4 border-top">
+    <button class="btn btn-outline-primary rounded-pill d-flex align-items-center w-100 px-1 py-1 mt-3"
       id="btnExportAppState" type="button">
-      <span class="flex-grow-1">
-        Guardar estado de la app
-      </span>
       <span class="px-3 text-primary rounded-pill bg-primary text-white">
         <i class="bi bi-filetype-json fs-5"></i>
       </span>
-      <!-- <span class="px-3 py-1 text-primary border-start border-primary">
-        <i class="bi bi-download fs-5"></i>
-      </span> -->
+      <span class="flex-grow-1">
+        Exportar estado de la app
+        <i class="bi bi-download fs-5 px-2"></i>
+      </span>
     </button>
+    
   </div>
 </div>

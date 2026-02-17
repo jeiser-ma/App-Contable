@@ -195,6 +195,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Loading component empty-state");
     loadComponent("empty-state");
 
+    // Cargamos el componente badge (chips con texto y opción de cerrar)
+    console.log("Loading component badge");
+    loadComponent("badge");
+
     // Cargamos la página inicial
     console.log("Loading home page");
     loadPage(PAGE_HOME); //poner el home

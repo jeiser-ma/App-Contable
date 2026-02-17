@@ -85,6 +85,8 @@ const PRECACHE_URLS = [
   "components/btn-clear-filters/btn-clear-filters.js",
   "components/list-counter/list-counter.html",
   "components/list-counter/list-counter.js",
+  "components/badge/badge.html",
+  "components/badge/badge.js",
   // "data/Estructuras/accounting.json",
   // "data/Estructuras/inventoryCount.json",
   // "data/Estructuras/products.json",
