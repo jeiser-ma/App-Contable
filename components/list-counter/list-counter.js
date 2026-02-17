@@ -8,7 +8,7 @@
  */
 function updateListCounter(current, total, moduleName) {
   // Obtener el label desde la configuración de la página
-  let label = moduleName ? PAGES_CONFIG[moduleName].title : "elementos";
+  let label = moduleName ? getModuleConfig(moduleName).title : "elementos";
   setLabelText(ID_CONTROL_LIST_COUNTER, `${current} de ${total} ${label}`);
 
 }

@@ -14,7 +14,7 @@ function setupSearchInput(moduleName, renderFn) {
   const searchInput = document.getElementById(ID_CONTROL_SEARCH_INPUT);
   const btnClearSearch = document.getElementById(ID_CONTROL_CLEAR_SEARCH);
 
-  let config = PAGES_CONFIG[moduleName];
+  let config = getModuleConfig(moduleName);
   if (!config) {
     console.error(`Config not found for module: ${moduleName}`);
   }

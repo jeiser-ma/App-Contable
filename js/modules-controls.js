@@ -318,3 +318,17 @@ function callModuleRender() {
     );
   }
 }
+
+/**
+ * Actualiza el contador del módulo desde los datos
+ * @param {string} moduleName - Nombre del módulo
+ * @returns {Object|null} - Objeto de configuración del módulo o null si no se encuentra
+ */
+function getModuleConfig(moduleName) {
+  const config = PAGES_CONFIG[moduleName];
+  if (!config) {
+    console.error(`Configuración no encontrada para el módulo: ${moduleName}`);
+    return null;
+  }
+  return config;
+}

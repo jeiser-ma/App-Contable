@@ -22,7 +22,7 @@ function setupOrderBy(moduleName, renderFn) {
     orderBy.innerHTML = '<option value="" disabled selected>Ordenar…</option>';
 
     // Agregar opciones
-    let sortOptions = PAGES_CONFIG[moduleName].sortOptions || [];
+    let sortOptions = getModuleConfig(moduleName).sortOptions || [];
     if (sortOptions && sortOptions.length > 0) {
       sortOptions.forEach((opt) => {
         const option = document.createElement("option");

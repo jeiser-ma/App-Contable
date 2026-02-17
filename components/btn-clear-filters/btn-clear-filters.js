@@ -77,10 +77,7 @@ async function clearSearchInput(moduleName) {
  */
 async function clearOrderBy(moduleName) {
   // obtener el config del módulo
-  let config = PAGES_CONFIG[moduleName];
-  if (!config) {
-    console.error(`Config not found for module: ${moduleName}`);
-  }
+  let config = getModuleConfig(moduleName);
 
   // obtener el estado del modulo
   let moduleState = getModuleState(moduleName);

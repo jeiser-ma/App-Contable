@@ -59,12 +59,15 @@ async function linkDateAndChipsFilters(moduleName, controlName) {
       // primero limpiar los chips filtrados
       clearChipsFilter(moduleName, moduleState);
 
+      // obtener la lista de chips del modulo
+      let chipList = getModuleConfig(moduleName).chips;
+
       // Si la fecha es hoy, activar el chip de hoy
       if (moduleState.filterDate === getToday()) {
-        activateChip(PAGES_CONFIG[moduleName].chips.find(chip => chip.value === "today").id, moduleState);
+        activateChip(chipList.find(chip => chip.value === "today").id, moduleState);
         // Si la fecha es ayer, activar el chip de ayer
       } else if (moduleState.filterDate === getYesterday(getToday())) {
-        activateChip(PAGES_CONFIG[moduleName].chips.find(chip => chip.value === "yesterday").id, moduleState);
+        activateChip(chipList.find(chip => chip.value === "yesterday").id, moduleState);
       }
     }
     

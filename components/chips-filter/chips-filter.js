@@ -21,7 +21,7 @@ async function setupChipsFilter(moduleName, renderFn) {
   container.replaceChildren();
 
   // Obtener la lista de chips configurados para el módulo
-  const chipList = PAGES_CONFIG[moduleName].chips;
+  const chipList = getModuleConfig(moduleName).chips;
   console.log("chipList obtenida correctamente: ", chipList.length + " chips");
 
   // Si no hay chips configurados, salir
@@ -81,7 +81,6 @@ async function setupChipHandler(chip, moduleName, renderFn) {
         activateChip(chip.id, moduleState);
 
         // Desactivar otros chips del mismo grupo
-        console.log("chip list: ", PAGES_CONFIG[moduleName].chips);
         deactivateOtherChips(chip.id, moduleName);
       }
 
@@ -123,7 +122,9 @@ async function activateChip(chipID, moduleState) {
  */
 async function deactivateOtherChips(activeChipID, moduleName) {
   console.log("disableOtherChips called with activeChipID: ", activeChipID);
-  PAGES_CONFIG[moduleName].chips.forEach((otherChip) => {
+
+  let chipList = getModuleConfig(moduleName).chips;
+  chipList.forEach((otherChip) => {
 
     if (otherChip.id !== activeChipID) {
       console.log("otherChip to deactivate: ", otherChip.id);
