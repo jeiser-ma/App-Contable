@@ -19,6 +19,8 @@ const ID_BTN_SAVE_SALARY_PERCENTAGE = "btnSaveSalaryPercentage";
 const ID_SALARY_PERCENTAGE_ERROR_FEEDBACK = "salaryPercentageErrorFeedback";
 
 const ID_APP_VERSION_TEXT = "appVersionText";
+const ID_APP_LAST_UPDATE_TEXT = "appLastUpdateDateText";
+const ID_BTN_EXPORT_APP_STATE = "btnExportAppState";
 //#endregion
 
 /**
@@ -43,7 +45,21 @@ function onSettingsPageLoaded() {
   // Cargar porcentaje de salario actual
   loadSalaryPercentage();
 
+  // Configurar la versión y la fecha de última actualización de la app
   setupAppVersion();
+  setupAppLastUpdate();
+
+  // Configurar el botón para exportar el estado de la app en JSON
+  setupExportAppStateListener();
+}
+
+/**
+ * Configura el botón para exportar el estado de la app en JSON
+ */
+function setupExportAppStateListener() {
+  const btn = document.getElementById(ID_BTN_EXPORT_APP_STATE);
+  if (!btn) return;
+  btn.onclick = () => exportAppStateToJson();
 }
 
 /**
@@ -51,10 +67,15 @@ function onSettingsPageLoaded() {
  * @returns {void}
  */
 function setupAppVersion() {
-  // const versionEl = document.getElementById("appVersionText");
-  // if (versionEl) {
     getAppVersion().then((ver) => { setLabelText(ID_APP_VERSION_TEXT, ver); });
-  // }
+}
+
+/**
+ * Muestra la versión de la app en el elemento #appVersionText (getAppVersion en configs.js).
+ * @returns {void}
+ */
+function setupAppLastUpdate() {
+  setLabelText(ID_APP_LAST_UPDATE_TEXT, APP_LAST_UPDATE); 
 }
 
 /**
@@ -219,7 +240,7 @@ function renderConcepts() {
  */
 function createUnitChip(unit, index) {
   const chip = document.createElement("div");
-  chip.className = "badge bg-primary rounded-pill d-flex align-items-center gap-2 px-3 py-2";
+  chip.className = "badge bg-primary btn-chip rounded-pill d-flex align-items-center gap-2 px-3 py-2";
   chip.style = "font-size: 0.875rem;";
   
   chip.innerHTML = `
@@ -244,7 +265,7 @@ function createUnitChip(unit, index) {
  */
 function createConceptChip(concept, index) {
   const chip = document.createElement("div");
-  chip.className = "badge bg-primary rounded-pill d-flex align-items-center gap-2 px-3 py-2";
+  chip.className = "badge bg-primary btn-chip rounded-pill d-flex align-items-center gap-2 px-3 py-2";
   chip.style = "font-size: 0.875rem;";
   
   chip.innerHTML = `

@@ -77,10 +77,17 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.onclick = logout;
   }
 
-  // Registrar Service Worker (PWA). Con ?v= se evita caché del propio SW y se detectan actualizaciones
+  // Service Worker (PWA): solo en producción. En localhost (Live Server) no se registra para poder ver cambios sin borrar caché
+  const isLocal = /localhost|127\.0\.0\.1/i.test(window.location.hostname);
   if ("serviceWorker" in navigator) {
-    const ver = typeof APP_VERSION !== "undefined" ? APP_VERSION : "1.0.0";
-    navigator.serviceWorker.register("service-worker.js?v=" + ver);
+    if (isLocal) {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => r.unregister());
+      });
+    } else {
+      const ver = typeof APP_VERSION !== "undefined" ? APP_VERSION : "1.0.0";
+      navigator.serviceWorker.register("service-worker.js?v=" + ver);
+    }
   }
 
 });

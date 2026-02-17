@@ -4,7 +4,8 @@
 //#region Constants
 
 /** Versión de la app. Único lugar a actualizar al publicar cambios (la PWA se actualiza al cambiar esto). */
-const APP_VERSION = "1.0.11";
+const APP_VERSION = "1.0.12";
+const APP_LAST_UPDATE = "2026-02-17";
 
 /**
  * Devuelve la versión de la app (por compatibilidad con código que usa getAppVersion().then(...)).
