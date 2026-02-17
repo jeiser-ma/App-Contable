@@ -74,8 +74,6 @@ async function onInventoryPageLoaded() {
   // Inicializar el modal después de cargarlo
   initModalModule(MODAL_INVENTORY);
 
-  // Configurar controles del módulo
-  //setupModuleControls(PAGE_INVENTORY);
 
   // Configurar controles del módulo
   await setupInventoryControls();
@@ -104,7 +102,7 @@ async function setupInventoryControls() {
   // Cargar el control de búsqueda
   await loadModuleControl(CONTROL_SEARCH_INPUT);
   // Configurar el control de búsqueda
-  setupSearchInput(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+  setupSearchInput(PAGE_INVENTORY, renderInventory);
 
   // El inventario no tiene botón de agregar
   //await loadModuleControl(CONTROL_BTN_ADD);
@@ -115,20 +113,20 @@ async function setupInventoryControls() {
   // El filtro de fecha ya se configura en setupDateFilter con la fecha de hoy
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  setupDateFilter(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+  setupDateFilter(PAGE_INVENTORY, renderInventory);
 
   // el inventario no tiene campo de ordenamiento
   //await loadModuleControl(CONTROL_ORDER_BY);
   // Configurar el control de ordenamiento
-  //setupOrderBy(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+  //setupOrderBy(PAGE_INVENTORY, renderInventory);
 
   // el inventario no tiene campo de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  await setupChipsFilter(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+  await setupChipsFilter(PAGE_INVENTORY, renderInventory);
 
   // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
-  await linkDateAndChipsFilters(PAGE_INVENTORY, INVENTORY_STATE, CONTROL_DATE_FILTER);
+  await linkDateAndChipsFilters(PAGE_INVENTORY, CONTROL_DATE_FILTER);
 
   // el inventario no tiene control de contador de elementos
   //await loadModuleControl(CONTROL_LIST_COUNTER);
@@ -138,7 +136,7 @@ async function setupInventoryControls() {
   // cargar el control de limpiar filtros
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
-  setupBtnClearFilters(PAGE_INVENTORY, INVENTORY_STATE, renderInventory);
+  setupBtnClearFilters(PAGE_INVENTORY, renderInventory);
 }
 
 /**

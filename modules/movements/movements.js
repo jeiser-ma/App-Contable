@@ -104,7 +104,7 @@ async function setupMovementsControls() {
   // Cargar el control de búsqueda
   await loadModuleControl(CONTROL_SEARCH_INPUT);
   // Configurar el control de búsqueda
-  setupSearchInput(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+  setupSearchInput(PAGE_MOVEMENTS, renderMovements);
 
   // Cargar el control de botón de agregar
   await loadModuleControl(CONTROL_BTN_ADD);
@@ -114,17 +114,17 @@ async function setupMovementsControls() {
   // Cargar el control de filtro de fecha
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  setupDateFilter(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+  setupDateFilter(PAGE_MOVEMENTS, renderMovements);
 
   // cargar el control de ordenamiento
   await loadModuleControl(CONTROL_ORDER_BY);
   // Configurar el control de ordenamiento
-  setupOrderBy(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+  setupOrderBy(PAGE_MOVEMENTS, renderMovements);
 
   // cargar el control de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  setupChipsFilter(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+  setupChipsFilter(PAGE_MOVEMENTS, renderMovements);
 
   // Cargar el control de contador de elementos
   await loadModuleControl(CONTROL_LIST_COUNTER);
@@ -134,7 +134,7 @@ async function setupMovementsControls() {
   // cargar el control de limpiar filtros
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
-  setupBtnClearFilters(PAGE_MOVEMENTS, MOVEMENTS_STATE, renderMovements);
+  setupBtnClearFilters(PAGE_MOVEMENTS, renderMovements);
 }
 
 

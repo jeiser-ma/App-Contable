@@ -156,12 +156,14 @@ function clearModuleControlsContent() {
   }
 }
 
+
+// DEPRECATED
 /**
  * Configura y muestra los controles del módulo
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
  * @returns {void}
  */
-async function setupModuleControls(moduleName) {
+async function setupModuleControls(moduleName) { // DEPRECATED
   const config = MODULES_CONFIG[moduleName];
   if (!config) {
     console.error(`Configuración no encontrada para el módulo: ${moduleName}`);
@@ -187,7 +189,7 @@ async function setupModuleControls(moduleName) {
 
   // Configurar controles
   // 1. Buscador
-  setupSearchInput(moduleName);
+  setupSearchInput(moduleName, config.renderFunction);
   // 2. Botón de agregar
   setupBtnAdd(moduleName);
   // 3. Ordenamiento

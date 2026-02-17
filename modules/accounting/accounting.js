@@ -148,7 +148,7 @@ async function setupAccountingControls() {
   // la contabilidad no tiene control de búsqueda
   //await loadModuleControl(CONTROL_SEARCH_INPUT);
   // Configurar el control de búsqueda
-  //setupSearchInput(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
+  //setupSearchInput(PAGE_ACCOUNTING, renderAccounting);
 
   // la contabilidad no tiene botón de agregar
   //await loadModuleControl(CONTROL_BTN_ADD);
@@ -159,21 +159,21 @@ async function setupAccountingControls() {
   // El filtro de fecha ya se configura en setupDateFilter con la fecha de hoy
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  setupDateFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
+  setupDateFilter(PAGE_ACCOUNTING, renderAccounting);
 
   // la contabilidad no tiene campo de ordenamiento
   //await loadModuleControl(CONTROL_ORDER_BY);
   // Configurar el control de ordenamiento
-  //setupOrderBy(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
+  //setupOrderBy(PAGE_ACCOUNTING, renderAccounting);
 
   // cargar el control de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  await setupChipsFilter(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
+  await setupChipsFilter(PAGE_ACCOUNTING, renderAccounting);
 
   // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
   //activateChip(PAGES_CONFIG[PAGE_ACCOUNTING].chips.find(chip => chip.value === "today").id, ACCOUNTING_STATE);
-  await linkDateAndChipsFilters(PAGE_ACCOUNTING, ACCOUNTING_STATE, CONTROL_DATE_FILTER);
+  await linkDateAndChipsFilters(PAGE_ACCOUNTING, CONTROL_DATE_FILTER);
 
 
   // la contabilidad no tiene control de contador de elementos
@@ -184,7 +184,7 @@ async function setupAccountingControls() {
   // cargar el control de limpiar filtros
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
-  setupBtnClearFilters(PAGE_ACCOUNTING, ACCOUNTING_STATE, renderAccounting);
+  setupBtnClearFilters(PAGE_ACCOUNTING, renderAccounting);
 }
 
 

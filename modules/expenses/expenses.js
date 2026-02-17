@@ -75,7 +75,7 @@ async function setupExpensesControls() {
   // Cargar el control de búsqueda
   await loadModuleControl(CONTROL_SEARCH_INPUT);
   // Configurar el control de búsqueda
-  setupSearchInput(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+  setupSearchInput(PAGE_EXPENSES, renderExpenses);
 
 
   // Cargar el control de botón de agregar
@@ -87,22 +87,22 @@ async function setupExpensesControls() {
   // Cargar el control de filtro de fecha
   await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  setupDateFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+  setupDateFilter(PAGE_EXPENSES, renderExpenses);
 
 
   // cargar el control de ordenamiento
   await loadModuleControl(CONTROL_ORDER_BY);
   // Configurar el control de ordenamiento
-  setupOrderBy(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+  setupOrderBy(PAGE_EXPENSES, renderExpenses);
 
 
   // cargar el control de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  await setupChipsFilter(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+  await setupChipsFilter(PAGE_EXPENSES, renderExpenses);
 
   // Para los modulos con chips de fecha, inicializar el chip today por defecto al cargar la pagina
-  await linkDateAndChipsFilters(PAGE_EXPENSES, EXPENSES_STATE, CONTROL_DATE_FILTER);
+  await linkDateAndChipsFilters(PAGE_EXPENSES, CONTROL_DATE_FILTER);
 
 
   // Cargar el control de contador de elementos
@@ -114,7 +114,7 @@ async function setupExpensesControls() {
   // cargar el control de limpiar filtros
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
-  setupBtnClearFilters(PAGE_EXPENSES, EXPENSES_STATE, renderExpenses);
+  setupBtnClearFilters(PAGE_EXPENSES, renderExpenses);
 
 }
 

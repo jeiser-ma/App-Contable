@@ -1,11 +1,10 @@
 /**
  * Configura y muestra los controles del módulo
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
- * @param {object} moduleState - Estado del módulo
  * @param {function} renderFn - Función de renderización de la lista de elementos
  * @returns {void}
  */
-function setupBtnClearFilters(moduleName, moduleState, renderFn) {
+function setupBtnClearFilters(moduleName, renderFn) {
   // 6. Configurar botón limpiar filtros (siempre visible, limpia todo)
 
 
@@ -18,18 +17,18 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
         console.log(`Clear filters clicked`);
 
         // Limpiar buscador
-        await clearSearchInput(moduleName, moduleState);
+        await clearSearchInput(moduleName);
 
         // Limpiar ordenamiento (si existe)
-        await clearOrderBy(moduleName, moduleState);
+        await clearOrderBy(moduleName);
 
         // Limpiar filtro de fecha (si existe)
-        await clearDateFilter(moduleName, moduleState);
+        await clearDateFilter(moduleName);
 
         // Limpiar chips (si existen)
-        await clearChipsFilter(moduleName, moduleState);
+        await clearChipsFilter(moduleName);
 
-        await linkDateAndChipsFilters(moduleName, moduleState, CONTROL_DATE_FILTER);
+        await linkDateAndChipsFilters(moduleName, CONTROL_DATE_FILTER);
 
         // Llamar a la función de renderizado
         renderFn();
@@ -48,10 +47,12 @@ function setupBtnClearFilters(moduleName, moduleState, renderFn) {
 /**
  * Limpiar buscador
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
- * @param {object} moduleState - Estado del módulo
  * @returns {void}
  */
-async function clearSearchInput(moduleName, moduleState) {
+async function clearSearchInput(moduleName) {
+  // obtener el estado del modulo
+  let moduleState = getModuleState(moduleName);
+
   const searchInput = document.getElementById(ID_CONTROL_SEARCH_INPUT);
   const btnClearSearch = document.getElementById(ID_CONTROL_CLEAR_SEARCH);
   if (searchInput && btnClearSearch) {
@@ -72,15 +73,17 @@ async function clearSearchInput(moduleName, moduleState) {
 /**
  * Limpiar ordenamiento
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
- * @param {object} moduleState - Estado del módulo
  * @returns {void}
  */
-async function clearOrderBy(moduleName, moduleState) {
+async function clearOrderBy(moduleName) {
   // obtener el config del módulo
   let config = PAGES_CONFIG[moduleName];
   if (!config) {
     console.error(`Config not found for module: ${moduleName}`);
   }
+
+  // obtener el estado del modulo
+  let moduleState = getModuleState(moduleName);
 
   // obtener los elementos del DOM
   const orderBy = document.getElementById(ID_CONTROL_ORDER_BY);
@@ -112,10 +115,12 @@ async function clearOrderBy(moduleName, moduleState) {
 /**
  * Limpiar el filtro de fecha
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
- * @param {object} moduleState - Estado del módulo
  * @returns {void}
  */
-async function clearDateFilter(moduleName, moduleState) {
+async function clearDateFilter(moduleName) {
+  // obtener el estado del modulo
+  let moduleState = getModuleState(moduleName);
+
   const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
   if (dateFilter) {
     console.log(`Date filter found for module: ${moduleName}`);
@@ -139,10 +144,12 @@ async function clearDateFilter(moduleName, moduleState) {
 /**
  * Limpiar los chips filtrados
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
- * @param {object} moduleState - Estado del módulo
  * @returns {void}
  */
-async function clearChipsFilter(moduleName, moduleState) {
+async function clearChipsFilter(moduleName) {
+  // obtener el estado del modulo
+  let moduleState = getModuleState(moduleName);
+
   const chips = document.querySelectorAll(
     `.${CLASS_CONTROL_CHIPS_FILTER_BUTTON}`
   );

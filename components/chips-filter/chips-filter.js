@@ -3,7 +3,7 @@
  * @param {string} moduleName - Nombre del módulo ("products", "movements", "inventory", "expenses")
  * @returns {void}
  */
-async function setupChipsFilter(moduleName, moduleState, renderFn) {
+async function setupChipsFilter(moduleName, renderFn) {
   // Obtener el elemento <template> del DOM
   const template = await getChipTemplate();
   console.log("chips filter template obtenido correctamente");
@@ -43,7 +43,7 @@ async function setupChipsFilter(moduleName, moduleState, renderFn) {
     }
 
     // Configurar el handler del chip
-    setupChipHandler(chip, moduleName, moduleState, renderFn);
+    setupChipHandler(chip, moduleName, renderFn);
 
     // Agregar el chip al contenedor de chips
     container.appendChild(chip);
@@ -55,11 +55,12 @@ async function setupChipsFilter(moduleName, moduleState, renderFn) {
  * Configura el handler del chip
  * @param {HTMLElement} chip - Chip a configurar
  * @param {string} moduleName - Nombre del módulo
- * @param {object} moduleState - Estado del módulo
  * @param {function} renderFn - Función para renderizar la lista
  * @returns {void}
  */
-async function setupChipHandler(chip, moduleName, moduleState, renderFn) {
+async function setupChipHandler(chip, moduleName, renderFn) {
+  let moduleState = getModuleState(moduleName);
+
   // Configurar el handler del chip (onclick)
   chip.onclick = async () => {
     if (renderFn && typeof renderFn === "function") {
@@ -85,7 +86,7 @@ async function setupChipHandler(chip, moduleName, moduleState, renderFn) {
       }
 
       // Enlazar el filtro de fecha con los chips de filtro (hoy | ayer)
-      await linkDateAndChipsFilters(moduleName, moduleState, CONTROL_CHIPS_FILTER);
+      await linkDateAndChipsFilters(moduleName, CONTROL_CHIPS_FILTER);
 
       // Llamar a la función de render del módulo para actualizar la lista
       renderFn();

@@ -4,8 +4,11 @@
  * @param {function} renderFn - Función para renderizar la lista
  * @returns {void}
  */
-function setupDateFilter(moduleName, moduleState, renderFn) {
+function setupDateFilter(moduleName, renderFn) {
   console.log(`Setting up date filter`);
+
+  // obtener el estado del modulo
+  let moduleState = getModuleState(moduleName);
 
   // obtener elementos del DOM
   const dateFilter = document.getElementById(ID_CONTROL_DATE_FILTER);
@@ -24,7 +27,7 @@ function setupDateFilter(moduleName, moduleState, renderFn) {
       if (renderFn && typeof renderFn === "function") {
         moduleState.filterDate = dateFilter.value || null;
         console.log(`Date filter changed: ${moduleState.filterDate}`);
-        await linkDateAndChipsFilters(moduleName, moduleState, CONTROL_DATE_FILTER);
+        await linkDateAndChipsFilters(moduleName, CONTROL_DATE_FILTER);
         // if (moduleName === PAGE_ACCOUNTING) {
         //   clearChipsFilter(moduleName, moduleState);
         // }
@@ -37,24 +40,19 @@ function setupDateFilter(moduleName, moduleState, renderFn) {
 /**
  * Enlaza el filtro de fecha con los chips de filtro (hoy | ayer)
  * @param {string} moduleName - Nombre del módulo
- * @param {object} moduleState - Estado del módulo
  * @param {string} controlName - Nombre del control que se activo
  * @returns {void}
  */
-async function linkDateAndChipsFilters(moduleName, moduleState, controlName) {
-
+async function linkDateAndChipsFilters(moduleName, controlName) {
   console.warn("linkDateAndChipsFilters>>>>>: " + controlName + " ---> " + moduleName);
+
+  // obtener el estado del modulo
+  let moduleState = getModuleState(moduleName);
+
   // Verificar si el modulo es uno de los que tiene chips de fecha
   const hasModuleChipsDate = [PAGE_ACCOUNTING, PAGE_INVENTORY, PAGE_EXPENSES].includes(moduleName);
   // Validar que sea un modulo con chips de fecha
   if (hasModuleChipsDate) {
-    
-    // obtener el estado del modulo
-    // const moduleState = getModuleState(moduleName);
-    // if (!moduleState) {
-    //   console.error(`Module state not found for module: ${moduleName}`);
-    //   return;
-    // }
 
     // Si hay una fecha filtrada, activar el chip correspondiente
     if (controlName === CONTROL_DATE_FILTER && moduleState.filterDate) {

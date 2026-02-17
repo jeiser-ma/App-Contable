@@ -79,9 +79,6 @@ async function onProductsPageLoaded() {
   initModalModule(MODAL_PRODUCTS);
 
   // Configurar controles del módulo
-  //await setupModuleControls(PAGE_PRODUCTS);
-
-  // Configurar controles del módulo
   await setupProductsControls();
 
   // Configurar botón de guardar del modal
@@ -105,7 +102,7 @@ async function setupProductsControls() {
   // Cargar el control de búsqueda
   await loadModuleControl(CONTROL_SEARCH_INPUT);
   // Configurar el control de búsqueda
-  setupSearchInput(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+  setupSearchInput(PAGE_PRODUCTS, renderProducts);
 
   // Cargar el control de botón de agregar
   await loadModuleControl(CONTROL_BTN_ADD);
@@ -115,17 +112,17 @@ async function setupProductsControls() {
   // No tiene filtro de fecha
   //await loadModuleControl(CONTROL_DATE_FILTER);
   // Configurar el filtro de fecha
-  //setupDateFilter(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+  //setupDateFilter(PAGE_PRODUCTS, renderProducts);
 
   // cargar el control de ordenamiento
   await loadModuleControl(CONTROL_ORDER_BY);
   // Configurar el control de ordenamiento
-  setupOrderBy(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+  setupOrderBy(PAGE_PRODUCTS, renderProducts);
 
   // cargar el control de chips filter
   await loadModuleControl(CONTROL_CHIPS_FILTER);
   // Configurar el control de chips filter
-  setupChipsFilter(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+  setupChipsFilter(PAGE_PRODUCTS, renderProducts);
 
   // Cargar el control de contador de elementos
   await loadModuleControl(CONTROL_LIST_COUNTER);
@@ -135,7 +132,7 @@ async function setupProductsControls() {
   // cargar el control de limpiar filtros
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
-  setupBtnClearFilters(PAGE_PRODUCTS, PRODUCTS_STATE, renderProducts);
+  setupBtnClearFilters(PAGE_PRODUCTS, renderProducts);
 }
 
 /**
