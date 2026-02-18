@@ -64,6 +64,31 @@ const PRODUCTS_STATE = {
 window.PRODUCTS_STATE = PRODUCTS_STATE;
 
 // ===============================
+// Migración de productos (code -> codes)
+// ===============================
+
+/**
+ * Migra productos con code (string) a codes (array).
+ * Se ejecuta al cargar la página de productos.
+ */
+function migrateProductsToCodes() {
+  const products = getData(PAGE_PRODUCTS) || [];
+  let changed = false;
+  const migrated = products.map((p) => {
+    if (Array.isArray(p.codes)) return p;
+    if (typeof p.code === "string" && p.code.trim()) {
+      changed = true;
+      const { code, ...rest } = p;
+      return { ...rest, codes: [code.trim()] };
+    }
+    changed = true;
+    const { code, ...rest } = p;
+    return { ...rest, codes: [] };
+  });
+  if (changed) setData(PAGE_PRODUCTS, migrated);
+}
+
+// ===============================
 // Hook que llama el router
 // ===============================
 
@@ -73,6 +98,8 @@ window.PRODUCTS_STATE = PRODUCTS_STATE;
  * y configura los event listeners de los botones
  */
 async function onProductsPageLoaded() {
+  migrateProductsToCodes();
+
   // Cargar modal de productos
   console.log("Loading product-modal");
   await loadModal(MODAL_PRODUCTS, PAGE_PRODUCTS);
@@ -92,9 +119,12 @@ async function onProductsPageLoaded() {
   renderProducts();
 }
 
+
+
 /**
  * Configura el botón "Escanear código". Usa el componente scanner (openScannerModal).
- * Al leer un código, abre el modal de producto con el campo Código rellenado.
+ * Si existe producto con ese código: abre modal editar. Si no: abre modal agregar.
+ * En ambos casos el campo Código se carga con el código escaneado / códigos del producto.
  */
 function setupScanProductButton() {
   const btnScan = document.getElementById(ID_BTN_SCAN_PRODUCT_CODE);
@@ -107,8 +137,14 @@ function setupScanProductButton() {
     }
     openScannerModal({
       onSuccess: (decodedText) => {
-        openAddProductModal();
-        setInputValue(ID_INPUT_CODE, decodedText);
+        const products = getData(PAGE_PRODUCTS) || [];
+        const found = products.find((p) => (p.codes || []).includes(decodedText));
+        if (found) {
+          openEditProductModal(found.id);
+        } else {
+          openAddProductModal();
+          setInputValue(ID_INPUT_CODE, decodedText);
+        }
       }
     });
   };
@@ -214,7 +250,7 @@ function openEditProductModal(id) {
 
   // Establecer el valor del input de ID
   setInputValue(ID_PRODUCT_ID, product.id);
-  setInputValue(ID_INPUT_CODE, product.code || "");
+  setInputValue(ID_INPUT_CODE, Array.isArray(product.codes) ? product.codes.join(", ") : product.code || "");
   // Establecer el valor del input de nombre
   setInputValue(ID_INPUT_NAME, product.name);
   // Establecer el valor del input de precio
@@ -536,7 +572,7 @@ function renderProducts() {
 function saveProductFromModal() {
   // Obtener los valores de los inputs
   const id = getInputValue(ID_PRODUCT_ID);
-  const code = getInputValue(ID_INPUT_CODE).trim();
+  const codesRaw = getInputValue(ID_INPUT_CODE).split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
   const name = getInputValue(ID_INPUT_NAME).trim();
   const price = parseFloat(getInputValue(ID_INPUT_PRICE));
   const um = getInputValue(ID_INPUT_UM).trim();
@@ -596,7 +632,7 @@ function saveProductFromModal() {
     }
     const updatedProduct = {
       ...productToEdit,
-      code: code || undefined,
+      codes: codesRaw,
       name,
       price: priceRounded,
       um,
@@ -609,7 +645,7 @@ function saveProductFromModal() {
     // ALTA
     const newProduct = {
       id: crypto.randomUUID(),
-      code: code || undefined,
+      codes: codesRaw,
       name,
       price: priceRounded,
       um,
