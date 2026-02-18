@@ -19,12 +19,14 @@ const ID_PRODUCTS_COUNTER = "productsCounter";
 const ID_PRODUCT_MODAL_TITLE = "productModalTitle";
 const ID_PRODUCT_FORM = "productForm";
 const ID_PRODUCT_ID = "productId";
+const ID_INPUT_CODE = "inputCode";
 const ID_INPUT_NAME = "inputName";
 const ID_INPUT_PRICE = "inputPrice";
 const ID_INPUT_UM = "inputUM";
 const ID_INPUT_QUANTITY = "inputQuantity";
 const ID_INPUT_LOW_STOCK_THRESHOLD = "inputLowStockThreshold";
 const ID_INPUT_CRITICAL_STOCK_THRESHOLD = "inputCriticalStockThreshold";
+const ID_BTN_SCAN_PRODUCT_CODE = "btnScanProductCode";
 //#endregion
 
 let productModal;
@@ -84,8 +86,32 @@ async function onProductsPageLoaded() {
   // Configurar botón de guardar del modal
   document.getElementById(BTN_ID_SAVE_PRODUCT).onclick = saveProductFromModal;
 
+  setupScanProductButton();
+
   // Renderizar la lista de productos
   renderProducts();
+}
+
+/**
+ * Configura el botón "Escanear código". Usa el componente scanner (openScannerModal).
+ * Al leer un código, abre el modal de producto con el campo Código rellenado.
+ */
+function setupScanProductButton() {
+  const btnScan = document.getElementById(ID_BTN_SCAN_PRODUCT_CODE);
+  if (!btnScan) return;
+
+  btnScan.onclick = () => {
+    if (typeof openScannerModal !== "function") {
+      alert("No se pudo iniciar el escáner. Comprueba que el componente scanner esté cargado.");
+      return;
+    }
+    openScannerModal({
+      onSuccess: (decodedText) => {
+        openAddProductModal();
+        setInputValue(ID_INPUT_CODE, decodedText);
+      }
+    });
+  };
 }
 
 /**
@@ -151,6 +177,7 @@ function openAddProductModal() {
   // Resetear el formulario del modal
   // Establecer el valor del input de ID
   setInputValue(ID_PRODUCT_ID, "");
+  setInputValue(ID_INPUT_CODE, "");
   // Establecer el valor del input de nombre
   setInputValue(ID_INPUT_NAME, "");
   // Establecer el valor del input de precio
@@ -187,6 +214,7 @@ function openEditProductModal(id) {
 
   // Establecer el valor del input de ID
   setInputValue(ID_PRODUCT_ID, product.id);
+  setInputValue(ID_INPUT_CODE, product.code || "");
   // Establecer el valor del input de nombre
   setInputValue(ID_INPUT_NAME, product.name);
   // Establecer el valor del input de precio
@@ -508,6 +536,7 @@ function renderProducts() {
 function saveProductFromModal() {
   // Obtener los valores de los inputs
   const id = getInputValue(ID_PRODUCT_ID);
+  const code = getInputValue(ID_INPUT_CODE).trim();
   const name = getInputValue(ID_INPUT_NAME).trim();
   const price = parseFloat(getInputValue(ID_INPUT_PRICE));
   const um = getInputValue(ID_INPUT_UM).trim();
@@ -567,6 +596,7 @@ function saveProductFromModal() {
     }
     const updatedProduct = {
       ...productToEdit,
+      code: code || undefined,
       name,
       price: priceRounded,
       um,
@@ -579,6 +609,7 @@ function saveProductFromModal() {
     // ALTA
     const newProduct = {
       id: crypto.randomUUID(),
+      code: code || undefined,
       name,
       price: priceRounded,
       um,

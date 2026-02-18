@@ -199,6 +199,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Loading component badge");
     loadComponent("badge");
 
+    // Cargamos el componente scanner (modal para escanear códigos de barras/QR)
+    console.log("Loading component scanner");
+    loadComponent("scanner");
+
     // Cargamos la página inicial
     console.log("Loading home page");
     loadPage(PAGE_HOME); //poner el home
