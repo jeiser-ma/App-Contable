@@ -122,13 +122,13 @@ function getWhatsAppStockMessage() {
   const bullet = "•";
   const lines = [];
 
-  lines.push("📋 Reporte de stock");
+  lines.push("Reporte de stock");
   lines.push("");
-  lines.push("🚨 Productos en falta (stock crítico):");
+  lines.push(">> Productos en falta (stock crítico):");
   if (critical.length) critical.forEach((p) => lines.push(bullet + " " + (p.name || "Sin nombre")));
   else lines.push(bullet + " (ninguno)");
   lines.push("");
-  lines.push("⚠️ Productos que se están acabando:");
+  lines.push(">> Productos que se están acabando:");
   if (low.length) low.forEach((p) => lines.push(bullet + " " + (p.name || "Sin nombre")));
   else lines.push(bullet + " (ninguno)");
 
