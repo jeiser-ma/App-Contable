@@ -124,7 +124,7 @@ function getWhatsAppStockMessage() {
 
   lines.push("Reporte de stock");
   lines.push("");
-  lines.push(">> Productos en falta (stock crítico):");
+  lines.push(">> Productos en falta:");
   if (critical.length) critical.forEach((p) => lines.push(bullet + " " + (p.name || "Sin nombre")));
   else lines.push(bullet + " (ninguno)");
   lines.push("");

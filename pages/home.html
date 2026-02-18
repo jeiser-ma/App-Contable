@@ -1,27 +1,20 @@
 <div class="" style="margin-top: 70px;">
 
   <!-- Cards de métricas -->
-  <div class="row mb-4 g-2">
+  <div class="row mb-5 g-2">
     <div class="fw-semibold col-12">
       <i class="bi bi-box-fill text-primary fs-6"></i> Productos
     </div>
     <!-- Total de productos -->
     <div class="col-12">
       <div class="rounded-pill bg-white shadow-sm border-0">
-        <div
-          class="d-flex justify-content-center align-items-center px-2 py-2 gap-2"
-        >
-          <i
-            class="bi bi-boxes text-white fs-4 bg-primary rounded-circle text-center"
-            style="width: 35px; height: 35px"
-          ></i>
+        <div class="d-flex justify-content-center align-items-center px-2 py-2 gap-2">
+          <i class="bi bi-boxes text-white fs-4 bg-primary rounded-circle text-center"
+            style="width: 35px; height: 35px"></i>
           <div class="text-muted small fw-bold flex-grow-1">
             Total de productos
           </div>
-          <div
-            class="fw-bold text-primary bg-primary bg-opacity-10 rounded-pill px-2"
-            id="totalProducts"
-          >
+          <div class="fw-bold text-primary bg-primary bg-opacity-10 rounded-pill px-2" id="totalProducts">
             0
           </div>
         </div>
@@ -30,18 +23,10 @@
 
     <!-- Productos con stock bajo -->
     <div class="col-6">
-      <div
-        class="rounded-4 bg-white shadow-sm border-0"
-        id="cardLowStock"
-        style="cursor: pointer"
-      >
-        <div
-          class="d-flex justify-content-between align-items-center px-2 py-2"
-        >
-          <i
-            class="bi bi-box text-warning fs-5 bg-warning bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center"
-            style="width: 35px; height: 35px"
-          ></i>
+      <div class="rounded-4 bg-white shadow-sm border-0" id="cardLowStock" style="cursor: pointer">
+        <div class="d-flex justify-content-between align-items-center px-2 py-2">
+          <i class="bi bi-box text-warning fs-5 bg-warning bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center"
+            style="width: 35px; height: 35px"></i>
 
           <div class="text-end flex-grow-1 px-2">
             <div class="text-muted small">Stock bajo</div>
@@ -59,27 +44,16 @@
 
     <!-- Productos con stock crítico -->
     <div class="col-6">
-      <div
-        class="rounded-4 bg-white shadow-sm border-0"
-        id="cardCriticalStock"
-        style="cursor: pointer"
-      >
-        <div
-          class="d-flex justify-content-between align-items-center px-2 py-2"
-        >
-          <i
-            class="bi bi-box text-danger fs-5 bg-danger bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center"
-            style="width: 35px; height: 35px"
-          ></i>
+      <div class="rounded-4 bg-white shadow-sm border-0" id="cardCriticalStock" style="cursor: pointer">
+        <div class="d-flex justify-content-between align-items-center px-2 py-2">
+          <i class="bi bi-box text-danger fs-5 bg-danger bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center"
+            style="width: 35px; height: 35px"></i>
 
           <div class="text-end flex-grow-1 px-1">
             <div class="text-muted small">Stock crítico</div>
             <div class="d-inline-flex align-items-center gap-2">
               <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
-              <div
-                class="h6 mb-0 fw-bold text-danger"
-                id="cardCriticalStock"
-              >
+              <div class="h6 mb-0 fw-bold text-danger" id="cardCriticalStock">
                 0
               </div>
             </div>
@@ -88,9 +62,8 @@
         </div>
       </div>
     </div>
-
-    <div class="mb-4 border-top">
-      <button class="btn btn-outline-success rounded-pill d-flex align-items-center w-100 px-1 py-1 mt-3"
+    <div class="col-12 ">
+      <button class="btn btn-outline-success rounded-pill d-flex align-items-center w-100 px-1 py-1"
         id="btnSendWhatsApp" type="button">
         <span class="px-3 text-success rounded-pill bg-success text-white">
           <i class="bi bi-whatsapp fs-5"></i>
@@ -110,10 +83,7 @@
         <i class="bi bi-calculator-fill text-primary"></i>
         Resumen contabilidad del día
       </h6>
-      <button
-        class="btn btn-chip rounded-pill btn-outline-primary"
-        id="btnViewAccountingDetails"
-      >
+      <button class="btn btn-chip rounded-pill btn-outline-primary" id="btnViewAccountingDetails">
         Detalles
         <i class="bi bi-chevron-right text-primary small"></i>
       </button>
@@ -121,9 +91,7 @@
 
     <div class="row g-2">
       <!-- Importe total del inventario -->
-      <div
-        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-      >
+      <div class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2">
         <div class="flex-grow-1">
           <div class="text-muted small">Importe total</div>
           <div class="h5 fw-bold text-primary" id="accountingTotalAmount">
@@ -131,62 +99,45 @@
           </div>
         </div>
 
-        <i
-          class="bi bi-cash-stack text-primary fs-4 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-          style="width: 40px; height: 40px"
-        ></i>
+        <i class="bi bi-cash-stack text-primary fs-4 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"></i>
       </div>
 
       <!-- Total de gastos -->
-      <div
-        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-      >
+      <div class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2">
         <div class="flex-grow-1">
           <div class="text-muted small">Total gastos</div>
           <div class="h5 fw-bold text-danger" id="accountingTotalExpenses">
             $0.00
           </div>
         </div>
-        <i
-          class="bi bi-cash-coin text-danger fs-4 bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-          style="width: 40px; height: 40px"
-        ></i>
+        <i class="bi bi-cash-coin text-danger fs-4 bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"></i>
       </div>
 
       <!-- Total de ventas -->
-      <div
-        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-      >
+      <div class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2">
         <div class="flex-grow-1">
           <div class="text-muted small">Total ventas</div>
           <div class="h5 fw-bold text-success" id="accountingTotalSales">
             $0.00
           </div>
         </div>
-        <i
-          class="bi bi-cart-check text-success fs-4 bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-          style="width: 40px; height: 40px"
-        ></i>
+        <i class="bi bi-cart-check text-success fs-4 bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"></i>
       </div>
 
       <!-- Cierre de caja (diferencia) -->
-      <div
-        class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-      >
+      <div class="col-12 rounded-4 bg-white shadow-sm d-flex align-items-center justify-content-between px-3 py-2">
         <div class="flex-grow-1">
           <div class="text-muted small">Cierre de caja</div>
           <div class="d-inline-flex gap-2">
-            <i
-              class="bi bi-cash-coin text-danger"
-              id="accountingDifferenceIcon"
-            ></i>
+            <i class="bi bi-cash-coin text-danger" id="accountingDifferenceIcon"></i>
             <div class="h5 fw-bold" id="accountingDifference">$0.00</div>
           </div>
         </div>
-        <i
-          class="bi bi-calculator text-info fs-4 bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-          style="width: 40px; height: 40px"
-        ></i>
+        <i class="bi bi-calculator text-info fs-4 bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"></i>
       </div>
     </div>
   </div>
