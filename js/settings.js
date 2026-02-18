@@ -22,6 +22,8 @@ const ID_APP_VERSION_TEXT = "appVersionText";
 const ID_APP_VERSION_CONTAINER = "appVersionContainer";
 const ID_APP_LAST_UPDATE_TEXT = "appLastUpdateDateText";
 const ID_BTN_EXPORT_APP_STATE = "btnExportAppState";
+const ID_BTN_IMPORT_APP_STATE = "btnImportAppState";
+const ID_INPUT_IMPORT_APP_STATE = "inputImportAppState";
 //#endregion
 
 /**
@@ -55,6 +57,8 @@ async function onSettingsPageLoaded() {
 
   // Configurar el botón para exportar el estado de la app en JSON
   setupExportAppStateListener();
+  // Configurar el botón e input para importar estado desde un archivo JSON
+  setupImportAppStateListener();
 }
 
 /**
@@ -64,6 +68,41 @@ function setupExportAppStateListener() {
   const btn = document.getElementById(ID_BTN_EXPORT_APP_STATE);
   if (!btn) return;
   btn.onclick = () => exportAppStateToJson();
+}
+
+/**
+ * Configura el botón e input para importar estado desde un archivo JSON
+ */
+function setupImportAppStateListener() {
+  const btn = document.getElementById(ID_BTN_IMPORT_APP_STATE);
+  const input = document.getElementById(ID_INPUT_IMPORT_APP_STATE);
+  if (!btn || !input) return;
+
+  btn.onclick = () => input.click();
+
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    input.value = "";
+    if (!file) return;
+
+    const result = await importAppStateFromFile(file);
+    if (result.ok) {
+      if (typeof showToast === "function") {
+        showToast(`Estado importado correctamente (${result.imported} datos actualizados).`, "success", 4);
+      } else {
+        alert(`Estado importado correctamente (${result.imported} datos actualizados).`);
+      }
+      renderUnits();
+      renderConcepts();
+      loadSalaryPercentage();
+    } else {
+      if (typeof showToast === "function") {
+        showToast(result.error || "Error al importar", "danger", 4);
+      } else {
+        alert(result.error || "Error al importar");
+      }
+    }
+  };
 }
 
 /**
