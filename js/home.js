@@ -14,6 +14,7 @@ function onHomePageLoaded() {
   setTimeout(() => {
     updateDashboard();
     setupClickableCards();
+    setupWhatsAppButton();
     updateAccountingSummary();
   }, 100);
 }
@@ -99,6 +100,52 @@ function formatCurrency(amount) {
     currency: "USD",
     minimumFractionDigits: 2,
   }).format(amount);
+}
+
+/**
+ * Construye el texto del mensaje para WhatsApp: productos en falta (crítico) y que se están acabando (bajo).
+ * @returns {string}
+ */
+function getWhatsAppStockMessage() {
+  const products = getData(PAGE_PRODUCTS) || [];
+  const critical = products.filter((p) => {
+    const criticalThreshold = p.criticalStockThreshold ?? 0;
+    return (p.quantity ?? 0) <= criticalThreshold;
+  });
+  const low = products.filter((p) => {
+    const lowThreshold = p.lowStockThreshold ?? 0;
+    const criticalThreshold = p.criticalStockThreshold ?? 0;
+    const qty = p.quantity ?? 0;
+    return qty <= lowThreshold && qty > criticalThreshold;
+  });
+
+  const bullet = "•";
+  const lines = [];
+
+  lines.push("📋 Reporte de stock");
+  lines.push("");
+  lines.push("🚨 Productos en falta (stock crítico):");
+  if (critical.length) critical.forEach((p) => lines.push(bullet + " " + (p.name || "Sin nombre")));
+  else lines.push(bullet + " (ninguno)");
+  lines.push("");
+  lines.push("⚠️ Productos que se están acabando:");
+  if (low.length) low.forEach((p) => lines.push(bullet + " " + (p.name || "Sin nombre")));
+  else lines.push(bullet + " (ninguno)");
+
+  return lines.join("\n");
+}
+
+/**
+ * Configura el botón Enviar por WhatsApp: abre wa.me con el mensaje para que el usuario elija el contacto.
+ */
+function setupWhatsAppButton() {
+  const btn = document.getElementById("btnSendWhatsApp");
+  if (!btn) return;
+  btn.onclick = () => {
+    const text = getWhatsAppStockMessage();
+    const url = "https://wa.me/?text=" + encodeURIComponent(text);
+    window.location.href = url;
+  };
 }
 
 /**
