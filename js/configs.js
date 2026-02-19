@@ -451,6 +451,7 @@ const CONTEXT_MENU_CONFIG = [
 // Nombres de los componentes de los módulos 
 //fila 1
 const CONTROL_SEARCH_INPUT = "search-input";
+const CONTROL_BTN_SCAN_PRODUCT = "btn-scan-product";
 const CONTROL_BTN_ADD = "btn-add";
 //fila 2
 const CONTROL_DATE_FILTER = "date-filter";
@@ -478,6 +479,7 @@ const ID_CONTROL_CLEAR_SEARCH = "control-clear-search"; // botón de limpiar el 
 
 // ids de los componentes de los btn add
 const ID_CONTROL_BTN_ADD = "control-btn-add"; // botón de agregar
+const ID_CONTROL_BTN_SCAN_PRODUCT = "control-btn-scan-product"; // botón de escanear código
 
 // ids de los componentes de la date filter
 const ID_CONTROL_DATE_FILTER = "control-date-filter";
@@ -511,6 +513,10 @@ const MODULES_CONTROLS_CONFIG = {
   [CONTROL_SEARCH_INPUT]: {
     containerId: ID_CONTAINER_SEARCH_INPUT_BTN_ADD,
     componentName: CONTROL_SEARCH_INPUT
+  },
+  [CONTROL_BTN_SCAN_PRODUCT]: {
+    containerId: ID_CONTAINER_SEARCH_INPUT_BTN_ADD,
+    componentName: CONTROL_BTN_SCAN_PRODUCT
   },
   [CONTROL_BTN_ADD]: {
     containerId: ID_CONTAINER_SEARCH_INPUT_BTN_ADD,

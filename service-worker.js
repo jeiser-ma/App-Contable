@@ -77,6 +77,8 @@ const PRECACHE_URLS = [
   "components/search-input/search-input.js",
   "components/btn-add/btn-add.html",
   "components/btn-add/btn-add.js",
+  "components/btn-scan-product/btn-scan-product.html",
+  "components/btn-scan-product/btn-scan-product.js",
   "components/order-by/order-by.html",
   "components/order-by/order-by.js",
   "components/date-filter/date-filter.html",

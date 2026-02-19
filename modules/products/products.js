@@ -26,7 +26,6 @@ const ID_INPUT_UM = "inputUM";
 const ID_INPUT_QUANTITY = "inputQuantity";
 const ID_INPUT_LOW_STOCK_THRESHOLD = "inputLowStockThreshold";
 const ID_INPUT_CRITICAL_STOCK_THRESHOLD = "inputCriticalStockThreshold";
-const ID_BTN_SCAN_PRODUCT_CODE = "btnScanProductCode";
 //#endregion
 
 let productModal;
@@ -113,8 +112,6 @@ async function onProductsPageLoaded() {
   // Configurar botón de guardar del modal
   document.getElementById(BTN_ID_SAVE_PRODUCT).onclick = saveProductFromModal;
 
-  setupScanProductButton();
-
   // Renderizar la lista de productos
   renderProducts();
 }
@@ -122,32 +119,26 @@ async function onProductsPageLoaded() {
 
 
 /**
- * Configura el botón "Escanear código". Usa el componente scanner (openScannerModal).
- * Si existe producto con ese código: abre modal editar. Si no: abre modal agregar.
- * En ambos casos el campo Código se carga con el código escaneado / códigos del producto.
+ * Maneja el escaneo de código: abre el scanner y según el resultado abre modal editar o agregar.
+ * Usado por el componente btn-scan-product.
  */
-function setupScanProductButton() {
-  const btnScan = document.getElementById(ID_BTN_SCAN_PRODUCT_CODE);
-  if (!btnScan) return;
-
-  btnScan.onclick = () => {
-    if (typeof openScannerModal !== "function") {
-      alert("No se pudo iniciar el escáner. Comprueba que el componente scanner esté cargado.");
-      return;
-    }
-    openScannerModal({
-      onSuccess: (decodedText) => {
-        const products = getData(PAGE_PRODUCTS) || [];
-        const found = products.find((p) => (p.codes || []).includes(decodedText));
-        if (found) {
-          openEditProductModal(found.id);
-        } else {
-          openAddProductModal();
-          setInputValue(ID_INPUT_CODE, decodedText);
-        }
+function handleScanProductCode() {
+  if (typeof openScannerModal !== "function") {
+    alert("No se pudo iniciar el escáner. Comprueba que el componente scanner esté cargado.");
+    return;
+  }
+  openScannerModal({
+    onSuccess: (decodedText) => {
+      const products = getData(PAGE_PRODUCTS) || [];
+      const found = products.find((p) => (p.codes || []).includes(decodedText));
+      if (found) {
+        openEditProductModal(found.id);
+      } else {
+        openAddProductModal();
+        setInputValue(ID_INPUT_CODE, decodedText);
       }
-    });
-  };
+    }
+  });
 }
 
 /**
@@ -165,6 +156,10 @@ async function setupProductsControls() {
   await loadModuleControl(CONTROL_SEARCH_INPUT);
   // Configurar el control de búsqueda
   setupSearchInput(PAGE_PRODUCTS, renderProducts);
+
+  // Cargar el botón de escanear código (a la izquierda del botón agregar)
+  await loadModuleControl(CONTROL_BTN_SCAN_PRODUCT);
+  setupBtnScanProduct(handleScanProductCode);
 
   // Cargar el control de botón de agregar
   await loadModuleControl(CONTROL_BTN_ADD);
