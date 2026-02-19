@@ -106,6 +106,10 @@ async function setupMovementsControls() {
   // Configurar el control de búsqueda
   setupSearchInput(PAGE_MOVEMENTS, renderMovements);
 
+  // Cargar el botón de escanear código (a la izquierda del botón agregar)
+  await loadModuleControl(CONTROL_BTN_SCAN_PRODUCT);
+  setupBtnScanProduct(handleScanMovementCode);
+
   // Cargar el control de botón de agregar
   await loadModuleControl(CONTROL_BTN_ADD);
   // Configurar el botón de agregar
@@ -137,6 +141,34 @@ async function setupMovementsControls() {
   setupBtnClearFilters(PAGE_MOVEMENTS, renderMovements);
 }
 
+
+/**
+ * Maneja el escaneo de código en movimientos: si el producto existe abre el modal para agregar;
+ * si no existe muestra un toast informativo.
+ * Usado por el componente btn-scan-product.
+ */
+function handleScanMovementCode() {
+  if (typeof openScannerModal !== "function") {
+    alert("No se pudo iniciar el escáner. Comprueba que el componente scanner esté cargado.");
+    return;
+  }
+  openScannerModal({
+    onSuccess: (decodedText) => {
+      const products = getData(PAGE_PRODUCTS) || [];
+      const found = products.find((p) => (p.codes || []).includes(decodedText));
+      if (found) {
+        openAddMovementModal();
+        setInputValue(ID_MOVEMENT_PRODUCT, found.name);
+      } else {
+        if (typeof showToast === "function") {
+          showToast("No existe un producto con el código escaneado", TOAST_COLORS.WARNING, 3);
+        } else {
+          alert("No existe un producto con el código escaneado");
+        }
+      }
+    }
+  });
+}
 
 /**
  * Abre el formulario para entrada (type=IN) o salida (type=OUT)
