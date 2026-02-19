@@ -104,6 +104,10 @@ async function setupInventoryControls() {
   // Configurar el control de búsqueda
   setupSearchInput(PAGE_INVENTORY, renderInventory);
 
+  // Cargar el botón de escanear código
+  await loadModuleControl(CONTROL_BTN_SCAN_PRODUCT);
+  setupBtnScanProduct(handleScanInventoryCode);
+
   // El inventario no tiene botón de agregar
   //await loadModuleControl(CONTROL_BTN_ADD);
   // Configurar el botón de agregar
@@ -137,6 +141,33 @@ async function setupInventoryControls() {
   await loadModuleControl(CONTROL_BTN_CLEAR_FILTERS);
   // Configurar el control de limpiar filtros
   setupBtnClearFilters(PAGE_INVENTORY, renderInventory);
+}
+
+/**
+ * Maneja el escaneo de código en inventario: si el producto existe abre el modal de inventario
+ * con ese producto; si no existe muestra un toast informativo.
+ * Usado por el componente btn-scan-product.
+ */
+function handleScanInventoryCode() {
+  if (typeof openScannerModal !== "function") {
+    alert("No se pudo iniciar el escáner. Comprueba que el componente scanner esté cargado.");
+    return;
+  }
+  openScannerModal({
+    onSuccess: (decodedText) => {
+      const products = getData(PAGE_PRODUCTS) || [];
+      const found = products.find((p) => (p.codes || []).includes(decodedText));
+      if (found) {
+        openAddInventoryModal(found.id);
+      } else {
+        if (typeof showToast === "function") {
+          showToast("No existe un producto con el código escaneado", TOAST_COLORS.WARNING, 3);
+        } else {
+          alert("No existe un producto con el código escaneado");
+        }
+      }
+    }
+  });
 }
 
 /**
