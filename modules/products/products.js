@@ -19,7 +19,8 @@ const ID_PRODUCTS_COUNTER = "productsCounter";
 const ID_PRODUCT_MODAL_TITLE = "productModalTitle";
 const ID_PRODUCT_FORM = "productForm";
 const ID_PRODUCT_ID = "productId";
-const ID_INPUT_CODE = "inputCode";
+const ID_PRODUCT_CODES_CONTAINER = "productCodesContainer";
+const ID_BTN_ADD_CODE_SCAN = "btnAddCodeScan";
 const ID_INPUT_NAME = "inputName";
 const ID_INPUT_PRICE = "inputPrice";
 const ID_INPUT_UM = "inputUM";
@@ -29,6 +30,9 @@ const ID_INPUT_CRITICAL_STOCK_THRESHOLD = "inputCriticalStockThreshold";
 //#endregion
 
 let productModal;
+
+/** Lista de códigos del producto en el modal (se guarda al hacer clic en Guardar) */
+let productModalCodes = [];
 
 // Estado de la pantalla de productos (unificado)
 const PRODUCTS_STATE = {
@@ -106,6 +110,9 @@ async function onProductsPageLoaded() {
   // Inicializar el modal después de cargarlo
   initModalModule(MODAL_PRODUCTS);
 
+  // Configurar botón de escanear códigos dentro del modal
+  setupProductModalCodesScanButton();
+
   // Configurar controles del módulo
   await setupProductsControls();
 
@@ -134,11 +141,70 @@ function handleScanProductCode() {
       if (found) {
         openEditProductModal(found.id);
       } else {
-        openAddProductModal();
-        setInputValue(ID_INPUT_CODE, decodedText);
+        openAddProductModal(decodedText);
       }
     }
   });
+}
+
+/**
+ * Renderiza los badges de códigos en el modal de producto.
+ * Si no hay códigos muestra un badge "ninguno" sin botón cerrar.
+ * Cada código tiene badge con X para eliminarlo.
+ */
+function renderProductCodesBadges() {
+  const container = document.getElementById(ID_PRODUCT_CODES_CONTAINER);
+  if (!container) return;
+
+  container.replaceChildren();
+
+  if (productModalCodes.length === 0) {
+    const badge = createBadge({
+      text: "sin códigos",
+      colorClass: "text-muted",
+      showCloseButton: false
+    });
+    if (badge) container.appendChild(badge);
+    return;
+  }
+
+  productModalCodes.forEach((code, index) => {
+    const badge = createBadge({
+      text: code,
+      colorClass: "bg-primary",
+      showCloseButton: true,
+      onClose: () => {
+        productModalCodes = productModalCodes.filter((_, i) => i !== index);
+        renderProductCodesBadges();
+      }
+    });
+    if (badge) container.appendChild(badge);
+  });
+}
+
+/**
+ * Configura el botón de escanear para agregar código dentro del modal de producto.
+ * Al escanear se agrega el código a productModalCodes (sin duplicados) y se re-renderizan los badges.
+ */
+function setupProductModalCodesScanButton() {
+  const btnScan = document.getElementById(ID_BTN_ADD_CODE_SCAN);
+  if (!btnScan) return;
+
+  btnScan.onclick = () => {
+    if (typeof openScannerModal !== "function") {
+      alert("No se pudo iniciar el escáner. Comprueba que el componente scanner esté cargado.");
+      return;
+    }
+    openScannerModal({
+      onSuccess: (decodedText) => {
+        const trimmed = decodedText.trim();
+        if (!trimmed) return;
+        if (productModalCodes.includes(trimmed)) return;
+        productModalCodes.push(trimmed);
+        renderProductCodesBadges();
+      }
+    });
+  };
 }
 
 /**
@@ -195,8 +261,9 @@ async function setupProductsControls() {
 /**
  * Abre el modal para agregar un nuevo producto
  * Resetea el formulario y configura el título del modal
+ * @param {string} [initialCode] - Código opcional (ej. escaneado) para pre-cargar
  */
-function openAddProductModal() {
+function openAddProductModal(initialCode) {
   // Resetear el estado de edición porque es un nuevo producto y no hay producto para editar
   PRODUCTS_STATE.elementToEdit = null;
 
@@ -208,7 +275,8 @@ function openAddProductModal() {
   // Resetear el formulario del modal
   // Establecer el valor del input de ID
   setInputValue(ID_PRODUCT_ID, "");
-  setInputValue(ID_INPUT_CODE, "");
+  productModalCodes = initialCode ? [initialCode.trim()] : [];
+  renderProductCodesBadges();
   // Establecer el valor del input de nombre
   setInputValue(ID_INPUT_NAME, "");
   // Establecer el valor del input de precio
@@ -245,7 +313,8 @@ function openEditProductModal(id) {
 
   // Establecer el valor del input de ID
   setInputValue(ID_PRODUCT_ID, product.id);
-  setInputValue(ID_INPUT_CODE, Array.isArray(product.codes) ? product.codes.join(", ") : product.code || "");
+  productModalCodes = [...(Array.isArray(product.codes) ? product.codes : product.code ? [product.code] : [])];
+  renderProductCodesBadges();
   // Establecer el valor del input de nombre
   setInputValue(ID_INPUT_NAME, product.name);
   // Establecer el valor del input de precio
@@ -567,7 +636,7 @@ function renderProducts() {
 function saveProductFromModal() {
   // Obtener los valores de los inputs
   const id = getInputValue(ID_PRODUCT_ID);
-  const codesRaw = getInputValue(ID_INPUT_CODE).split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
+  const codesRaw = [...productModalCodes];
   const name = getInputValue(ID_INPUT_NAME).trim();
   const price = parseFloat(getInputValue(ID_INPUT_PRICE));
   const um = getInputValue(ID_INPUT_UM).trim();
