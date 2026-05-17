@@ -909,7 +909,7 @@ function saveSalesGeneric(inputId) {
   }
 
   // Validar que no sea negativo
-  if (amount <= 0) {
+  if (amount < 0) {
     setInputError(inputId, "La cantidad debe ser mayor a 0");
     return;
   }

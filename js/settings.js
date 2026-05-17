@@ -24,6 +24,16 @@ const ID_APP_LAST_UPDATE_TEXT = "appLastUpdateDateText";
 const ID_BTN_EXPORT_APP_STATE = "btnExportAppState";
 const ID_BTN_IMPORT_APP_STATE = "btnImportAppState";
 const ID_INPUT_IMPORT_APP_STATE = "inputImportAppState";
+const ID_BTN_DELETE_APP_DATA_FULL = "btnDeleteAppDataFull";
+const ID_BTN_RESET_APP_DATA_PRODUCTS = "btnResetAppDataProducts";
+
+/** Claves operativas que se borran en el reset (productos se conservan con stock 0) */
+const OPERATIONAL_STATE_KEYS = [
+  PAGE_MOVEMENTS,
+  PAGE_INVENTORY,
+  PAGE_EXPENSES,
+  PAGE_ACCOUNTING,
+];
 //#endregion
 
 /**
@@ -59,6 +69,66 @@ async function onSettingsPageLoaded() {
   setupExportAppStateListener();
   // Configurar el botón e input para importar estado desde un archivo JSON
   setupImportAppStateListener();
+  // Configurar botones para eliminar / resetear datos de la app
+  setupDeleteAppDataListeners();
+}
+
+/**
+ * Configura los botones de borrado completo y reset con productos en stock 0
+ */
+function setupDeleteAppDataListeners() {
+  const btnFull = document.getElementById(ID_BTN_DELETE_APP_DATA_FULL);
+  if (btnFull) {
+    btnFull.onclick = () =>
+      openConfirmActionModal({
+        title: "Borrado completo",
+        message:
+          "Se eliminarán todos los datos de la app, incluido el catálogo de productos, " +
+          "ajustes y la sesión. Tendrás que iniciar sesión de nuevo. ¿Continuar?",
+        confirmText: "Eliminar todo",
+        confirmButtonClass: "btn-danger",
+        callbackFn: deleteAppDataFull,
+      });
+  }
+
+  const btnReset = document.getElementById(ID_BTN_RESET_APP_DATA_PRODUCTS);
+  if (btnReset) {
+    btnReset.onclick = () =>
+      openConfirmActionModal({
+        title: "Reset de datos operativos",
+        message:
+          "Se borrarán movimientos, inventarios, gastos y contabilidad. " +
+          "Los productos se conservan con stock en 0. Unidades, conceptos y % de salario no se modifican. ¿Continuar?",
+        confirmText: "Resetear",
+        confirmButtonClass: "btn-warning",
+        callbackFn: resetAppDataKeepingProducts,
+      });
+  }
+}
+
+/**
+ * Borrado completo: elimina todo el localStorage y recarga la app
+ */
+function deleteAppDataFull() {
+  localStorage.clear();
+  location.reload();
+}
+
+/**
+ * Reset operativo: productos con stock 0; borra movimientos, inventario, gastos y contabilidad
+ */
+function resetAppDataKeepingProducts() {
+  const products = (getData(PAGE_PRODUCTS) || []).map((p) => ({
+    ...p,
+    quantity: 0,
+  }));
+
+  for (const key of OPERATIONAL_STATE_KEYS) {
+    localStorage.removeItem(key);
+  }
+
+  setData(PAGE_PRODUCTS, products);
+  location.reload();
 }
 
 /**

@@ -2,7 +2,7 @@
 <div class="mb-4" style="margin-top: 70px">
   <div class="d-flex align-items-center gap-2">
     <i class="bi bi-beaker text-primary fs-5"></i>
-    <h6 class="mb-0 fw-semibold">Unidades de Medida</h6>
+    <h6 class="mb-0 fw-semibold">Unidades de Medida (UM)</h6>
   </div>
 
   <!-- Texto informativo -->
@@ -34,7 +34,7 @@
 <div class="mb-4 pt-3 border-top">
   <div class="d-flex align-items-center gap-2">
     <i class="bi bi-cash-coin text-primary fs-5"></i>
-    <h6 class="mb-0 fw-semibold">Conceptos de Gastos</h6>
+    <h6 class="mb-0 fw-semibold">Conceptos de Gastos (CG)</h6>
   </div>
 
   <!-- Texto informativo -->
@@ -66,7 +66,7 @@
 <div class="mb-4 pt-3 border-top">
   <div class="d-flex align-items-center gap-2">
     <i class="bi bi-percent text-primary fs-5"></i>
-    <h6 class="mb-0 fw-semibold">Porcentaje de Salario</h6>
+    <h6 class="mb-0 fw-semibold">Porcentaje de Salario (PS)</h6>
   </div>
 
   <!-- Texto informativo -->
@@ -141,5 +141,38 @@
         <i class="bi bi-cloud-upload fs-5 px-2"></i>
       </span>
     </button>
+    
+    <button class="btn btn-outline-warning rounded-pill d-flex align-items-center w-100 px-1 py-1 mt-3"
+      id="btnResetAppDataProducts" type="button">
+      <span class="px-3 text-warning rounded-pill bg-warning text-dark">
+        <i class="bi bi-box-seam fs-5"></i>
+      </span>
+      <span class="flex-grow-1">
+        Reiniciar app
+        <i class="bi bi-arrow-counterclockwise fs-5 px-2"></i>
+      </span>
+    </button>
+    <!-- Texto informativo -->
+    <div class="text-muted fs-small btn-chip mb-3">
+      <i class="bi bi-info-circle"></i>
+      Reinicio: borra los datos de la app y conserva los productos con stock en 0. 
+      Mantiene UMs, CGs y PS.
+    </div>
+
+    <button class="btn btn-outline-danger rounded-pill d-flex align-items-center w-100 px-1 py-1 mt-3"
+      id="btnDeleteAppDataFull" type="button">
+      <span class="px-3 text-danger rounded-pill bg-danger text-white">
+        <i class="bi bi-database-x fs-5"></i>
+      </span>
+      <span class="flex-grow-1">
+        Eliminar datos  de la app
+        <i class="bi bi-trash3 fs-5 px-2"></i>
+      </span>
+    </button>
+    <!-- Texto informativo -->
+    <div class="text-muted fs-small btn-chip mb-3">
+      <i class="bi bi-info-circle"></i>
+      Borrado: elimina todos los datos y recarga la app.
+    </div>
   </div>
 </div>
